@@ -1,0 +1,3 @@
+/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/stereox.dir
+/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/rebuild_cache.dir
