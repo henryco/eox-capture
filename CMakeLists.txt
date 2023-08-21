@@ -1,9 +1,16 @@
 cmake_minimum_required(VERSION 3.26)
-project(stereox)
+project(stereox VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_COMPILER "clang-16")
 set(CMAKE_CXX_COMPILER "clang++-16")
+
+# Creates the compile_commands.json used by editors for code completion
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Must use GNUInstallDirs to install libraries into correct locations on all platforms:
+include(GNUInstallDirs)
 
 # Find OpenCV package
 find_package(OpenCV REQUIRED)
@@ -19,9 +26,7 @@ pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
 add_executable(${PROJECT_NAME}
         src/main.cpp
         src/calibration/ui_calibration.cpp
-        src/calibration/ui_calibration.h
         src/errors/error_reporter.cpp
-        src/errors/error_reporter.h
 )
 
 # Include directories for the specific target
