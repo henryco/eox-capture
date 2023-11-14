@@ -9,7 +9,7 @@
 #include <gtkmm/box.h>
 #include <opencv2/videoio.hpp>
 
-class UiCalibration : public Gtk::Window {
+class UiCalibration final : public Gtk::Window {
 private:
     cv::VideoCapture cap;
     Gtk::GLArea m_GLArea;

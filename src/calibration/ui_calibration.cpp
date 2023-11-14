@@ -22,7 +22,7 @@ UiCalibration::UiCalibration() {
     m_GLArea.show();
     m_VBox.show();
 
-    cap.open(0);
+    cap.open(2);
     if (!cap.isOpened()) {
         std::cerr << "Failed to open camera\n";
         return;

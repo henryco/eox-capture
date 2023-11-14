@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
 
     try {
 
-        auto app = Gtk::Application::create(
+        const auto app = Gtk::Application::create(
                 argc,
                 argv,
                 "dev.tindersamurai.stereox"

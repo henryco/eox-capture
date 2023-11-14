@@ -1,7 +1,14 @@
 # ninja log v5
 1	222	1692652178952780020	CMakeFiles/stereox.dir/src/errors/error_reporter.cpp.o	13da93d86a445b24
 3	1667	1692652448363834462	CMakeFiles/stereox.dir/src/main.cpp.o	702222c3789cc1b9
-0	40	1692652784490275093	build.ninja	9c4d9e81afb16f6e
-1777	2610	1692652009993330746	cvtest	8e0a052a222580eb
+0	40	1699911580255998666	build.ninja	9c4d9e81afb16f6e
 1667	2466	1692652449159857417	stereox	38f7aad121f4585b
 1	1445	1692652180172808144	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
+3	243	1699996940281565838	CMakeFiles/stereox.dir/src/errors/error_reporter.cpp.o	13da93d86a445b24
+3	1452	1699996941493574313	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
+3	1766	1699996941805576493	CMakeFiles/stereox.dir/src/main.cpp.o	702222c3789cc1b9
+1766	2974	1699996943009584911	stereox	38f7aad121f4585b
+2	1515	1699996962553721674	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
+1515	2381	1699996963417727726	stereox	38f7aad121f4585b
+2	1443	1699996977037823160	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
+1443	2292	1699996977885829106	stereox	38f7aad121f4585b

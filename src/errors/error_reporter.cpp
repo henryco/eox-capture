@@ -49,10 +49,9 @@ void ErrorReporter::dumpError() {
 
 void ErrorReporter::printStackTrace() {
     void* array[10];
-    int size;
 
     // get void*'s for all entries on the stack
-    size = backtrace(array, 10);
+    const int size = backtrace(array, 10);
 
     // print out all the frames
     char** messages = backtrace_symbols(array, size);
