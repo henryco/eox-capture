@@ -27,6 +27,8 @@ add_executable(${PROJECT_NAME}
         src/main.cpp
         src/calibration/ui_calibration.cpp
         src/errors/error_reporter.cpp
+        src/camera/stereo_camera.cpp
+        src/camera/stereo_camera.h
 )
 
 # Include directories for the specific target

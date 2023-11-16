@@ -7,19 +7,24 @@
 #include <gtkmm/glarea.h>
 #include <GL/gl.h>
 #include <gtkmm/box.h>
-#include <opencv2/videoio.hpp>
+
+#include "../camera/stereo_camera.h"
 
 class UiCalibration final : public Gtk::Window {
-private:
-    cv::VideoCapture cap;
-    Gtk::GLArea m_GLArea;
-    Gtk::Box m_VBox;
-    GLuint texture;
 
 public:
-    UiCalibration();
+    UiCalibration() = default;
+    void init();
 
 protected:
     bool on_render(const Glib::RefPtr<Gdk::GLContext> &context);
     bool on_timeout();
+    void initGl();
+
+private:
+    Gtk::GLArea m_GLArea;
+    Gtk::Box m_VBox;
+    GLuint texture;
+
+    StereoCamera camera;
 };

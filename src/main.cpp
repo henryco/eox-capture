@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
         );
 
         UiCalibration calibration;
+        calibration.init();
         calibration.show();
         return app->run(calibration);
 

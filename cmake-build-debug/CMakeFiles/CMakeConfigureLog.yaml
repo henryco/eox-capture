@@ -4,16 +4,16 @@ events:
   -
     kind: "message-v1"
     backtrace:
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineSystem.cmake:211 (message)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineSystem.cmake:204 (message)"
       - "CMakeLists.txt:2 (project)"
     message: |
       The system is: Linux - 5.15.0-88-generic - x86_64
   -
     kind: "message-v1"
     backtrace:
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
       - "CMakeLists.txt:2 (project)"
     message: |
       Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
@@ -28,19 +28,19 @@ events:
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
       
       The CXX compiler identification is Clang, found in:
-        /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/3.27.0/CompilerIdCXX/a.out
+        /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/3.26.4/CompilerIdCXX/a.out
       
   -
     kind: "try_compile-v1"
     backtrace:
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-cb5VRJ"
-      binary: "/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-cb5VRJ"
+      source: "/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-Rn7nBj"
+      binary: "/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-Rn7nBj"
     cmakeVariables:
       CMAKE_CXX_FLAGS: ""
       CMAKE_CXX_FLAGS_DEBUG: "-g"
@@ -49,10 +49,9 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-cb5VRJ'
+        Change Dir: /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-Rn7nBj
         
-        Run Build Command(s): /home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/ninja/linux/x64/ninja -v cmTC_3ebcb
-        [1/2] /usr/bin/c++   -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -c /home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXCompilerABI.cpp
+        Run Build Command(s):/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/ninja/linux/x64/ninja -v cmTC_0bd60 && [1/2] /usr/bin/c++   -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -c /home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp
         clang version 10.0.0-4ubuntu1 
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -66,7 +65,7 @@ events:
         Selected multilib: .;@m64
         Found CUDA installation: /usr/local/cuda, version 7.0
          (in-process)
-         "/usr/lib/llvm-10/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model static -mthread-model posix -mframe-pointer=all -fmath-errno -fno-rounding-math -masm-verbose -mconstructor-aliases -munwind-tables -target-cpu x86-64 -dwarf-column-info -fno-split-dwarf-inlining -debugger-tuning=gdb -v -resource-dir /usr/lib/llvm-10/lib/clang/10.0.0 -dependency-file CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/backward -internal-isystem /usr/local/include -internal-isystem /usr/lib/llvm-10/lib/clang/10.0.0/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-cb5VRJ -ferror-limit 19 -fmessage-length 0 -fgnuc-version=4.2.1 -fobjc-runtime=gcc -fcxx-exceptions -fexceptions -fdiagnostics-show-option -fcolor-diagnostics -faddrsig -o CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXCompilerABI.cpp
+         "/usr/lib/llvm-10/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model static -mthread-model posix -mframe-pointer=all -fmath-errno -fno-rounding-math -masm-verbose -mconstructor-aliases -munwind-tables -target-cpu x86-64 -dwarf-column-info -fno-split-dwarf-inlining -debugger-tuning=gdb -v -resource-dir /usr/lib/llvm-10/lib/clang/10.0.0 -dependency-file CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/backward -internal-isystem /usr/local/include -internal-isystem /usr/lib/llvm-10/lib/clang/10.0.0/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-Rn7nBj -ferror-limit 19 -fmessage-length 0 -fgnuc-version=4.2.1 -fobjc-runtime=gcc -fcxx-exceptions -fexceptions -fdiagnostics-show-option -fcolor-diagnostics -faddrsig -o CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp
         clang -cc1 version 10.0.0 based upon LLVM 10.0.0 default target x86_64-pc-linux-gnu
         ignoring nonexistent directory "/include"
         ignoring duplicate directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9"
@@ -80,7 +79,7 @@ events:
          /usr/include/x86_64-linux-gnu
          /usr/include
         End of search list.
-        [2/2] : && /usr/bin/c++  -v CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_3ebcb   && :
+        [2/2] : && /usr/bin/c++  -v CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_0bd60   && :
         clang version 10.0.0-4ubuntu1 
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -93,14 +92,14 @@ events:
         Candidate multilib: .;@m64
         Selected multilib: .;@m64
         Found CUDA installation: /usr/local/cuda, version 7.0
-         "/usr/bin/ld" --hash-style=both --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_3ebcb /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crt1.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtbegin.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/x86_64-linux-gnu/../../lib64 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../.. -L/usr/lib/llvm-10/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtend.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
+         "/usr/bin/ld" --hash-style=both --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_0bd60 /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crt1.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtbegin.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/x86_64-linux-gnu/../../lib64 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../.. -L/usr/lib/llvm-10/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtend.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o
         
       exitCode: 0
   -
     kind: "message-v1"
     backtrace:
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     message: |
       Parsed CXX implicit include dir info: rv=done
@@ -127,16 +126,15 @@ events:
   -
     kind: "message-v1"
     backtrace:
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
-      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     message: |
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
-        ignore line: [Change Dir: '/home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-cb5VRJ']
+        ignore line: [Change Dir: /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-Rn7nBj]
         ignore line: []
-        ignore line: [Run Build Command(s): /home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/ninja/linux/x64/ninja -v cmTC_3ebcb]
-        ignore line: [[1/2] /usr/bin/c++   -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -c /home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Run Build Command(s):/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/ninja/linux/x64/ninja -v cmTC_0bd60 && [1/2] /usr/bin/c++   -fcolor-diagnostics   -v -MD -MT CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -c /home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [clang version 10.0.0-4ubuntu1 ]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -152,7 +150,7 @@ events:
         ignore line: [@m64]
         ignore line: [Found CUDA installation: /usr/local/cuda  version 7.0]
         ignore line: [ (in-process)]
-        ignore line: [ "/usr/lib/llvm-10/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model static -mthread-model posix -mframe-pointer=all -fmath-errno -fno-rounding-math -masm-verbose -mconstructor-aliases -munwind-tables -target-cpu x86-64 -dwarf-column-info -fno-split-dwarf-inlining -debugger-tuning=gdb -v -resource-dir /usr/lib/llvm-10/lib/clang/10.0.0 -dependency-file CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/backward -internal-isystem /usr/local/include -internal-isystem /usr/lib/llvm-10/lib/clang/10.0.0/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-cb5VRJ -ferror-limit 19 -fmessage-length 0 -fgnuc-version=4.2.1 -fobjc-runtime=gcc -fcxx-exceptions -fexceptions -fdiagnostics-show-option -fcolor-diagnostics -faddrsig -o CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/henryco/.local/share/JetBrains/Toolbox/apps/clion-nova/bin/cmake/linux/x64/share/cmake-3.27/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [ "/usr/lib/llvm-10/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model static -mthread-model posix -mframe-pointer=all -fmath-errno -fno-rounding-math -masm-verbose -mconstructor-aliases -munwind-tables -target-cpu x86-64 -dwarf-column-info -fno-split-dwarf-inlining -debugger-tuning=gdb -v -resource-dir /usr/lib/llvm-10/lib/clang/10.0.0 -dependency-file CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9 -internal-isystem /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/c++/9/backward -internal-isystem /usr/local/include -internal-isystem /usr/lib/llvm-10/lib/clang/10.0.0/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir /home/henryco/Projects/stereox/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-Rn7nBj -ferror-limit 19 -fmessage-length 0 -fgnuc-version=4.2.1 -fobjc-runtime=gcc -fcxx-exceptions -fexceptions -fdiagnostics-show-option -fcolor-diagnostics -faddrsig -o CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -x c++ /home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.26/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [clang -cc1 version 10.0.0 based upon LLVM 10.0.0 default target x86_64-pc-linux-gnu]
         ignore line: [ignoring nonexistent directory "/include"]
         ignore line: [ignoring duplicate directory "/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../include/x86_64-linux-gnu/c++/9"]
@@ -166,7 +164,7 @@ events:
         ignore line: [ /usr/include/x86_64-linux-gnu]
         ignore line: [ /usr/include]
         ignore line: [End of search list.]
-        ignore line: [[2/2] : && /usr/bin/c++  -v CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_3ebcb   && :]
+        ignore line: [[2/2] : && /usr/bin/c++  -v CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_0bd60   && :]
         ignore line: [clang version 10.0.0-4ubuntu1 ]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -181,7 +179,7 @@ events:
         ignore line: [Selected multilib: .]
         ignore line: [@m64]
         ignore line: [Found CUDA installation: /usr/local/cuda  version 7.0]
-        link line: [ "/usr/bin/ld" --hash-style=both --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_3ebcb /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crt1.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtbegin.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/x86_64-linux-gnu/../../lib64 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../.. -L/usr/lib/llvm-10/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtend.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o]
+        link line: [ "/usr/bin/ld" --hash-style=both --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_0bd60 /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crt1.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtbegin.o -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/usr/lib/x86_64-linux-gnu/../../lib64 -L/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../.. -L/usr/lib/llvm-10/bin/../lib -L/lib -L/usr/lib CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtend.o /usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crtn.o]
           arg [/usr/bin/ld] ==> ignore
           arg [--hash-style=both] ==> ignore
           arg [--build-id] ==> ignore
@@ -191,7 +189,7 @@ events:
           arg [-dynamic-linker] ==> ignore
           arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_3ebcb] ==> ignore
+          arg [cmTC_0bd60] ==> ignore
           arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crt1.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crt1.o]
           arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/9/../../../x86_64-linux-gnu/crti.o]
           arg [/usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtbegin.o] ==> obj [/usr/bin/../lib/gcc/x86_64-linux-gnu/9/crtbegin.o]
@@ -207,7 +205,7 @@ events:
           arg [-L/usr/lib/llvm-10/bin/../lib] ==> dir [/usr/lib/llvm-10/bin/../lib]
           arg [-L/lib] ==> dir [/lib]
           arg [-L/usr/lib] ==> dir [/usr/lib]
-          arg [CMakeFiles/cmTC_3ebcb.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [CMakeFiles/cmTC_0bd60.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
           arg [-lstdc++] ==> lib [stdc++]
           arg [-lm] ==> lib [m]
           arg [-lgcc_s] ==> lib [gcc_s]
