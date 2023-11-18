@@ -29,6 +29,8 @@ add_executable(${PROJECT_NAME}
         src/errors/error_reporter.cpp
         src/camera/stereo_camera.cpp
         src/camera/stereo_camera.h
+        src/utils/thread_pool.cpp
+        src/utils/thread_pool.h
 )
 
 # Include directories for the specific target

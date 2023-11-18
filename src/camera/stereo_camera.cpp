@@ -52,7 +52,7 @@ std::vector<cv::Mat> StereoCamera::capture() {
 }
 
 void StereoCamera::open() {
-    for (const auto property : properties) {
+    for (const auto& property : properties) {
         std::cout << "open [" << property.index << "]" << std::endl;
         auto capture = cv::VideoCapture();
         initFromParams(capture, property);

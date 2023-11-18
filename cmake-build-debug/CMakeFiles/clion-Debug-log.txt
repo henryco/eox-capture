@@ -1,15 +1,4 @@
 /home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/henryco/.local/share/JetBrains/Toolbox/apps/clion/bin/ninja/linux/x64/ninja -G Ninja -S /home/henryco/Projects/stereox -B /home/henryco/Projects/stereox/cmake-build-debug
--- The CXX compiler identification is Clang 10.0.0
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/c++ - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Found OpenCV: /usr/local (found version "4.8.0") 
--- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so   
--- Found PkgConfig: /usr/bin/pkg-config (found version "0.29.1") 
--- Checking for module 'gtkmm-3.0'
---   Found gtkmm-3.0, version 3.24.2
--- Configuring done (0.4s)
+-- Configuring done (0.0s)
 -- Generating done (0.0s)
 -- Build files have been written to: /home/henryco/Projects/stereox/cmake-build-debug
