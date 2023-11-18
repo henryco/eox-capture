@@ -7,22 +7,6 @@
 void ThreadPool::worker() {
     while (true) {
 
-        {
-            std::unique_lock<std::mutex> stopLock(mutex);
-            if (stop) {
-                stopLock.unlock();
-                return;
-            }
-
-            flag.wait(stopLock);
-
-            if (stop) {
-                stopLock.unlock();
-                return;
-            }
-            stopLock.unlock();
-        }
-
         while (true) {
             std::unique_lock<std::mutex> stateLock(mutex);
 
@@ -42,6 +26,22 @@ void ThreadPool::worker() {
 
             if (task)
                 task();
+        }
+
+        {
+            std::unique_lock<std::mutex> stopLock(mutex);
+            if (stop) {
+                stopLock.unlock();
+                return;
+            }
+
+            flag.wait(stopLock);
+
+            if (stop) {
+                stopLock.unlock();
+                return;
+            }
+            stopLock.unlock();
         }
     }
 }
