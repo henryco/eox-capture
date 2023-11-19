@@ -9,6 +9,7 @@
 #include <gtkmm/box.h>
 
 #include "../camera/stereo_camera.h"
+#include "../utils/ogl/render/texture_1.h"
 
 class UiCalibration final : public Gtk::Window {
 
@@ -24,7 +25,10 @@ protected:
 private:
     Gtk::GLArea m_GLArea;
     Gtk::Box m_VBox;
-    GLuint texture;
 
+    xogl::Texture1 texture;
     StereoCamera camera;
+
+    unsigned char* image;
+    int i_w, i_h, i_c;
 };

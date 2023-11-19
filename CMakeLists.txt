@@ -29,8 +29,13 @@ add_executable(${PROJECT_NAME}
         src/errors/error_reporter.cpp
         src/camera/stereo_camera.cpp
         src/camera/stereo_camera.h
-        src/utils/thread_pool.cpp
-        src/utils/thread_pool.h
+        src/utils/tp/thread_pool.cpp
+        src/utils/tp/thread_pool.h
+        src/utils/stb_image.h
+        src/utils/ogl/render/texture_1.cpp
+        src/utils/ogl/render/texture_1.h
+        src/utils/ogl/shader/simple_shader.cpp
+        src/utils/ogl/shader/simple_shader.h
 )
 
 # Include directories for the specific target
