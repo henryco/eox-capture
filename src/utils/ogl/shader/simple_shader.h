@@ -15,7 +15,7 @@ namespace xogl {
         std::string vertex;
         std::string fragment;
 
-        GLuint shaderProgram;
+        unsigned int shaderProgram;
 
     public:
         SimpleShader(std::string vertex, std::string fragment);
@@ -24,7 +24,7 @@ namespace xogl {
         void init();
         void cleanup() const;
 
-        [[nodiscard]] GLuint getHandle() const;
+        [[nodiscard]] unsigned int getHandle() const;
     };
 }
 

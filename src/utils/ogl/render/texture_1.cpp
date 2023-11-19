@@ -2,7 +2,6 @@
 // Created by henryco on 11/19/23.
 //
 
-#include <iostream>
 #include "texture_1.h"
 
 namespace xogl {
@@ -29,6 +28,7 @@ namespace xogl {
 
             void main() {
                 FragColor = texture(texture_image, TexCoord);
+                //FragColor = vec4(0.0, 0.0, 1.0, 1.0);
             }
         )glsl";
 
@@ -80,27 +80,32 @@ namespace xogl {
                 1, 2, 3  // second triangle
         };
 
-        { // VBO
-            glGenBuffers(1, &vbo);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-        }
-
-        { // EBO
-            glGenBuffers(1, &ebo);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-        }
-
         { // VAO
             glGenVertexArrays(1, &vao);
+            glGenBuffers(1, &vbo);
+            glGenBuffers(1, &ebo);
+
             glBindVertexArray(vao);
+
+            { // VBO
+                glBindBuffer(GL_ARRAY_BUFFER, vbo);
+                glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+            }
+
+            { // EBO
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+                glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+            }
+
+            // position attribute
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) 0); // NOLINT(*-use-nullptr)
             glEnableVertexAttribArray(0);
 
+            // texture cord attribute
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (3 * sizeof(float)));
             glEnableVertexAttribArray(1);
 
+            // unbind
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
         }
@@ -114,11 +119,7 @@ namespace xogl {
         }
 
         shader.init();
-
-        glUseProgram(shader.getHandle());
-        tex_loc = glGetUniformLocation(shader.getHandle(), "texture_image");
-        std::cout << "Texture location: " << tex_loc << std::endl;
-        glUseProgram(0);
+        tex_loc = glGetUniformLocation(shader.getHandle(), "textureSampler");
     }
 
     void Texture1::setImage(const Image &image) const {
@@ -140,16 +141,15 @@ namespace xogl {
     }
 
     void Texture1::render() {
-        glBindTexture(GL_TEXTURE_2D, texture);
-
         glUseProgram(shader.getHandle());
-        glActiveTexture(0);
         glUniform1i(tex_loc, 0);
-
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // NOLINT(*-use-nullptr)
-        glBindVertexArray(0);
 
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // NOLINT(*-use-nullptr)
+
+        glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glUseProgram(0);
     }

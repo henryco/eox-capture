@@ -60,7 +60,7 @@ namespace xogl {
         glDeleteProgram(shaderProgram);
     }
 
-    GLuint SimpleShader::getHandle() const {
+    unsigned int SimpleShader::getHandle() const {
         return shaderProgram;
     }
 }

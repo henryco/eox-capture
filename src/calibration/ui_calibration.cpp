@@ -23,15 +23,9 @@ void UiCalibration::init() {
     this->add(m_VBox);
 
     m_VBox.pack_start(m_GLArea);
-    m_GLArea.signal_render().connect(
-            sigc::mem_fun(
-                    *this,
-                    &UiCalibration::on_render
-                    ),
-                    false);
 
-    this->initGl();
-
+    m_GLArea.signal_realize().connect(sigc::mem_fun(*this,&UiCalibration::initGl),false);
+    m_GLArea.signal_render().connect(sigc::mem_fun(*this,&UiCalibration::on_render),false);
     Glib::signal_timeout().connect(sigc::mem_fun(*this, &UiCalibration::on_timeout), 1000 / 30);
 
     m_GLArea.show();
@@ -39,18 +33,16 @@ void UiCalibration::init() {
 }
 
 void UiCalibration::initGl() {
+    m_GLArea.make_current();
+    m_GLArea.throw_if_error();
     texture.init();
     texture.setImage(xogl::Image(image, i_w, i_h));
 }
 
 bool UiCalibration::on_render(const Glib::RefPtr<Gdk::GLContext> &context) {
-    std::cout << "render" << std::endl;
-
     glClearColor(.0f, .0f, .0f, .0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
     texture.render();
-
     return true;
 }
 

@@ -26,15 +26,19 @@ namespace xogl {
         [[nodiscard]] GLenum getFormat() const;
     };
 
-    class Texture1 {
+    class Texture1 { // NOLINT(*-pro-type-member-init)
     private:
         static const std::string vertexShaderSource;
         static const std::string fragmentShaderSource;
-        SimpleShader shader = SimpleShader(vertexShaderSource, fragmentShaderSource);
+
+        SimpleShader shader = SimpleShader(
+                vertexShaderSource,
+                fragmentShaderSource);
 
         unsigned int vao;
         unsigned int vbo;
         unsigned int ebo;
+
         GLuint texture;
         GLint tex_loc;
 
