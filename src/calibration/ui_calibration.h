@@ -24,7 +24,8 @@ protected:
 
 private:
     Gtk::GLArea m_GLArea;
-    Gtk::Box m_VBox;
+    Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
+    Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 
     xogl::Texture1 texture;
     StereoCamera camera;
