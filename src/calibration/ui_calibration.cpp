@@ -92,7 +92,8 @@ std::function<bool(const Glib::RefPtr<Gdk::GLContext>&)> UiCalibration::createRe
 }
 
 bool UiCalibration::update() {
-    frames.clear();
+//    frames.clear();
+//    auto result = camera.capture();
 //    frames = std::move(camera.capture());
 // FIXME
 //
