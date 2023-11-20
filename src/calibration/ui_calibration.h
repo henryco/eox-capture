@@ -21,6 +21,7 @@ protected:
     bool on_render(const Glib::RefPtr<Gdk::GLContext> &context);
     bool on_timeout();
     void initGl();
+    void prepare();
 
 private:
     Gtk::GLArea m_GLArea;

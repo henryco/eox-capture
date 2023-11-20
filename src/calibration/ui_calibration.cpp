@@ -10,12 +10,26 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../utils/stb_image.h"
 
-void UiCalibration::init() {
+void UiCalibration::prepare() {
+    const std::vector<int> index = {
+            2, //4
+    };
+    const std::string codec = "YUYV";
+    const int width = 640;
+    const int height = 480;
+    const int fps = 30;
 
-    camera.open({
-        CameraProp(4),
-//        CameraProp(2)
+    std::vector<CameraProp> props(index.size());
+    std::transform(index.begin(), index.end(), props.begin(),
+                   [&](int x) {
+        return CameraProp(x, width, height, codec, fps);
     });
+
+    camera.open(props);
+}
+
+void UiCalibration::init() {
+    prepare();
 
     this->set_title("StereoX++ calibration");
     this->set_default_size(1280, 480);
