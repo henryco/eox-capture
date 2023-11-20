@@ -16,3 +16,5 @@
 2	1922	1700447797289999123	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
 2	2053	1700447797422000161	CMakeFiles/stereox.dir/src/main.cpp.o	702222c3789cc1b9
 2053	3009	1700447798374007646	stereox	cabcf7172706c3a0
+3	1800	1700482809240307404	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
+1800	2960	1700482810400315408	stereox	cabcf7172706c3a0

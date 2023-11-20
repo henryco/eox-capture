@@ -18,7 +18,7 @@ void UiCalibration::init() {
     });
 
     this->set_title("StereoX++ calibration");
-    this->set_default_size(1280, 720);
+    this->set_default_size(1280, 480);
 
     m_GLArea.set_size_request(640, 480);
 
