@@ -25,6 +25,7 @@ void UiCalibration::prepare() {
         return CameraProp(x, width, height, codec, fps);
     });
 
+    m_GLArea.set_size_request(width, height);
     camera.open(props);
 }
 
@@ -33,8 +34,6 @@ void UiCalibration::init() {
 
     this->set_title("StereoX++ calibration");
     this->set_default_size(1280, 480);
-
-    m_GLArea.set_size_request(640, 480);
 
     m_GLArea.signal_realize().connect(sigc::mem_fun(*this,&UiCalibration::initGl),false);
     m_GLArea.signal_render().connect(sigc::mem_fun(*this,&UiCalibration::on_render),false);
