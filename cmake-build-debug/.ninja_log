@@ -92,3 +92,9 @@
 1893	2735	1700520525618243809	stereox	cabcf7172706c3a0
 3	1700	1700520533754307099	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
 1700	2555	1700520534606313726	stereox	cabcf7172706c3a0
+2	219	1700520702647619404	CMakeFiles/stereox.dir/src/utils/ogl/render/texture_1.cpp.o	13b05dc5db3093ee
+2	241	1700520702671619590	CMakeFiles/stereox.dir/src/utils/ogl/shader/simple_shader.cpp.o	9932e3fb17fe08f8
+1	779	1700520703207623750	CMakeFiles/stereox.dir/src/camera/stereo_camera.cpp.o	6e6b2f5c39e355f6
+1	1825	1700520704247631823	CMakeFiles/stereox.dir/src/main.cpp.o	702222c3789cc1b9
+1	1827	1700520704251631853	CMakeFiles/stereox.dir/src/calibration/ui_calibration.cpp.o	a56356bf7509262f
+1827	2643	1700520705063638157	stereox	cabcf7172706c3a0

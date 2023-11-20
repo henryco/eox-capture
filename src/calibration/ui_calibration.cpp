@@ -29,8 +29,8 @@ void UiCalibration::prepareCamera() {
         auto prop = CameraProp(i, width, height, codec, fps);
 
         auto area = std::make_unique<Gtk::GLArea>();
-        area->signal_realize().connect(createInitFunc(idx));
-        area->signal_render().connect(createRenderFunc(idx));
+        area->signal_realize().connect(createInitFunc(idx), false);
+        area->signal_render().connect(createRenderFunc(idx), false);
         area->set_size_request(prop.width, prop.height);
 
         h_box.pack_end(*area, Gtk::PACK_SHRINK);
