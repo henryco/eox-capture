@@ -52,8 +52,10 @@ public:
 
     void open(std::vector<CameraProp> props);
 
+    [[nodiscard]] const std::vector<CameraProp>& getProperties() const;
+
 private:
-    std::vector<cv::VideoCapture> captures;
+    std::vector<std::unique_ptr<cv::VideoCapture>> captures;
     std::vector<CameraProp> properties;
 };
 

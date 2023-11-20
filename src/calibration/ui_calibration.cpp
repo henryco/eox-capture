@@ -10,7 +10,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../utils/stb_image.h"
 
-void UiCalibration::prepare() {
+void UiCalibration::prepareCamera() {
     const std::vector<int> index = {
             2, //4
     };
@@ -19,55 +19,83 @@ void UiCalibration::prepare() {
     const int height = 480;
     const int fps = 30;
 
-    std::vector<CameraProp> props(index.size());
-    std::transform(index.begin(), index.end(), props.begin(),
-                   [&](int x) {
-        return CameraProp(x, width, height, codec, fps);
-    });
+    std::vector<CameraProp> props;
+    props.reserve(index.size());
+    textures.reserve(index.size());
+    glAreas.reserve(index.size());
 
-    m_GLArea.set_size_request(width, height);
+    int idx = 0;
+    for (int i : index) {
+        auto prop = CameraProp(i, width, height, codec, fps);
+
+        auto area = std::make_unique<Gtk::GLArea>();
+        area->signal_realize().connect(createInitFunc(idx));
+        area->signal_render().connect(createRenderFunc(idx));
+        area->set_size_request(prop.width, prop.height);
+
+        h_box.pack_end(*area, Gtk::PACK_SHRINK);
+        glAreas.push_back(std::move(area));
+        textures.push_back(std::make_unique<xogl::Texture1>());
+        props.push_back(prop);
+    }
+
     camera.open(props);
 }
 
+
 void UiCalibration::init() {
-    prepare();
+    prepareCamera();
 
     this->set_title("StereoX++ calibration");
     this->set_default_size(1280, 480);
-
-    m_GLArea.signal_realize().connect(sigc::mem_fun(*this,&UiCalibration::initGl),false);
-    m_GLArea.signal_render().connect(sigc::mem_fun(*this,&UiCalibration::on_render),false);
-    Glib::signal_timeout().connect(sigc::mem_fun(*this, &UiCalibration::on_timeout), 1000 / 30);
-
-    h_box.pack_start(m_GLArea, Gtk::PACK_SHRINK);
-    v_box.pack_start(h_box, Gtk::PACK_SHRINK);
-
     this->add(v_box);
+
+//    v_box.pack_end(h_box, Gtk::PACK_SHRINK);
+    testArea.set_size_request(640, 480);
+    v_box.pack_end(testArea);
+
+    Glib::signal_timeout().connect(sigc::mem_fun(*this, &UiCalibration::update), 1000 / 30);
     show_all_children();
 }
 
-void UiCalibration::initGl() {
-    m_GLArea.make_current();
-    m_GLArea.throw_if_error();
-    texture.init();
+
+std::function<void()> UiCalibration::createInitFunc(const int num) {
+    return [num, this]() {
+        auto& area = glAreas[num];
+        area->make_current();
+        area->throw_if_error();
+        textures[num]->init();
+    };
 }
 
-bool UiCalibration::on_render(const Glib::RefPtr<Gdk::GLContext> &context) {
-    auto frames = camera.capture();
-    auto frame = frames[0];
-    texture.setImage(xogl::Image(frame.data, frame.cols, frame.rows, GL_BGR));
+std::function<bool(const Glib::RefPtr<Gdk::GLContext>&)> UiCalibration::createRenderFunc(const int num) {
+    return [num, this](const Glib::RefPtr<Gdk::GLContext>& context) -> bool {
 
-    glClearColor(.0f, .0f, .0f, .0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    texture.render();
+        std::cout << "rendering: " << num << std::endl;
+
+        auto& frame = frames[num];
+        auto& texture = textures[num];
+
+        glClearColor(.0f, .0f, .0f, .0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        texture->setImage(xogl::Image(frame.data, frame.cols, frame.rows, GL_BGR));
+        texture->render();
+
+        return true;
+    };
+}
+
+bool UiCalibration::update() {
+    frames.clear();
+    frames = std::move(camera.capture());
+
+    // TODO: some logic on frames here
+
+    for (auto &area: glAreas) {
+        area->queue_render();
+    }
     return true;
 }
-
-bool UiCalibration::on_timeout() {
-    m_GLArea.queue_render();
-    return true;
-}
-
-
 
 

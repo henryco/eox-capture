@@ -34,16 +34,16 @@ StereoCamera::StereoCamera(StereoCamera&& other) noexcept
 std::vector<cv::Mat> StereoCamera::capture() {
     std::vector<cv::Mat> frames;
 
-    for (auto capture : captures) {
+    for (auto& capture : captures) {
         std::cout << "grab" << std::endl;
-        capture.grab();
+        capture->grab();
     }
 
-    for (auto capture : captures) {
+    for (auto& capture : captures) {
         std::cout << "capture" << std::endl;
 
         cv::Mat frame;
-        capture.retrieve(frame);
+        capture->retrieve(frame);
         if (frame.empty())
             throw std::runtime_error("Frame is empty");
         frames.push_back(frame);
@@ -54,11 +54,11 @@ std::vector<cv::Mat> StereoCamera::capture() {
 void StereoCamera::open() {
     for (const auto& property : properties) {
         std::cout << "open [" << property.index << "]" << std::endl;
-        auto capture = cv::VideoCapture();
-        initFromParams(capture, property);
-        if (!capture.isOpened())
+        auto capture = std::make_unique<cv::VideoCapture>();
+        initFromParams(*capture, property);
+        if (!capture->isOpened())
             throw std::runtime_error("Failed to open camera: " + std::to_string(property.index));
-        captures.push_back(capture);
+        captures.push_back(std::move(capture));
     }
     std::cout << "opened: " <<  captures.size() << std::endl;
 }
@@ -69,11 +69,15 @@ void StereoCamera::open(std::vector<CameraProp> props) {
 }
 
 void StereoCamera::release() {
-    for (auto capture : captures)
-        capture.release();
+    for (auto& capture : captures)
+        capture->release();
     captures.clear();
 }
 
 StereoCamera::~StereoCamera() {
     release();
+}
+
+const std::vector<CameraProp>& StereoCamera::getProperties() const {
+    return properties;
 }

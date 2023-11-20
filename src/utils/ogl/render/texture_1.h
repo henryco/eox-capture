@@ -44,7 +44,11 @@ namespace xogl {
 
     public:
         Texture1() = default;
+
+        Texture1(Texture1 &&ref) noexcept ;
+
         ~Texture1();
+
         void init();
         void render();
         void render(Image image);

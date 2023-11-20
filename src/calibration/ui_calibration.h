@@ -18,16 +18,20 @@ public:
     void init();
 
 protected:
-    bool on_render(const Glib::RefPtr<Gdk::GLContext> &context);
-    bool on_timeout();
-    void initGl();
-    void prepare();
+    void prepareCamera();
+    bool update();
+
+    std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> createRenderFunc(int num);
+    std::function<void()> createInitFunc(int num);
 
 private:
-    Gtk::GLArea m_GLArea;
+    std::vector<std::unique_ptr<xogl::Texture1>> textures;
+    std::vector<std::unique_ptr<Gtk::GLArea>> glAreas;
+    std::vector<cv::Mat> frames;
+
     Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
     Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 
-    xogl::Texture1 texture;
     StereoCamera camera;
+    Gtk::GLArea testArea;
 };

@@ -63,4 +63,9 @@ namespace xogl {
     unsigned int SimpleShader::getHandle() const {
         return shaderProgram;
     }
+
+    SimpleShader::SimpleShader(SimpleShader &&ref) noexcept:
+    vertex(std::move(ref.vertex)),
+    fragment(std::move(ref.fragment)),
+    shaderProgram(ref.shaderProgram) {}
 }
