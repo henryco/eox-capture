@@ -29,7 +29,4 @@ private:
 
     xogl::Texture1 texture;
     StereoCamera camera;
-
-    unsigned char* image;
-    int i_w, i_h, i_c;
 };
