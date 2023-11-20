@@ -50,9 +50,7 @@ void UiCalibration::init() {
     this->set_default_size(1280, 480);
     this->add(v_box);
 
-//    v_box.pack_end(h_box, Gtk::PACK_SHRINK);
-    testArea.set_size_request(640, 480);
-    v_box.pack_end(testArea);
+    v_box.pack_end(h_box, Gtk::PACK_SHRINK);
 
     Glib::signal_timeout().connect(sigc::mem_fun(*this, &UiCalibration::update), 1000 / 30);
     show_all_children();
@@ -73,12 +71,19 @@ std::function<bool(const Glib::RefPtr<Gdk::GLContext>&)> UiCalibration::createRe
 
         std::cout << "rendering: " << num << std::endl;
 
-        auto& frame = frames[num];
         auto& texture = textures[num];
+        if (texture == nullptr) {
+            return false;
+        }
+
+        if (frames.empty()) {
+            return true;
+        }
 
         glClearColor(.0f, .0f, .0f, .0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        auto& frame = frames[num];
         texture->setImage(xogl::Image(frame.data, frame.cols, frame.rows, GL_BGR));
         texture->render();
 
@@ -88,13 +93,16 @@ std::function<bool(const Glib::RefPtr<Gdk::GLContext>&)> UiCalibration::createRe
 
 bool UiCalibration::update() {
     frames.clear();
-    frames = std::move(camera.capture());
-
-    // TODO: some logic on frames here
-
+//    frames = std::move(camera.capture());
+// FIXME
+//
+//    // TODO: some logic on frames here
+//
     for (auto &area: glAreas) {
         area->queue_render();
     }
+
+    std::cout << "updated" << std::endl;
     return true;
 }
 

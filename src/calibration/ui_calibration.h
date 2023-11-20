@@ -33,5 +33,4 @@ private:
     Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 
     StereoCamera camera;
-    Gtk::GLArea testArea;
 };
