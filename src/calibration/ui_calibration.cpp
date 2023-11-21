@@ -71,12 +71,6 @@ std::function<bool(const Glib::RefPtr<Gdk::GLContext>&)> UiCalibration::createRe
 
         std::cout << "rendering: " << num << std::endl;
 
-//        auto result = camera.capture();
-//        frames.clear();
-//        for (auto &item: result) {
-//            frames.push_back(item);
-//        }
-
         auto& texture = textures[num];
         if (texture == nullptr) {
             return true;
