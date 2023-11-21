@@ -18,6 +18,7 @@ private:
     std::vector<std::unique_ptr<xogl::Texture1>> textures;
     std::vector<std::unique_ptr<Gtk::GLArea>> glAreas;
     std::vector<std::shared_ptr<unsigned char>> frames;
+    std::vector<bool> initialized;
 
     GLenum format = GL_RGB;
     int width = 0;

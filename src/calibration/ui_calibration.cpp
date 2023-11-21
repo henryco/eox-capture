@@ -41,7 +41,9 @@ void UiCalibration::prepareCamera() {
             if (min_h == 0 || prop.height < min_h)
                 min_h = prop.height;
         }
+
         glImage.init((int) index.size(), min_w, min_h, GL_BGR);
+        deltaLoop = std::make_unique<sex::DeltaLoop>([this](float delta) { update(delta); }, fps);
     }
 
     camera.open(props);
@@ -55,19 +57,15 @@ void UiCalibration::init() {
     this->set_default_size(1280, 480);
     this->add(glImage);
 
-    Glib::signal_timeout().connect(sigc::mem_fun(*this, &UiCalibration::update), 1000 / 30);
     dispatcher.connect(sigc::mem_fun(*this, &UiCalibration::on_dispatcher_signal));
     show_all_children();
 }
 
+void UiCalibration::update(float delta) {
+    std::cout << "LOOP: " << delta << "\n" << std::endl;
 
-bool UiCalibration::update() {
-    glImage.update();
-    return true;
-}
+    // TODO SOME LOGIC
 
-void UiCalibration::loop() {
-    // TODO
     dispatcher.emit();
 }
 

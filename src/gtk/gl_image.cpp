@@ -16,6 +16,11 @@ namespace xgtk {
     std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> GLImage::renderFunc(int num) {
         return [num, this](const Glib::RefPtr<Gdk::GLContext>& context) -> bool {
 
+            if (initialized.empty() || !initialized[num]) {
+                std::cout << "GLImage [" << num << "] is not initialized yet!" << std::endl;
+                return true;
+            }
+
             std::cout << "rendering: " << num << std::endl;
 
             auto& texture = textures[num];
@@ -42,6 +47,7 @@ namespace xgtk {
             area->make_current();
             area->throw_if_error();
             textures[num]->init();
+            initialized[num] = true;
         };
     }
 
@@ -50,6 +56,7 @@ namespace xgtk {
         this->height = _height;
         this->format = _format;
 
+        initialized.reserve(_number);
         textures.reserve(_number);
         glAreas.reserve(_number);
         frames.reserve(_number);
@@ -64,6 +71,7 @@ namespace xgtk {
             h_box.pack_end(*area, Gtk::PACK_SHRINK);
             glAreas.push_back(std::move(area));
             textures.push_back(std::make_unique<xogl::Texture1>());
+            initialized.push_back(false);
         }
 
         set_size_request(_number * _width, height);

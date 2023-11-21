@@ -10,8 +10,9 @@
 #include <glibmm/dispatcher.h>
 
 #include "../camera/stereo_camera.h"
-#include "../utils/ogl/render/texture_1.h"
-#include "../utils/gtk/gl_image.h"
+#include "../ogl/render/texture_1.h"
+#include "../gtk/gl_image.h"
+#include "../utils/loop/delta_loop.h"
 
 class UiCalibration final : public Gtk::Window {
 
@@ -20,16 +21,15 @@ public:
     void init();
 
 protected:
-    void prepareCamera();
-    bool update();
-
     void on_dispatcher_signal();
-    void loop();
+    void prepareCamera();
+
+    void update(float delta);
 
 private:
-    xgtk::GLImage glImage;
+    std::unique_ptr<sex::DeltaLoop> deltaLoop;
     std::vector<cv::Mat> frames;
     Glib::Dispatcher dispatcher;
-
+    xgtk::GLImage glImage;
     StereoCamera camera;
 };

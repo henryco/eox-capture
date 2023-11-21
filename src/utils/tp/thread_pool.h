@@ -33,7 +33,7 @@ private:
     std::queue<std::thread> threads;
     std::condition_variable flag;
     std::mutex mutex;
-    bool stop = false;
+    std::atomic<bool> stop = false;
 
     void worker();
 
