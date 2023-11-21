@@ -20,20 +20,22 @@ private:
     std::vector<std::shared_ptr<unsigned char>> frames;
 
     GLenum format = GL_RGB;
-    int width;
-    int height;
+    int width = 0;
+    int height = 0;
 
 protected:
     std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> renderFunc(int num);
     std::function<void()> initFunc(int num);
 
-    void init(int number, int width, int height, GLenum format = GL_RGB);
-
 public:
     GLImage() = default;
     ~GLImage() override;
 
+    void setFrames(const std::vector<std::shared_ptr<unsigned char>>& _frames);
+    void init(int number, int width, int height, GLenum format = GL_RGB);
+    void update(const std::vector<std::shared_ptr<unsigned char>>& _frames);
     void update();
+
 };
 
 } // xgtk

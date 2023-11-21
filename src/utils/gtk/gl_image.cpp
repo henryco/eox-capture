@@ -34,7 +34,6 @@ namespace xgtk {
 
             return true;
         };
-
     }
 
     std::function<void()> GLImage::initFunc(int num) {
@@ -53,6 +52,7 @@ namespace xgtk {
 
         textures.reserve(_number);
         glAreas.reserve(_number);
+        frames.reserve(_number);
 
         for (int i = 0; i < _number; ++i) {
             auto area = std::make_unique<Gtk::GLArea>();
@@ -66,9 +66,9 @@ namespace xgtk {
             textures.push_back(std::make_unique<xogl::Texture1>());
         }
 
+        set_size_request(_number * _width, height);
         set_orientation(Gtk::ORIENTATION_VERTICAL);
         pack_end(h_box, Gtk::PACK_SHRINK);
-        show_all_children();
     }
 
     void GLImage::update() {
@@ -78,5 +78,16 @@ namespace xgtk {
         std::cout << "updated" << std::endl;
     }
 
+    void GLImage::setFrames(const std::vector<std::shared_ptr<unsigned char>>& _frames) {
+        frames.clear();
+        for (const auto &item: _frames) {
+            frames.push_back(item);
+        }
+    }
+
+    void GLImage::update(const std::vector<std::shared_ptr<unsigned char>> &_frames) {
+        setFrames(_frames);
+        update();
+    }
 
 } // xgtk

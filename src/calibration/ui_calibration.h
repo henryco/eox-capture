@@ -11,6 +11,7 @@
 
 #include "../camera/stereo_camera.h"
 #include "../utils/ogl/render/texture_1.h"
+#include "../utils/gtk/gl_image.h"
 
 class UiCalibration final : public Gtk::Window {
 
@@ -25,17 +26,9 @@ protected:
     void on_dispatcher_signal();
     void loop();
 
-    std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> createRenderFunc(int num);
-    std::function<void()> createInitFunc(int num);
-
 private:
-    std::vector<std::unique_ptr<xogl::Texture1>> textures;
-    std::vector<std::unique_ptr<Gtk::GLArea>> glAreas;
+    xgtk::GLImage glImage;
     std::vector<cv::Mat> frames;
-
-    Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
-    Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
-
     Glib::Dispatcher dispatcher;
 
     StereoCamera camera;
