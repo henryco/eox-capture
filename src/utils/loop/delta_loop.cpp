@@ -28,8 +28,12 @@ namespace sex {
     }
 
     void DeltaLoop::worker() {
-        auto loop_start = std::chrono::high_resolution_clock::now();
 
+        // fine tuned magic constants
+        const std::chrono::nanoseconds approximate(500000); // 0.5ms
+        const std::chrono::nanoseconds margin = approximate / 10;
+
+        auto loop_start = std::chrono::high_resolution_clock::now();
         while (true) {
             const auto start = std::chrono::high_resolution_clock::now();
 
@@ -42,10 +46,21 @@ namespace sex {
                 lock.unlock();
             }
 
-            const auto loop_end = std::chrono::high_resolution_clock::now();
-            const auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
+            auto loop_end = std::chrono::high_resolution_clock::now();
+            auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
 
-            std::cout << "should: " << ((float) frame.count()) / 1000000 << std::endl;
+            // sort of busy waiting for the latest fractions of millisecond for greater precision
+            while (delta < frame) {
+                const auto diff = frame - delta;
+
+                // fine tuned magic constants
+                if (diff > margin)
+                    std::this_thread::sleep_for(std::chrono::nanoseconds(10000));
+
+                loop_end = std::chrono::high_resolution_clock::now();
+                delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
+            }
+
             runnable(((float) delta.count()) / 1000000);
 
             loop_start = std::chrono::high_resolution_clock::now();
@@ -66,7 +81,7 @@ namespace sex {
                     continue;
                 }
 
-                flag.wait_for(lock, sleep);
+                flag.wait_for(lock, sleep - approximate);
                 lock.unlock();
             }
         }
