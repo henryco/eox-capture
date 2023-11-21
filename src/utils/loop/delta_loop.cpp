@@ -30,7 +30,7 @@ namespace sex {
     void DeltaLoop::worker() {
 
         auto loop_pre = std::chrono::high_resolution_clock::now();
-        auto loop_start = std::chrono::high_resolution_clock::now();
+        auto loop_post = std::chrono::high_resolution_clock::now();
         auto drift = std::chrono::nanoseconds(0);
 
         while (true) {
@@ -46,7 +46,7 @@ namespace sex {
             }
 
             auto loop_end = std::chrono::high_resolution_clock::now();
-            auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
+            auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_post);
             auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_pre);
             auto late = duration - frame;
 
@@ -54,7 +54,10 @@ namespace sex {
 
             runnable(((float) delta.count()) / 1000000, ((float) late.count()) / 1000000);
 
-            loop_start = std::chrono::high_resolution_clock::now();
+            loop_post = std::chrono::high_resolution_clock::now();
+
+            if (late.count() > 0)
+                continue;
 
             {
                 std::unique_lock<std::mutex> lock(mutex);
