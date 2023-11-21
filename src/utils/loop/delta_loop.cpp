@@ -53,9 +53,20 @@ namespace sex {
             while (delta < frame) {
                 const auto diff = frame - delta;
 
-                // fine tuned magic constants
-                if (diff > margin)
-                    std::this_thread::sleep_for(std::chrono::nanoseconds(10000));
+                {
+                    std::unique_lock<std::mutex> lock(mutex);
+
+                    // fine tuned magic constants
+                    if (diff > margin) {
+                        flag.wait_for(lock, std::chrono::nanoseconds(10000));
+                    }
+
+                    if (!alive) {
+                        lock.unlock();
+                        return;
+                    }
+                    lock.unlock();
+                }
 
                 loop_end = std::chrono::high_resolution_clock::now();
                 delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
