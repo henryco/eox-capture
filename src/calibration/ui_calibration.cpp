@@ -46,13 +46,13 @@ void UiCalibration::prepareCamera() {
 void UiCalibration::init() {
     prepareCamera();
 
+    v_box.pack_end(h_box, Gtk::PACK_SHRINK);
     this->set_title("StereoX++ calibration");
     this->set_default_size(1280, 480);
     this->add(v_box);
 
-    v_box.pack_end(h_box, Gtk::PACK_SHRINK);
-
     Glib::signal_timeout().connect(sigc::mem_fun(*this, &UiCalibration::update), 1000 / 30);
+    dispatcher.connect(sigc::mem_fun(*this, &UiCalibration::on_dispatcher_signal));
     show_all_children();
 }
 
@@ -71,9 +71,15 @@ std::function<bool(const Glib::RefPtr<Gdk::GLContext>&)> UiCalibration::createRe
 
         std::cout << "rendering: " << num << std::endl;
 
+//        auto result = camera.capture();
+//        frames.clear();
+//        for (auto &item: result) {
+//            frames.push_back(item);
+//        }
+
         auto& texture = textures[num];
         if (texture == nullptr) {
-            return false;
+            return true;
         }
 
         if (frames.empty()) {
@@ -92,19 +98,22 @@ std::function<bool(const Glib::RefPtr<Gdk::GLContext>&)> UiCalibration::createRe
 }
 
 bool UiCalibration::update() {
-//    frames.clear();
-//    auto result = camera.capture();
-//    frames = std::move(camera.capture());
-// FIXME
-//
-//    // TODO: some logic on frames here
-//
     for (auto &area: glAreas) {
         area->queue_render();
     }
-
     std::cout << "updated" << std::endl;
     return true;
+}
+
+void UiCalibration::loop() {
+    // TODO
+    dispatcher.emit();
+}
+
+void UiCalibration::on_dispatcher_signal() {
+    for (auto &area: glAreas) {
+        area->queue_render();
+    }
 }
 
 

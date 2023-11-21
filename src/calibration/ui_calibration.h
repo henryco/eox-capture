@@ -7,6 +7,7 @@
 #include <gtkmm/glarea.h>
 #include <GL/gl.h>
 #include <gtkmm/box.h>
+#include <glibmm/dispatcher.h>
 
 #include "../camera/stereo_camera.h"
 #include "../utils/ogl/render/texture_1.h"
@@ -21,6 +22,9 @@ protected:
     void prepareCamera();
     bool update();
 
+    void on_dispatcher_signal();
+    void loop();
+
     std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> createRenderFunc(int num);
     std::function<void()> createInitFunc(int num);
 
@@ -31,6 +35,8 @@ private:
 
     Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
     Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+
+    Glib::Dispatcher dispatcher;
 
     StereoCamera camera;
 };

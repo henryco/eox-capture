@@ -59,7 +59,7 @@ private:
 
         {
             std::unique_lock<std::mutex> lock(mutex);
-            tasks.push(lambda);
+            tasks.push(std::move(lambda));
             lock.unlock();
         }
 
