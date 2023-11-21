@@ -43,7 +43,9 @@ void UiCalibration::prepareCamera() {
         }
 
         glImage.init((int) index.size(), min_w, min_h, GL_BGR);
-        deltaLoop = std::make_unique<sex::DeltaLoop>([this](float delta) { update(delta); }, min_fps);
+        deltaLoop = std::make_unique<sex::DeltaLoop>(
+                [this](float d, float l) { update(d, l); },
+                min_fps);
     }
 
     camera.open(props);
@@ -61,8 +63,19 @@ void UiCalibration::init() {
     show_all_children();
 }
 
-void UiCalibration::update(float delta) {
-    std::cout << "LOOP: " << delta << "\n" << std::endl;
+std::vector<std::shared_ptr<cv::Mat>> steal(std::vector<cv::Mat> &captured) {
+    std::vector<std::shared_ptr<cv::Mat>> images;
+    images.reserve(captured.size());
+    for (auto& mat: captured)
+        images.push_back(std::make_shared<cv::Mat>(std::move(mat)));
+    return images;
+}
+
+void UiCalibration::update(float delta, float late) {
+    std::cout << "LOOP: " << delta << " LATE: " << late << "\n" << std::endl;
+
+    auto captured = camera.capture();
+//    auto images = steal(captured);
 
     // TODO SOME LOGIC
 

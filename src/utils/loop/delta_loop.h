@@ -17,7 +17,7 @@ namespace sex {
     private:
         const std::chrono::nanoseconds frame;
         std::unique_ptr<std::thread> thread;
-        std::function<void(float)> runnable;
+        std::function<void(float, float)> runnable;
 
         std::atomic<bool> alive = false;
         std::condition_variable flag;
@@ -26,7 +26,7 @@ namespace sex {
     public:
         explicit DeltaLoop(int fps = 60);
 
-        explicit DeltaLoop(std::function<void(float)> runnable,  int fps = 60);
+        explicit DeltaLoop(std::function<void(float, float)> runnable,  int fps = 60);
 
         ~DeltaLoop();
 
@@ -34,7 +34,7 @@ namespace sex {
 
         void stop();
 
-        void setFunc(std::function<void(float)> _runnable);
+        void setFunc(std::function<void(float, float)> _runnable);
 
     protected:
         void worker();

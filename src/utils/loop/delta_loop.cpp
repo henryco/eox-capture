@@ -13,7 +13,7 @@ namespace sex {
     DeltaLoop::DeltaLoop(const int fps)
     : frame(((long long) ((long long) 1000000000) / fps)) {}
 
-    DeltaLoop::DeltaLoop(std::function<void(float)> runnable, const int fps)
+    DeltaLoop::DeltaLoop(std::function<void(float, float)> runnable, const int fps)
     : DeltaLoop(fps) {
         this->runnable = std::move(runnable);
         start();
@@ -23,16 +23,13 @@ namespace sex {
         stop();
     }
 
-    void DeltaLoop::setFunc(std::function<void(float)> _runnable) {
+    void DeltaLoop::setFunc(std::function<void(float, float)> _runnable) {
         this->runnable = std::move(_runnable);
     }
 
     void DeltaLoop::worker() {
 
-        // fine tuned magic constants
-        const std::chrono::nanoseconds approximate(500000); // 0.5ms
-        const std::chrono::nanoseconds margin = approximate / 10;
-
+        auto loop_pre = std::chrono::high_resolution_clock::now();
         auto loop_start = std::chrono::high_resolution_clock::now();
         auto drift = std::chrono::nanoseconds(0);
 
@@ -50,34 +47,12 @@ namespace sex {
 
             auto loop_end = std::chrono::high_resolution_clock::now();
             auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
+            auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_pre);
+            auto late = duration - frame;
 
+            loop_pre = std::chrono::high_resolution_clock::now();
 
-            // sort of busy waiting for the latest fractions of millisecond for greater precision
-            // This code is working but is not efficient int terms of CPU
-
-//            while (delta < frame) {
-//                const auto diff = frame - delta;
-//
-//                {
-//                    std::unique_lock<std::mutex> lock(mutex);
-//
-//                    // fine tuned magic constants
-//                    if (diff > margin) {
-//                        flag.wait_for(lock, std::chrono::nanoseconds(50000));
-//                    }
-//
-//                    if (!alive) {
-//                        lock.unlock();
-//                        return;
-//                    }
-//                    lock.unlock();
-//                }
-//
-//                loop_end = std::chrono::high_resolution_clock::now();
-//                delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
-//            }
-
-            runnable(((float) delta.count()) / 1000000);
+            runnable(((float) delta.count()) / 1000000, ((float) late.count()) / 1000000);
 
             loop_start = std::chrono::high_resolution_clock::now();
 
@@ -92,20 +67,17 @@ namespace sex {
                 const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 const auto sleep = std::chrono::duration_cast<std::chrono::nanoseconds>(frame - elapsed);
                 const auto should = sleep + std::chrono::high_resolution_clock::now();
+                const auto total = sleep + drift;
 
-                if (sleep.count() < 0) {
+                if (total.count() < 0) {
                     lock.unlock();
                     continue;
                 }
 
-//                flag.wait_for(lock, sleep - approximate);
-                flag.wait_for(lock, sleep + drift);
+                flag.wait_for(lock, total);
                 lock.unlock();
 
-                drift += should
-                        - (std::chrono::high_resolution_clock::now())
-//                        + std::chrono::nanoseconds(5000) // yet another magic number (small overshooting time)
-                        ;
+                drift += should - (std::chrono::high_resolution_clock::now());
             }
         }
     }
