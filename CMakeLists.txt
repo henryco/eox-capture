@@ -36,6 +36,8 @@ add_executable(${PROJECT_NAME}
         src/utils/ogl/render/texture_1.h
         src/utils/ogl/shader/simple_shader.cpp
         src/utils/ogl/shader/simple_shader.h
+        src/utils/gtk/gl_image.cpp
+        src/utils/gtk/gl_image.h
 )
 
 # Include directories for the specific target
