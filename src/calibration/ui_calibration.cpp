@@ -43,7 +43,7 @@ void UiCalibration::prepareCamera() {
         }
 
         glImage.init((int) index.size(), min_w, min_h, GL_BGR);
-        deltaLoop = std::make_unique<sex::DeltaLoop>([this](float delta) { update(delta); }, fps);
+        deltaLoop = std::make_unique<sex::DeltaLoop>([this](float delta) { update(delta); }, min_fps);
     }
 
     camera.open(props);

@@ -34,6 +34,8 @@ namespace sex {
         const std::chrono::nanoseconds margin = approximate / 10;
 
         auto loop_start = std::chrono::high_resolution_clock::now();
+        auto drift = std::chrono::nanoseconds(0);
+
         while (true) {
             const auto start = std::chrono::high_resolution_clock::now();
 
@@ -49,28 +51,31 @@ namespace sex {
             auto loop_end = std::chrono::high_resolution_clock::now();
             auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
 
+
             // sort of busy waiting for the latest fractions of millisecond for greater precision
-            while (delta < frame) {
-                const auto diff = frame - delta;
+            // This code is working but is not efficient int terms of CPU
 
-                {
-                    std::unique_lock<std::mutex> lock(mutex);
-
-                    // fine tuned magic constants
-                    if (diff > margin) {
-                        flag.wait_for(lock, std::chrono::nanoseconds(10000));
-                    }
-
-                    if (!alive) {
-                        lock.unlock();
-                        return;
-                    }
-                    lock.unlock();
-                }
-
-                loop_end = std::chrono::high_resolution_clock::now();
-                delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
-            }
+//            while (delta < frame) {
+//                const auto diff = frame - delta;
+//
+//                {
+//                    std::unique_lock<std::mutex> lock(mutex);
+//
+//                    // fine tuned magic constants
+//                    if (diff > margin) {
+//                        flag.wait_for(lock, std::chrono::nanoseconds(50000));
+//                    }
+//
+//                    if (!alive) {
+//                        lock.unlock();
+//                        return;
+//                    }
+//                    lock.unlock();
+//                }
+//
+//                loop_end = std::chrono::high_resolution_clock::now();
+//                delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_start);
+//            }
 
             runnable(((float) delta.count()) / 1000000);
 
@@ -86,14 +91,21 @@ namespace sex {
                 const auto end = std::chrono::high_resolution_clock::now();
                 const auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 const auto sleep = std::chrono::duration_cast<std::chrono::nanoseconds>(frame - elapsed);
+                const auto should = sleep + std::chrono::high_resolution_clock::now();
 
                 if (sleep.count() < 0) {
                     lock.unlock();
                     continue;
                 }
 
-                flag.wait_for(lock, sleep - approximate);
+//                flag.wait_for(lock, sleep - approximate);
+                flag.wait_for(lock, sleep + drift);
                 lock.unlock();
+
+                drift += should
+                        - (std::chrono::high_resolution_clock::now())
+//                        + std::chrono::nanoseconds(5000) // yet another magic number (small overshooting time)
+                        ;
             }
         }
     }

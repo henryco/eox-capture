@@ -21,7 +21,7 @@ namespace xgtk {
                 return true;
             }
 
-            std::cout << "rendering: " << num << std::endl;
+//            std::cout << "rendering: " << num << std::endl;
 
             auto& texture = textures[num];
             if (texture == nullptr) {
@@ -83,7 +83,7 @@ namespace xgtk {
         for (auto &area: glAreas) {
             area->queue_render();
         }
-        std::cout << "updated" << std::endl;
+//        std::cout << "updated" << std::endl;
     }
 
     void GLImage::setFrames(const std::vector<std::shared_ptr<unsigned char>>& _frames) {
