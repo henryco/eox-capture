@@ -37,24 +37,26 @@ namespace sex {
         std::vector<cv::Mat> frames;
 
         if (captures.empty()) {
-            std::cerr << "StereoCamera is not initialized" << std::endl;
+            log->error("StereoCamera is not initialized");
         }
 
         // TODO REWORK AND THREAD POOL
 
         int i = 0;
         for (auto& capture : captures) {
-            std::cout << "grab [" << i << "]: " << (capture->isOpened() ? "T" : "F") << std::endl;
+
+            log->debug("grab [{}]: {}", i, (capture->isOpened() ? "T" : "F"));
+
             auto ok = capture->grab();
             if (!ok) {
-                std::cerr << "nothing grabbed [" << i << "]" << std::endl;
+                log->error("nothing grabbed [{}]", i);
                 return frames;
             }
             i++;
         }
 
         for (auto& capture : captures) {
-            std::cout << "capture" << std::endl;
+            log->debug("capture");
 
             cv::Mat frame;
             capture->retrieve(frame);
@@ -67,14 +69,19 @@ namespace sex {
 
     void StereoCamera::open() {
         for (const auto& property : properties) {
-            std::cout << "open [" << property.index << "]" << std::endl;
+
+            log->debug("open [{}]", property.index);
+
             auto capture = std::make_unique<cv::VideoCapture>();
             initFromParams(*capture, property);
             if (!capture->isOpened())
                 throw std::runtime_error("Failed to open camera: " + std::to_string(property.index));
             captures.push_back(std::move(capture));
         }
-        std::cout << "opened: " <<  captures.size() << std::endl;
+
+        executor.start(properties.size());
+
+        log->debug("opened: {}", captures.size());
     }
 
     void StereoCamera::open(std::vector<CameraProp> props) {
@@ -83,9 +90,20 @@ namespace sex {
     }
 
     void StereoCamera::release() {
-        for (auto& capture : captures)
+        log->debug("release");
+
+        int i = 0;
+        for (auto& capture : captures) {
+            log->debug("release camera [{}]", i);
+
             capture->release();
+
+            log->debug("camera released [{}]", i++);
+        }
         captures.clear();
+        executor.shutdown();
+
+        log->debug("released");
     }
 
     StereoCamera::~StereoCamera() {
@@ -95,5 +113,5 @@ namespace sex {
     const std::vector<CameraProp>& StereoCamera::getProperties() const {
         return properties;
     }
-    
+
 }

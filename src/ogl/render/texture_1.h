@@ -28,6 +28,9 @@ namespace xogl {
 
     class Texture1 { // NOLINT(*-pro-type-member-init)
     private:
+        static inline const auto log =
+                spdlog::stdout_color_mt("texture_1");
+
         static const std::string vertexShaderSource;
         static const std::string fragmentShaderSource;
 

@@ -99,14 +99,22 @@ namespace sex {
     }
 
     void DeltaLoop::stop() {
+        log->debug("stop");
+
         {
             std::lock_guard<std::mutex> lock(mutex);
             alive = false;
             flag.notify_all();
         }
+
         if (thread->joinable()) {
+
+            log->debug("wait join");
+
             thread->join();
         }
+
+        log->debug("stopped");
     }
 
 } // sex

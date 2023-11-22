@@ -2,10 +2,12 @@
 #include <gtkmm.h>
 #include "calibration/ui_calibration.h"
 #include "utils/errors/error_reporter.h"
+#include "spdlog/spdlog.h"
 
 int main(int argc, char **argv) {
 
     try {
+        spdlog::set_level(spdlog::level::debug);
 
         const auto app = Gtk::Application::create(
                 argc,

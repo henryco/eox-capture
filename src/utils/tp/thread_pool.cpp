@@ -2,6 +2,7 @@
 // Created by henryco on 11/16/23.
 //
 
+#include <iostream>
 #include "thread_pool.h"
 
 namespace sex {
@@ -59,16 +60,29 @@ namespace sex {
     }
 
     void ThreadPool::shutdown() {
-        std::lock_guard<std::mutex> lock(mutex);
-        stop = true;
-        flag.notify_all();
+        log->debug("shutdown thread pool");
+
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            stop = true;
+            flag.notify_all();
+        }
 
         while (!threads.empty()) {
+
+            log->debug("freeing pool");
+
             auto thread = std::move(threads.front());
             threads.pop();
-            if (thread.joinable())
+
+            log->debug("pool wait");
+
+            if (thread.joinable()) {
                 thread.join();
+            }
         }
+
+        log->debug("pool freed");
     }
 
     ThreadPool::~ThreadPool() {
@@ -80,6 +94,7 @@ namespace sex {
     }
 
     void ThreadPool::start(size_t size) {
+        log->debug("start: {}", size);
         shutdown();
         {
             std::lock_guard<std::mutex> lock(mutex);
@@ -89,6 +104,7 @@ namespace sex {
             stop = false;
             flag.notify_all();
         }
+        log->debug("started");
     }
 
 }

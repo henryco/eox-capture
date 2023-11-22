@@ -10,10 +10,15 @@
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
+#include <spdlog/logger.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace sex {
 
     class DeltaLoop {
+        static inline const auto log =
+                spdlog::stdout_color_mt("delta_loop");
+
     private:
         const std::chrono::nanoseconds frame;
         std::unique_ptr<std::thread> thread;

@@ -17,7 +17,7 @@ namespace xgtk {
         return [num, this](const Glib::RefPtr<Gdk::GLContext>& context) -> bool {
 
             if (initialized.empty() || !initialized[num]) {
-                std::cerr << "GLImage [" << num << "] is not initialized yet!" << std::endl;
+                log->warn("source [{}] is not initialized yet!", num);
                 return true;
             }
 

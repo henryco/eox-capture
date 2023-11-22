@@ -11,6 +11,8 @@
 #include <thread>
 #include <functional>
 #include <future>
+#include <spdlog/logger.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace sex {
 
@@ -34,6 +36,9 @@ namespace sex {
         void start(size_t size);
 
     private:
+        static inline const auto log =
+                spdlog::stdout_color_mt("thread_pool");
+
         std::queue<std::function<void()>> tasks;
         std::queue<std::thread> threads;
         std::condition_variable flag;

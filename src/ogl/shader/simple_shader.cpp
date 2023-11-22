@@ -19,7 +19,7 @@ namespace xogl {
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
             glGetShaderInfoLog(shader, 512, NULL, infoLog);
-            std::cerr << "Shader compilation failed\n" << infoLog << std::endl;
+            SimpleShader::log->error("Shader compilation failed, {}", infoLog);
         }
 
         return shader;
@@ -49,7 +49,7 @@ namespace xogl {
         glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
         if (!success) {
             glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-            std::cerr << "Shader program linking failed\n" << infoLog << std::endl;
+            log->error("shader program linking failed: {}", infoLog);
         }
 
         glDeleteShader(shaderVertex);

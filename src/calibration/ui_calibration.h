@@ -18,6 +18,7 @@ class UiCalibration final : public Gtk::Window {
 
 public:
     UiCalibration() = default;
+    ~UiCalibration() override;
     void init();
 
 protected:
@@ -27,6 +28,9 @@ protected:
     void update(float delta, float late);
 
 private:
+    static inline const auto log =
+            spdlog::stdout_color_mt("ui_calibration");
+
     std::unique_ptr<sex::DeltaLoop> deltaLoop;
     Glib::Dispatcher dispatcher;
     xgtk::GLImage glImage;

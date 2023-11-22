@@ -18,6 +18,9 @@ find_package(OpenCV REQUIRED)
 # Find OpenCV package
 find_package(OpenGL REQUIRED)
 
+# Find spdlog package
+find_package(spdlog REQUIRED)
+
 # Find GTK-MM package
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
@@ -51,7 +54,9 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
         PRIVATE ${OpenCV_LIBS}
         PRIVATE ${GTKMM_LIBRARIES}
-        PRIVATE OpenGL::GL)
+        PRIVATE OpenGL::GL
+        PRIVATE spdlog::spdlog
+)
 
 target_compile_options(${PROJECT_NAME}
         PRIVATE ${GTKMM_CFLAGS_OTHER})

@@ -9,11 +9,17 @@
 #include <gtkmm/glarea.h>
 #include <opencv2/core/mat.hpp>
 #include "../ogl/render/texture_1.h"
+#include <spdlog/logger.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 namespace xgtk {
 
 class GLImage : public Gtk::Box {
 private:
+
+    static inline const auto log =
+            spdlog::stdout_color_mt("gl_image");
+
     Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
 
     std::vector<std::unique_ptr<xogl::Texture1>> textures;

@@ -65,11 +65,11 @@ void UiCalibration::init() {
 }
 
 void UiCalibration::update(float delta, float late) {
-    std::cout << "LOOP: " << delta << " LATE: " << late << "\n" << std::endl;
+    log->debug("update: {}, late: {}", delta, late);
 
     auto captured = camera.capture();
     if (captured.empty()) {
-        std::cerr << "SKIP" << std::endl;
+        log->debug("skip");
         return;
     }
 
@@ -81,6 +81,15 @@ void UiCalibration::update(float delta, float late) {
 
 void UiCalibration::on_dispatcher_signal() {
     glImage.update();
+}
+
+UiCalibration::~UiCalibration() {
+    log->debug("terminate calibration");
+
+    deltaLoop->stop();
+    camera.release();
+
+    log->debug("terminated");
 }
 
 

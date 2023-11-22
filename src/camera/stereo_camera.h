@@ -6,6 +6,7 @@
 #define STEREO_CAMERA_H
 #include <opencv2/videoio.hpp>
 #include <opencv2/core/mat.hpp>
+#include "../utils/tp/thread_pool.h"
 
 namespace sex {
 
@@ -57,8 +58,13 @@ namespace sex {
         [[nodiscard]] const std::vector<CameraProp>& getProperties() const;
 
     private:
+        static inline const auto log =
+                spdlog::stdout_color_mt("stereo_camera");
+
         std::vector<std::unique_ptr<cv::VideoCapture>> captures;
         std::vector<CameraProp> properties;
+        sex::ThreadPool executor;
+
     };
 
 }
