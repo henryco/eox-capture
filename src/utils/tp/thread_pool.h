@@ -28,9 +28,27 @@ namespace sex {
         void shutdown();
 
         template<typename T>
-        std::future<T> execute(std::function<T()>&& func) {
-            std::future<T> future = enqueue(func);
-            return future;
+        std::future<T> execute(std::function<T()> func) {
+            auto le_promise = std::make_shared<std::promise<T>>();
+            auto le_future = le_promise->get_future();
+
+            auto lambda = [p = le_promise, func, this]() mutable {
+                try {
+                    p->set_value(func());
+                } catch (...) {
+                    p->set_exception(std::current_exception());
+                }
+                this->trigger();
+            };
+
+            {
+                std::unique_lock<std::mutex> lock(mutex);
+                tasks.push(std::move(lambda));
+                flag.notify_all();
+                lock.unlock();
+            }
+
+            return le_future;
         }
 
         void start(size_t size);
@@ -49,34 +67,6 @@ namespace sex {
         void worker();
 
         void trigger();
-
-        template<typename T>
-        std::future<T> enqueue(std::function<T()>&& func) {
-            std::promise<T> promise;
-            std::future<T> future = promise.get_future();
-
-            auto lambda = [p = std::move(promise), &func, this]() mutable {
-                try {
-                    p.set_value(func());
-                } catch (...) {
-                    try {
-                        p.set_exception(std::current_exception());
-                    } catch (...) {
-                        p.set_exception(std::runtime_error("unknown error during task execution"));
-                    }
-                }
-                this->trigger();
-            };
-
-            {
-                std::unique_lock<std::mutex> lock(mutex);
-                tasks.push(std::move(lambda));
-                flag.notify_all();
-                lock.unlock();
-            }
-
-            return future;
-        }
     };
 
 }

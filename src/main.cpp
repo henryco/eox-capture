@@ -7,7 +7,8 @@
 int main(int argc, char **argv) {
 
     try {
-        spdlog::set_level(spdlog::level::debug);
+//        spdlog::set_level(spdlog::level::debug);
+        spdlog::set_level(spdlog::level::info);
 
         const auto app = Gtk::Application::create(
                 argc,

@@ -17,7 +17,7 @@ void UiCalibration::prepareCamera() {
             2,
             0
     };
-    const std::string codec = "YUYV";
+    const std::string codec = "MJPG";
     const int width = 640;
     const int height = 480;
     const int fps = 30;

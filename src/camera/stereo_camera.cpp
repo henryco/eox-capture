@@ -40,30 +40,43 @@ namespace sex {
             log->error("StereoCamera is not initialized");
         }
 
-        // TODO REWORK AND THREAD POOL
+        std::vector<std::future<bool>> grabs;
+        grabs.reserve(captures.size());
+        for (auto &capture: captures) {
+            grabs.push_back(executor.execute<bool>([&capture]() mutable {
+                log->debug("grab frame");
+                return capture->grab();
+            }));
+        }
 
-        int i = 0;
-        for (auto& capture : captures) {
-
-            log->debug("grab [{}]: {}", i, (capture->isOpened() ? "T" : "F"));
-
-            auto ok = capture->grab();
-            if (!ok) {
-                log->error("nothing grabbed [{}]", i);
+        for (auto &future: grabs) {
+            const auto grabbed = future.get();
+            if (!grabbed) {
+                log->warn("Nothing grabbed");
                 return frames;
             }
-            i++;
         }
 
-        for (auto& capture : captures) {
-            log->debug("capture");
+        std::vector<std::future<cv::Mat>> results;
+        results.reserve(captures.size());
+        for (auto &capture: captures) {
+            results.push_back(executor.execute<cv::Mat>([&capture]() mutable -> cv::Mat {
+                log->debug("retrieve frame");
+                cv::Mat frame;
+                capture->retrieve(frame);
+                return frame;
+            }));
+        }
 
-            cv::Mat frame;
-            capture->retrieve(frame);
-            if (frame.empty())
-                throw std::runtime_error("Frame is empty");
+        for (auto &future: results) {
+            auto frame = future.get();
+            if (frame.empty()) {
+                log->warn("Frame is empty");
+                return frames;
+            }
             frames.push_back(std::move(frame));
         }
+
         return frames;
     }
 

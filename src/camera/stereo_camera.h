@@ -37,6 +37,14 @@ namespace sex {
 
     class StereoCamera final {
 
+    private:
+        static inline const auto log =
+                spdlog::stdout_color_mt("stereo_camera");
+
+        std::vector<std::unique_ptr<cv::VideoCapture>> captures;
+        std::vector<CameraProp> properties;
+        sex::ThreadPool executor;
+
     public:
 
         StereoCamera() = default;
@@ -56,14 +64,6 @@ namespace sex {
         void open(std::vector<CameraProp> props);
 
         [[nodiscard]] const std::vector<CameraProp>& getProperties() const;
-
-    private:
-        static inline const auto log =
-                spdlog::stdout_color_mt("stereo_camera");
-
-        std::vector<std::unique_ptr<cv::VideoCapture>> captures;
-        std::vector<CameraProp> properties;
-        sex::ThreadPool executor;
 
     };
 
