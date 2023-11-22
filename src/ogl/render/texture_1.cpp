@@ -165,4 +165,12 @@ namespace xogl {
         cleanup();
     }
 
+    Texture1::Texture1(Texture1 &&ref) noexcept :
+    vao(ref.vao),
+    vbo(ref.vbo),
+    ebo(ref.ebo),
+    texture(ref.texture),
+    tex_loc(ref.tex_loc),
+    shader(std::move(ref.shader)) {}
+
 } // xogl

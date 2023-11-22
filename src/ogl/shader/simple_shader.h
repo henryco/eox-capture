@@ -19,6 +19,8 @@ namespace xogl {
 
     public:
         SimpleShader(std::string vertex, std::string fragment);
+        SimpleShader(SimpleShader&& ref) noexcept;
+
         ~SimpleShader();
 
         void init();

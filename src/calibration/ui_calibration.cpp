@@ -10,64 +10,73 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../utils/stb_image.h"
 
-void UiCalibration::prepare() {
+void UiCalibration::prepareCamera() {
+
+    // TEMPORAL
     const std::vector<int> index = {
-            2, //4
+            2,
+            4
     };
     const std::string codec = "YUYV";
     const int width = 640;
     const int height = 480;
     const int fps = 30;
+    // TEMPORAL
 
-    std::vector<CameraProp> props(index.size());
-    std::transform(index.begin(), index.end(), props.begin(),
-                   [&](int x) {
-        return CameraProp(x, width, height, codec, fps);
-    });
+    std::vector<CameraProp> props;
+    props.reserve(index.size());
+    for (int i : index) {
+        props.emplace_back(i, width, height, codec, fps);
+    }
 
-    m_GLArea.set_size_request(width, height);
-    camera.open(props);
+    {
+        // FIND COMMON MIN VALUES
+        int min_fps = 0;
+        int min_w = 0;
+        int min_h = 0;
+        for (const auto &prop: props) {
+            if (min_fps == 0 || prop.fps < min_fps)
+                min_fps = prop.fps;
+            if (min_w == 0 || prop.width < min_w)
+                min_w = prop.width;
+            if (min_h == 0 || prop.height < min_h)
+                min_h = prop.height;
+        }
+
+        glImage.init((int) index.size(), min_w, min_h, GL_BGR);
+
+        camera.open(props);
+
+        deltaLoop = std::make_unique<sex::DeltaLoop>(
+                [this](float d, float l) { update(d, l); },
+                min_fps);
+    }
 }
 
 void UiCalibration::init() {
-    prepare();
+    prepareCamera();
 
     this->set_title("StereoX++ calibration");
     this->set_default_size(1280, 480);
+    this->add(glImage);
 
-    m_GLArea.signal_realize().connect(sigc::mem_fun(*this,&UiCalibration::initGl),false);
-    m_GLArea.signal_render().connect(sigc::mem_fun(*this,&UiCalibration::on_render),false);
-    Glib::signal_timeout().connect(sigc::mem_fun(*this, &UiCalibration::on_timeout), 1000 / 30);
-
-    h_box.pack_start(m_GLArea, Gtk::PACK_SHRINK);
-    v_box.pack_start(h_box, Gtk::PACK_SHRINK);
-
-    this->add(v_box);
+    dispatcher.connect(sigc::mem_fun(*this, &UiCalibration::on_dispatcher_signal));
     show_all_children();
 }
 
-void UiCalibration::initGl() {
-    m_GLArea.make_current();
-    m_GLArea.throw_if_error();
-    texture.init();
+void UiCalibration::update(float delta, float late) {
+    std::cout << "LOOP: " << delta << " LATE: " << late << "\n" << std::endl;
+
+    auto captured = camera.capture();
+
+    // TODO SOME LOGIC
+
+    glImage.setFrames(std::move(captured));
+    dispatcher.emit();
 }
 
-bool UiCalibration::on_render(const Glib::RefPtr<Gdk::GLContext> &context) {
-    auto frames = camera.capture();
-    auto frame = frames[0];
-    texture.setImage(xogl::Image(frame.data, frame.cols, frame.rows, GL_BGR));
-
-    glClearColor(.0f, .0f, .0f, .0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    texture.render();
-    return true;
+void UiCalibration::on_dispatcher_signal() {
+    glImage.update();
 }
-
-bool UiCalibration::on_timeout() {
-    m_GLArea.queue_render();
-    return true;
-}
-
-
 
 

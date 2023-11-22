@@ -7,9 +7,12 @@
 #include <gtkmm/glarea.h>
 #include <GL/gl.h>
 #include <gtkmm/box.h>
+#include <glibmm/dispatcher.h>
 
 #include "../camera/stereo_camera.h"
-#include "../utils/ogl/render/texture_1.h"
+#include "../ogl/render/texture_1.h"
+#include "../gtk/gl_image.h"
+#include "../utils/loop/delta_loop.h"
 
 class UiCalibration final : public Gtk::Window {
 
@@ -18,16 +21,14 @@ public:
     void init();
 
 protected:
-    bool on_render(const Glib::RefPtr<Gdk::GLContext> &context);
-    bool on_timeout();
-    void initGl();
-    void prepare();
+    void on_dispatcher_signal();
+    void prepareCamera();
+
+    void update(float delta, float late);
 
 private:
-    Gtk::GLArea m_GLArea;
-    Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
-    Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
-
-    xogl::Texture1 texture;
+    std::unique_ptr<sex::DeltaLoop> deltaLoop;
+    Glib::Dispatcher dispatcher;
+    xgtk::GLImage glImage;
     StereoCamera camera;
 };

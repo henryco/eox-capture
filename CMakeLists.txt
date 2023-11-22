@@ -26,16 +26,20 @@ pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
 add_executable(${PROJECT_NAME}
         src/main.cpp
         src/calibration/ui_calibration.cpp
-        src/errors/error_reporter.cpp
+        src/utils/errors/error_reporter.cpp
         src/camera/stereo_camera.cpp
         src/camera/stereo_camera.h
         src/utils/tp/thread_pool.cpp
         src/utils/tp/thread_pool.h
         src/utils/stb_image.h
-        src/utils/ogl/render/texture_1.cpp
-        src/utils/ogl/render/texture_1.h
-        src/utils/ogl/shader/simple_shader.cpp
-        src/utils/ogl/shader/simple_shader.h
+        src/ogl/render/texture_1.cpp
+        src/ogl/render/texture_1.h
+        src/ogl/shader/simple_shader.cpp
+        src/ogl/shader/simple_shader.h
+        src/gtk/gl_image.cpp
+        src/gtk/gl_image.h
+        src/utils/loop/delta_loop.cpp
+        src/utils/loop/delta_loop.h
 )
 
 # Include directories for the specific target

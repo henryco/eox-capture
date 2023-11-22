@@ -33,7 +33,7 @@ private:
     std::queue<std::thread> threads;
     std::condition_variable flag;
     std::mutex mutex;
-    bool stop = false;
+    std::atomic<bool> stop = false;
 
     void worker();
 
@@ -59,7 +59,7 @@ private:
 
         {
             std::unique_lock<std::mutex> lock(mutex);
-            tasks.push(lambda);
+            tasks.push(std::move(lambda));
             lock.unlock();
         }
 
