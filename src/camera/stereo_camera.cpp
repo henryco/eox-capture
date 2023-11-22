@@ -34,6 +34,12 @@ StereoCamera::StereoCamera(StereoCamera&& other) noexcept
 std::vector<cv::Mat> StereoCamera::capture() {
     std::vector<cv::Mat> frames;
 
+    if (captures.empty()) {
+        std::cerr << "StereoCamera is not initialized" << std::endl;
+    }
+
+    // TODO REWORK AND THREAD POOL
+
     for (auto& capture : captures) {
         std::cout << "grab" << std::endl;
         capture->grab();

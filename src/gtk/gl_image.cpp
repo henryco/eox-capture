@@ -17,11 +17,9 @@ namespace xgtk {
         return [num, this](const Glib::RefPtr<Gdk::GLContext>& context) -> bool {
 
             if (initialized.empty() || !initialized[num]) {
-                std::cout << "GLImage [" << num << "] is not initialized yet!" << std::endl;
+                std::cerr << "GLImage [" << num << "] is not initialized yet!" << std::endl;
                 return true;
             }
-
-//            std::cout << "rendering: " << num << std::endl;
 
             auto& texture = textures[num];
             if (texture == nullptr) {
@@ -83,7 +81,6 @@ namespace xgtk {
         for (auto &area: glAreas) {
             area->queue_render();
         }
-//        std::cout << "updated" << std::endl;
     }
 
     void GLImage::setFrames(std::vector<cv::Mat> _frames) { // NOLINT(*-unnecessary-value-param)

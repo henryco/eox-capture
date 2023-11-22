@@ -14,7 +14,8 @@ void UiCalibration::prepareCamera() {
 
     // TEMPORAL
     const std::vector<int> index = {
-            2, //4
+            2,
+            4
     };
     const std::string codec = "YUYV";
     const int width = 640;
@@ -43,12 +44,13 @@ void UiCalibration::prepareCamera() {
         }
 
         glImage.init((int) index.size(), min_w, min_h, GL_BGR);
+
+        camera.open(props);
+
         deltaLoop = std::make_unique<sex::DeltaLoop>(
                 [this](float d, float l) { update(d, l); },
                 min_fps);
     }
-
-    camera.open(props);
 }
 
 void UiCalibration::init() {
