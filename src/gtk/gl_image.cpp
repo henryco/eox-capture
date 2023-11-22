@@ -35,7 +35,7 @@ namespace xgtk {
             glClearColor(.0f, .0f, .0f, .0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            texture->render(xogl::Image(frames[num].get(), width, height, format));
+            texture->render(xogl::Image(frames[num].data, width, height, format));
 
             return true;
         };
@@ -86,15 +86,15 @@ namespace xgtk {
 //        std::cout << "updated" << std::endl;
     }
 
-    void GLImage::setFrames(const std::vector<std::shared_ptr<unsigned char>>& _frames) {
+    void GLImage::setFrames(std::vector<cv::Mat> _frames) { // NOLINT(*-unnecessary-value-param)
         frames.clear();
-        for (const auto &item: _frames) {
-            frames.push_back(item);
+        for (auto item: _frames) {
+            frames.push_back(std::move(item));
         }
     }
 
-    void GLImage::update(const std::vector<std::shared_ptr<unsigned char>> &_frames) {
-        setFrames(_frames);
+    void GLImage::update(std::vector<cv::Mat> _frames) {
+        setFrames(std::move(_frames));
         update();
     }
 

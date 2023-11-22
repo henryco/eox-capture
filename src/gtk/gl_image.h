@@ -7,6 +7,7 @@
 
 #include <gtkmm/box.h>
 #include <gtkmm/glarea.h>
+#include <opencv2/core/mat.hpp>
 #include "../ogl/render/texture_1.h"
 
 namespace xgtk {
@@ -17,7 +18,7 @@ private:
 
     std::vector<std::unique_ptr<xogl::Texture1>> textures;
     std::vector<std::unique_ptr<Gtk::GLArea>> glAreas;
-    std::vector<std::shared_ptr<unsigned char>> frames;
+    std::vector<cv::Mat> frames;
     std::vector<bool> initialized;
 
     GLenum format = GL_RGB;
@@ -32,9 +33,9 @@ public:
     GLImage() = default;
     ~GLImage() override;
 
-    void setFrames(const std::vector<std::shared_ptr<unsigned char>>& _frames);
     void init(int number, int width, int height, GLenum format = GL_RGB);
-    void update(const std::vector<std::shared_ptr<unsigned char>>& _frames);
+    void setFrames(std::vector<cv::Mat> _frames);
+    void update(std::vector<cv::Mat> _frames);
     void update();
 
 };

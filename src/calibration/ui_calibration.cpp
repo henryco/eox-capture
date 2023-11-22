@@ -51,7 +51,6 @@ void UiCalibration::prepareCamera() {
     camera.open(props);
 }
 
-
 void UiCalibration::init() {
     prepareCamera();
 
@@ -63,22 +62,14 @@ void UiCalibration::init() {
     show_all_children();
 }
 
-std::vector<std::shared_ptr<cv::Mat>> steal(std::vector<cv::Mat> &captured) {
-    std::vector<std::shared_ptr<cv::Mat>> images;
-    images.reserve(captured.size());
-    for (auto& mat: captured)
-        images.push_back(std::make_shared<cv::Mat>(std::move(mat)));
-    return images;
-}
-
 void UiCalibration::update(float delta, float late) {
     std::cout << "LOOP: " << delta << " LATE: " << late << "\n" << std::endl;
 
     auto captured = camera.capture();
-//    auto images = steal(captured);
 
     // TODO SOME LOGIC
 
+    glImage.setFrames(std::move(captured));
     dispatcher.emit();
 }
 

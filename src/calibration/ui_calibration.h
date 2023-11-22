@@ -28,7 +28,6 @@ protected:
 
 private:
     std::unique_ptr<sex::DeltaLoop> deltaLoop;
-    std::vector<cv::Mat> frames;
     Glib::Dispatcher dispatcher;
     xgtk::GLImage glImage;
     StereoCamera camera;
