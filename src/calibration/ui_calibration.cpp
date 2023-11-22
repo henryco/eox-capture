@@ -43,7 +43,8 @@ void UiCalibration::prepareCamera() {
                 min_h = prop.height;
         }
 
-        glImage.init((int) index.size(), min_w, min_h, GL_BGR);
+//        glImage.init((int) index.size(), min_w, min_h, GL_BGR);
+        glImage.init(1, min_w * (int) index.size(), min_h, GL_BGR);
 
         camera.open(props);
 
@@ -73,9 +74,22 @@ void UiCalibration::update(float delta, float late) {
         return;
     }
 
-    // TODO SOME LOGIC
 
-    glImage.setFrames(std::move(captured));
+
+    // TODO FIXME =====
+    auto first = captured[0];
+    cv::Mat merged(first.rows, (int) (first.cols * captured.size()), first.type());
+    for (int i = 0; i < captured.size(); i++) {
+        auto source = captured[i];
+        source.copyTo(merged(cv::Rect(source.cols * i, 0, source.cols, source.rows)));
+    }
+    std::vector<cv::Mat> vec = {merged};
+    glImage.setFrames(std::move(vec));
+    // TODO FIXME =====
+
+
+
+//    glImage.setFrames(std::move(captured));
     dispatcher.emit();
 }
 
