@@ -28,7 +28,6 @@ namespace xogl {
 
             void main() {
                 FragColor = texture(texture_image, TexCoord);
-                //FragColor = vec4(0.0, 0.0, 1.0, 1.0);
             }
         )glsl";
 

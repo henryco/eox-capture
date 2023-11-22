@@ -4,7 +4,6 @@
 
 #include "stereo_camera.h"
 
-#include <iostream>
 #include <utility>
 
 namespace sex {
