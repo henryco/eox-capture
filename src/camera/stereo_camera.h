@@ -7,58 +7,60 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/core/mat.hpp>
 
-class CameraProp {
-public:
-    int index;
-    int api;
-    int width;
-    int height;
-    int fps;
-    std::string codec;
+namespace sex {
 
-    explicit CameraProp(
-        const int index = 0,
-        const int width = 640,
-        const int height = 480,
-        const std::string codec = "YUYV",
-        const int fps = 30,
-        const int api = cv::CAP_V4L2)
-        : index(index),
-          width(width),
-          height(height),
-          fps(fps),
-          codec(codec),
-          api(api)
-    {};
-};
+    class CameraProp {
+    public:
+        int index;
+        int api;
+        int width;
+        int height;
+        int fps;
+        std::string codec;
 
-class StereoCamera final {
+        explicit CameraProp(
+                const int index = 0,
+                const int width = 640,
+                const int height = 480,
+                const std::string codec = "YUYV",
+                const int fps = 30,
+                const int api = cv::CAP_V4L2)
+                : index(index),
+                  width(width),
+                  height(height),
+                  fps(fps),
+                  codec(codec),
+                  api(api)
+        {};
+    };
 
-public:
+    class StereoCamera final {
 
-    StereoCamera() = default;
+    public:
 
-    ~StereoCamera();
+        StereoCamera() = default;
 
-    explicit StereoCamera(const std::vector<CameraProp>&props);
+        ~StereoCamera();
 
-    StereoCamera(StereoCamera&& other) noexcept;
+        explicit StereoCamera(const std::vector<CameraProp>&props);
 
-    std::vector<cv::Mat> capture();
+        StereoCamera(StereoCamera&& other) noexcept;
 
-    void release();
+        std::vector<cv::Mat> capture();
 
-    void open();
+        void release();
 
-    void open(std::vector<CameraProp> props);
+        void open();
 
-    [[nodiscard]] const std::vector<CameraProp>& getProperties() const;
+        void open(std::vector<CameraProp> props);
 
-private:
-    std::vector<std::unique_ptr<cv::VideoCapture>> captures;
-    std::vector<CameraProp> properties;
-};
+        [[nodiscard]] const std::vector<CameraProp>& getProperties() const;
 
+    private:
+        std::vector<std::unique_ptr<cv::VideoCapture>> captures;
+        std::vector<CameraProp> properties;
+    };
 
+}
 
 #endif //STEREO_CAMERA_H

@@ -30,5 +30,5 @@ private:
     std::unique_ptr<sex::DeltaLoop> deltaLoop;
     Glib::Dispatcher dispatcher;
     xgtk::GLImage glImage;
-    StereoCamera camera;
+    sex::StereoCamera camera;
 };

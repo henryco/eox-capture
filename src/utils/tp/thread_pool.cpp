@@ -4,71 +4,91 @@
 
 #include "thread_pool.h"
 
-void ThreadPool::worker() {
-    while (true) {
+namespace sex {
 
+    void ThreadPool::worker() {
         while (true) {
-            std::unique_lock<std::mutex> stateLock(mutex);
 
-            if (stop) {
+            while (true) {
+                std::unique_lock<std::mutex> stateLock(mutex);
+
+                if (stop) {
+                    stateLock.unlock();
+                    return;
+                }
+
+                if (tasks.empty()) {
+                    stateLock.unlock();
+                    break;
+                }
+
+                auto task = std::move(tasks.front());
+                tasks.pop();
                 stateLock.unlock();
-                return;
+
+                if (task)
+                    task();
             }
 
-            if (tasks.empty()) {
-                stateLock.unlock();
-                break;
+            {
+                std::unique_lock<std::mutex> stopLock(mutex);
+                if (stop) {
+                    stopLock.unlock();
+                    return;
+                }
+
+                if (!tasks.empty()) {
+                    stopLock.unlock();
+                    continue;
+                }
+
+                flag.wait(stopLock);
+
+                if (stop) {
+                    stopLock.unlock();
+                    return;
+                }
+                stopLock.unlock();
             }
-
-            auto task = std::move(tasks.front());
-            tasks.pop();
-            stateLock.unlock();
-
-            if (task)
-                task();
         }
+    }
 
+    void ThreadPool::trigger() {
+        std::lock_guard<std::mutex> lock(mutex);
+        flag.notify_all();
+    }
+
+    void ThreadPool::shutdown() {
+        std::lock_guard<std::mutex> lock(mutex);
+        stop = true;
+        flag.notify_all();
+
+        while (!threads.empty()) {
+            auto thread = std::move(threads.front());
+            threads.pop();
+            if (thread.joinable())
+                thread.join();
+        }
+    }
+
+    ThreadPool::~ThreadPool() {
+        shutdown();
+    }
+
+    ThreadPool::ThreadPool(size_t size) {
+        start(size);
+    }
+
+    void ThreadPool::start(size_t size) {
+        shutdown();
         {
-            std::unique_lock<std::mutex> stopLock(mutex);
-            if (stop) {
-                stopLock.unlock();
-                return;
+            std::lock_guard<std::mutex> lock(mutex);
+            for (int i = 0; i < size; ++i) {
+                threads.emplace(&ThreadPool::worker, this);
             }
-
-            flag.wait(stopLock);
-
-            if (stop) {
-                stopLock.unlock();
-                return;
-            }
-            stopLock.unlock();
+            stop = false;
+            flag.notify_all();
         }
     }
-}
 
-void ThreadPool::trigger() {
-    std::lock_guard<std::mutex> lock(mutex);
-    flag.notify_all();
-}
-
-void ThreadPool::shutdown() {
-    std::lock_guard<std::mutex> lock(mutex);
-    stop = true;
-    flag.notify_all();
-}
-
-ThreadPool::~ThreadPool() {
-    shutdown();
-    while (!threads.empty()) {
-        auto thread = std::move(threads.front());
-        threads.pop();
-        if (thread.joinable())
-            thread.join();
-    }
-}
-
-ThreadPool::ThreadPool(int size) {
-    for (int i = 0; i < size; ++i) {
-        threads.emplace(&ThreadPool::worker, this);
-    }
 }

@@ -27,13 +27,13 @@ private:
 
 protected:
     std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> renderFunc(int num);
-    std::function<void()> initFunc(int num);
+    std::function<void()> initFunc(size_t num);
 
 public:
     GLImage() = default;
     ~GLImage() override;
 
-    void init(int number, int width, int height, GLenum format = GL_RGB);
+    void init(size_t number, int width, int height, GLenum format = GL_RGB);
     void setFrames(std::vector<cv::Mat> _frames);
     void update(std::vector<cv::Mat> _frames);
     void update();

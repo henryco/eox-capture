@@ -15,7 +15,7 @@ void UiCalibration::prepareCamera() {
     // TEMPORAL
     const std::vector<int> index = {
             2,
-            4
+            0
     };
     const std::string codec = "YUYV";
     const int width = 640;
@@ -23,7 +23,7 @@ void UiCalibration::prepareCamera() {
     const int fps = 30;
     // TEMPORAL
 
-    std::vector<CameraProp> props;
+    std::vector<sex::CameraProp> props;
     props.reserve(index.size());
     for (int i : index) {
         props.emplace_back(i, width, height, codec, fps);
@@ -68,6 +68,10 @@ void UiCalibration::update(float delta, float late) {
     std::cout << "LOOP: " << delta << " LATE: " << late << "\n" << std::endl;
 
     auto captured = camera.capture();
+    if (captured.empty()) {
+        std::cerr << "SKIP" << std::endl;
+        return;
+    }
 
     // TODO SOME LOGIC
 

@@ -39,7 +39,7 @@ namespace xgtk {
         };
     }
 
-    std::function<void()> GLImage::initFunc(int num) {
+    std::function<void()> GLImage::initFunc(size_t num) {
         return [num, this]() {
             auto& area = glAreas[num];
             area->make_current();
@@ -49,7 +49,7 @@ namespace xgtk {
         };
     }
 
-    void GLImage::init(int _number, int _width, int _height, GLenum _format) {
+    void GLImage::init(size_t _number, int _width, int _height, GLenum _format) {
         this->width = _width;
         this->height = _height;
         this->format = _format;
