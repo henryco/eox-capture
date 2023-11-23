@@ -43,8 +43,8 @@ namespace sex {
         std::vector<int> ready;
         cameras.reserve(captures.size());
         ready.reserve(captures.size());
-        for (auto &item: captures) {
-            cameras.push_back(*item);
+        for (auto &cam: captures) {
+            cameras.push_back(*cam);
         }
 
         auto any = cv::VideoCapture::waitAny(cameras, ready);
