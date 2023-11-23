@@ -5,23 +5,31 @@
 #include "stereo_camera.h"
 
 #include <utility>
+#include <iostream>
 
 namespace sex {
+
+    int fourCC(std::string name) {
+        return cv::VideoWriter::fourcc(
+                name[0],
+                name[1],
+                name[2],
+                name[3]);
+    }
 
     void initFromParams(cv::VideoCapture& capture, const CameraProp& prop) {
         std::vector<int> params;
         // todo
         params.assign({
-                              cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc(
-                        prop.codec[0],
-                        prop.codec[1],
-                        prop.codec[2],
-                        prop.codec[3]),
-                              cv::CAP_PROP_FRAME_WIDTH, prop.width,
-                              cv::CAP_PROP_FRAME_HEIGHT, prop.height,
-                              cv::CAP_PROP_FPS, prop.fps
-                      });
+            cv::CAP_PROP_FOURCC, fourCC(prop.codec),
+            cv::CAP_PROP_FRAME_WIDTH, prop.width,
+            cv::CAP_PROP_FRAME_HEIGHT, prop.height,
+            cv::CAP_PROP_FPS, prop.fps,
+            cv::CAP_PROP_BUFFERSIZE, prop.buffer
+        });
         capture.open(prop.index, prop.api, params);
+
+        std::cout << "BUFF: " << capture.get(cv::CAP_PROP_BUFFERSIZE) << std::endl;
     }
 
     StereoCamera::StereoCamera(const std::vector<CameraProp>& props) {
@@ -47,11 +55,45 @@ namespace sex {
             cameras.push_back(*cam);
         }
 
+        const auto t0 = std::chrono::high_resolution_clock::now();
+
         auto any = cv::VideoCapture::waitAny(cameras, ready);
 
-        if (!any) {
-            log->warn("Nothing grabbed");
-            return frames;
+//        for (auto &item: cameras) {
+//            const auto ok = item.grab();
+//            if (!ok) {
+//                log->info("not ok");
+//            }
+//        }
+
+        const auto t1 = std::chrono::high_resolution_clock::now();
+        const auto d = t1 - t0;
+        const auto u = std::chrono::duration_cast<std::chrono::milliseconds>(d);
+        log->info("total: {}", u.count());
+        log->info("");
+
+//        if (!any) {
+//            log->warn("Nothing grabbed");
+//            return frames;
+//        }
+
+        if (ready.size() < captures.size()) {
+//            log->warn("only one: {}", ready[0]);
+
+//            for (int i = 0; i < cameras.size(); i++) {
+//                if (i != ready[0]) {
+//                    auto& cam = cameras[i];
+//
+//                    while (true) {
+//                        log->warn("GRABBING: {}", i);
+//                        auto ok = cam.grab();
+//                        if (ok)
+//                            break;
+//                    }
+//
+//                    break;
+//                }
+//            }
         }
 
         std::vector<std::future<cv::Mat>> results;
@@ -75,9 +117,9 @@ namespace sex {
         }
 
         // TODO DELETE?
-        if (ready.size() < captures.size()) {
-            return {};
-        }
+//        if (ready.size() < captures.size()) {
+//            return {};
+//        }
 
         return frames;
     }

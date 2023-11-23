@@ -14,8 +14,9 @@ void UiCalibration::prepareCamera() {
 
     // TEMPORAL
     const std::vector<int> index = {
+//            0,
             2,
-            0
+            4
     };
     const std::string codec = "MJPG";
     const int width = 640;
@@ -49,8 +50,7 @@ void UiCalibration::prepareCamera() {
         camera.open(props);
 
         deltaLoop = std::make_unique<sex::DeltaLoop>(
-                [this](float d, float l) { update(d, l); },
-                min_fps);
+                [this](float d, float l){ update(d, l); });
     }
 }
 
@@ -66,7 +66,7 @@ void UiCalibration::init() {
 }
 
 void UiCalibration::update(float delta, float late) {
-    log->debug("update: {}, late: {}", delta, late);
+    log->info("update: {}, late: {}", delta, late);
 
     auto captured = camera.capture();
     if (captured.empty()) {

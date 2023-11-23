@@ -6,12 +6,12 @@
 
 #include <memory>
 #include <utility>
-#include <iostream>
 
 namespace sex {
 
-    DeltaLoop::DeltaLoop(const int fps)
-    : frame(((long long) ((long long) 1000000000) / fps)) {}
+    DeltaLoop::DeltaLoop(const int fps) { // NOLINT(*-pro-type-member-init)
+        setFps(fps);
+    }
 
     DeltaLoop::DeltaLoop(std::function<void(float, float)> runnable, const int fps)
     : DeltaLoop(fps) {
@@ -25,6 +25,14 @@ namespace sex {
 
     void DeltaLoop::setFunc(std::function<void(float, float)> _runnable) {
         this->runnable = std::move(_runnable);
+    }
+
+    void DeltaLoop::setFps(int _fps) {
+        if (_fps <= 0) {
+            this->frame = std::chrono::nanoseconds(0);
+            return;
+        }
+        this->frame = std::chrono::nanoseconds((long long) ((long long) 1000000000) / _fps);
     }
 
     void DeltaLoop::worker() {

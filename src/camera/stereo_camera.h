@@ -10,6 +10,14 @@
 
 namespace sex {
 
+    /**
+     * @class CameraProp
+     * @brief The CameraProp class represents the properties for capturing camera.
+     *
+     * This class contains various properties related to camera capture, such as index, API type,
+     * width, height, frames per second (FPS), buffer size, and codec used.
+     */
+
     class CameraProp {
     public:
         int index;
@@ -17,23 +25,35 @@ namespace sex {
         int width;
         int height;
         int fps;
+        int buffer;
         std::string codec;
+
+        /**
+         * @brief The CameraProp class represents the properties for capturing camera.
+         */
 
         explicit CameraProp(
                 const int index = 0,
                 const int width = 640,
                 const int height = 480,
-                const std::string codec = "YUYV",
+                std::string codec = "YUYV",
                 const int fps = 30,
+                const int buffer = 2,
                 const int api = cv::CAP_V4L2)
                 : index(index),
                   width(width),
                   height(height),
                   fps(fps),
-                  codec(codec),
+                  codec(std::move(codec)),
+                  buffer(buffer),
                   api(api)
         {};
     };
+
+    /**
+     * @class StereoCamera
+     * @brief The StereoCamera class represents a stereo camera for capturing stereo images.
+     */
 
     class StereoCamera final {
 
@@ -51,7 +71,24 @@ namespace sex {
 
         ~StereoCamera();
 
+        /**
+         * @class StereoCamera
+         * @brief Represents a stereo camera composed of multiple individual cameras.
+         *
+         * The StereoCamera class provides a convenient way to manage and control a set
+         * of individual cameras that capture stereo imagery. It takes a vector of
+         * CameraProp objects as input during construction, where each CameraProp object
+         * represents the properties of an individual camera, such as its resolution, etc.
+         */
+
         explicit StereoCamera(const std::vector<CameraProp>&props);
+
+        /**
+         * @brief Move constructor for StereoCamera objects.
+         *        Moves the contents of another StereoCamera object into this one.
+         *
+         * @param other The StereoCamera object to be moved from.
+         */
 
         StereoCamera(StereoCamera&& other) noexcept;
 
@@ -60,6 +97,20 @@ namespace sex {
         void release();
 
         void open();
+
+        /**
+         * @brief Opens the cameras based on the provided properties.
+         *
+         * This function opens the cameras based on the provided properties. Each camera property
+         * specifies the configuration settings for a camera. The function uses a vector of CameraProp
+         * objects to represent these properties. Once the cameras have been successfully opened, they
+         * can be used to capture frames or perform other camera-related operations.
+         *
+         * @param props A vector of CameraProp objects representing the properties of the cameras to be opened.
+         * @return void
+         *
+         * @see CameraProp
+         */
 
         void open(std::vector<CameraProp> props);
 
