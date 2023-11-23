@@ -39,21 +39,19 @@ namespace sex {
             log->error("StereoCamera is not initialized");
         }
 
-        std::vector<std::future<bool>> grabs;
-        grabs.reserve(captures.size());
-        for (auto &capture: captures) {
-            grabs.push_back(executor.execute<bool>([&capture]() mutable {
-                log->debug("grab frame");
-                return capture->grab();
-            }));
+        std::vector<cv::VideoCapture> cameras;
+        std::vector<int> ready;
+        cameras.reserve(captures.size());
+        ready.reserve(captures.size());
+        for (auto &item: captures) {
+            cameras.push_back(*item);
         }
 
-        for (auto &future: grabs) {
-            const auto grabbed = future.get();
-            if (!grabbed) {
-                log->warn("Nothing grabbed");
-                return frames;
-            }
+        auto any = cv::VideoCapture::waitAny(cameras, ready);
+
+        if (!any) {
+            log->warn("Nothing grabbed");
+            return frames;
         }
 
         std::vector<std::future<cv::Mat>> results;
@@ -74,6 +72,11 @@ namespace sex {
                 return frames;
             }
             frames.push_back(std::move(frame));
+        }
+
+        // TODO DELETE?
+        if (ready.size() < captures.size()) {
+            return {};
         }
 
         return frames;
