@@ -65,6 +65,8 @@ namespace sex {
         std::vector<CameraProp> properties;
         sex::ThreadPool executor;
 
+        bool fast = false;
+
     public:
 
         StereoCamera() = default;
@@ -81,7 +83,7 @@ namespace sex {
          * represents the properties of an individual camera, such as its resolution, etc.
          */
 
-        explicit StereoCamera(const std::vector<CameraProp>&props);
+        explicit StereoCamera(const std::vector<CameraProp>& props);
 
         /**
          * @brief Move constructor for StereoCamera objects.
@@ -92,10 +94,24 @@ namespace sex {
 
         StereoCamera(StereoCamera&& other) noexcept;
 
+        /**
+         * @brief Captures an image using the stereo camera.
+         *
+         * This function captures an image using the stereo camera. It retrieves the
+         * frames simultaneously and returns them as a vector of cv::Mat objects.
+         *
+         * @return A vector of cv::Mat objects representing the frames (usually left and right).
+         *
+         * @note This is blocking operation
+         */
+
         std::vector<cv::Mat> capture();
 
         void release();
 
+        /**
+         * @see StereoCamera::open(std::vector<CameraProp> props)
+         */
         void open();
 
         /**
@@ -114,8 +130,27 @@ namespace sex {
 
         void open(std::vector<CameraProp> props);
 
+        /**
+         * @brief Get the properties of the stereo camera.
+         *
+         * This function retrieves the properties of the stereo camera. The properties include
+         * information such as resolution, focal length, and distortion coefficients.
+         *
+         * @return A structure containing the properties of the stereo camera.
+         */
         [[nodiscard]] const std::vector<CameraProp>& getProperties() const;
 
+        /**
+         * @brief Set the fast mode for the StereoCamera.
+         *
+         * This function sets the fast mode for the StereoCamera. When fast mode is enabled, certain optimizations
+         * may be used to improve performance, but at the cost of potentially reduced accuracy.
+         *
+         * @param fast A bool indicating whether fast mode should be enabled (true) or disabled (false).
+         *
+         * @note Fast mode is disabled by default.
+         */
+        void setFast(bool fast);
     };
 
 }

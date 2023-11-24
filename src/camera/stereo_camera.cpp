@@ -40,6 +40,8 @@ namespace sex {
             : captures(std::move(other.captures)), properties(std::move(other.properties)) {}
 
 
+
+
     std::vector<cv::Mat> StereoCamera::capture() {
         std::vector<cv::Mat> frames;
 
@@ -55,13 +57,17 @@ namespace sex {
             cameras.push_back(*cam);
         }
 
-        const auto t0 = std::chrono::high_resolution_clock::now();
 
-//        auto any = cv::VideoCapture::waitAny(cameras, ready);
-
-        for (auto &item: cameras) {
-            if (!item.grab())
+        if (fast) {
+            // faster because but less precise method of grabbing frames
+            if (!cv::VideoCapture::waitAny(cameras, ready))
                 return {};
+        } else {
+            // slower, but more precise method of grabbing frames
+            for (auto &item: cameras) {
+                if (!item.grab())
+                    return {};
+            }
         }
 
         std::vector<std::future<cv::Mat>> results;
@@ -132,6 +138,10 @@ namespace sex {
 
     const std::vector<CameraProp>& StereoCamera::getProperties() const {
         return properties;
+    }
+
+    void StereoCamera::setFast(bool _fast) {
+        fast = _fast;
     }
 
 }
