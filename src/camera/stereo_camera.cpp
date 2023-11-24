@@ -39,9 +39,6 @@ namespace sex {
     StereoCamera::StereoCamera(StereoCamera&& other) noexcept
             : captures(std::move(other.captures)), properties(std::move(other.properties)) {}
 
-
-
-
     std::vector<cv::Mat> StereoCamera::capture() {
         std::vector<cv::Mat> frames;
 
@@ -59,11 +56,11 @@ namespace sex {
 
 
         if (fast) {
-            // faster because but less precise method of grabbing frames
+            // faster because it calls for buffer often, but less synchronized method of grabbing frames
             if (!cv::VideoCapture::waitAny(cameras, ready))
                 return {};
         } else {
-            // slower, but more precise method of grabbing frames
+            // slower, but more precise (synchronized) method of grabbing frames
             for (auto &item: cameras) {
                 if (!item.grab())
                     return {};

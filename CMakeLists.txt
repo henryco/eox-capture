@@ -25,6 +25,9 @@ find_package(spdlog REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM REQUIRED gtkmm-3.0)
 
+# Find v4l2 (video for linux) package
+pkg_check_modules(V4L2 REQUIRED libv4l2)
+
 # Create an executable
 add_executable(${PROJECT_NAME}
         src/main.cpp
@@ -43,12 +46,15 @@ add_executable(${PROJECT_NAME}
         src/gtk/gl_image.h
         src/utils/loop/delta_loop.cpp
         src/utils/loop/delta_loop.h
+        src/v4l2/linux_video.cpp
+        src/v4l2/linux_video.h
 )
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
         PRIVATE ${OpenCV_INCLUDE_DIRS}
-        PRIVATE ${GTKMM_INCLUDE_DIRS})
+        PRIVATE ${GTKMM_INCLUDE_DIRS}
+        PRIVATE ${V4L2_INCLUDE_DIRS})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
@@ -56,7 +62,8 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE ${GTKMM_LIBRARIES}
         PRIVATE OpenGL::GL
         PRIVATE spdlog::spdlog
-)
+        PRIVATE ${V4L2_LIBRARIES})
 
 target_compile_options(${PROJECT_NAME}
-        PRIVATE ${GTKMM_CFLAGS_OTHER})
+        PRIVATE ${GTKMM_CFLAGS_OTHER}
+        PRIVATE ${V4L2_CFLAGS_OTHER})
