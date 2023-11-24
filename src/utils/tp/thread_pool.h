@@ -42,10 +42,9 @@ namespace sex {
             };
 
             {
-                std::unique_lock<std::mutex> lock(mutex);
+                std::lock_guard<std::mutex> lock(mutex);
                 tasks.push(std::move(lambda));
                 flag.notify_all();
-                lock.unlock();
             }
 
             return le_future;
