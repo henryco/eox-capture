@@ -25,7 +25,7 @@ protected:
     void on_dispatcher_signal();
     void prepareCamera();
 
-    void update(float delta, float late);
+    void update(float delta, float late, float fps);
 
 private:
     static inline const auto log =

@@ -50,7 +50,7 @@ void UiCalibration::prepareCamera() {
         camera.open(props);
 
         deltaLoop = std::make_unique<sex::DeltaLoop>(
-                [this](float d, float l){ update(d, l); });
+                [this](float d, float l, float f){ update(d, l, f); });
     }
 }
 
@@ -65,8 +65,8 @@ void UiCalibration::init() {
     show_all_children();
 }
 
-void UiCalibration::update(float delta, float late) {
-    log->info("update: {}, late: {}", delta, late);
+void UiCalibration::update(float delta, float latency, float fps) {
+    log->info("update: {}, late: {}, fps: {}", delta, latency, fps);
 
     auto captured = camera.capture();
     if (captured.empty()) {

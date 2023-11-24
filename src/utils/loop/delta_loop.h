@@ -28,7 +28,7 @@ namespace sex {
     private:
         std::chrono::nanoseconds frame;
         std::unique_ptr<std::thread> thread;
-        std::function<void(float, float)> runnable;
+        std::function<void(float, float, float)> runnable;
 
         std::atomic<bool> alive = false;
         std::condition_variable flag;
@@ -66,7 +66,7 @@ namespace sex {
          * Usage example:
          * @code{.cpp}
          * // Define a function to be executed repeatedly
-         * void myFunction(float deltaTime, float totalTime)
+         * void myFunction(float deltaTime, float latency, float fps)
          * {
          *     // Do something based on the time difference between update calls
          *     // and the total elapsed time
@@ -81,7 +81,7 @@ namespace sex {
          * @endcode
          */
 
-        explicit DeltaLoop(std::function<void(float, float)> runnable, int fps = 0);
+        explicit DeltaLoop(std::function<void(float, float, float)> runnable, int fps = 0);
 
         ~DeltaLoop();
 
@@ -89,15 +89,26 @@ namespace sex {
 
         void stop();
 
-        void setFunc(std::function<void(float, float)> _runnable);
+        void setFunc(std::function<void(float, float, float)> _runnable);
 
         void setFps(int fps);
 
+        float getFrameLength();
+
     protected:
+
+        /**
+        * @brief Worker function for the DeltaLoop class.
+        *
+        * This function performs the main computation of the DeltaLoop algorithm.
+        * It is responsible for repeatedly executing the user-provided computation
+        * function until the convergence condition is met.
+        */
+
         void worker();
 
     };
 
-} // sx
+} // sex
 
 #endif //STEREOX_DELTA_LOOP_H

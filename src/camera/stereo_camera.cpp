@@ -44,7 +44,7 @@ namespace sex {
         std::vector<cv::Mat> frames;
 
         if (captures.empty()) {
-            log->error("StereoCamera is not initialized");
+            log->warn("StereoCamera is not initialized");
         }
 
         std::vector<cv::VideoCapture> cameras;
@@ -57,43 +57,11 @@ namespace sex {
 
         const auto t0 = std::chrono::high_resolution_clock::now();
 
-        auto any = cv::VideoCapture::waitAny(cameras, ready);
+//        auto any = cv::VideoCapture::waitAny(cameras, ready);
 
-//        for (auto &item: cameras) {
-//            const auto ok = item.grab();
-//            if (!ok) {
-//                log->info("not ok");
-//            }
-//        }
-
-        const auto t1 = std::chrono::high_resolution_clock::now();
-        const auto d = t1 - t0;
-        const auto u = std::chrono::duration_cast<std::chrono::milliseconds>(d);
-        log->info("total: {}", u.count());
-        log->info("");
-
-//        if (!any) {
-//            log->warn("Nothing grabbed");
-//            return frames;
-//        }
-
-        if (ready.size() < captures.size()) {
-//            log->warn("only one: {}", ready[0]);
-
-//            for (int i = 0; i < cameras.size(); i++) {
-//                if (i != ready[0]) {
-//                    auto& cam = cameras[i];
-//
-//                    while (true) {
-//                        log->warn("GRABBING: {}", i);
-//                        auto ok = cam.grab();
-//                        if (ok)
-//                            break;
-//                    }
-//
-//                    break;
-//                }
-//            }
+        for (auto &item: cameras) {
+            if (!item.grab())
+                return {};
         }
 
         std::vector<std::future<cv::Mat>> results;
@@ -110,16 +78,11 @@ namespace sex {
         for (auto &future: results) {
             auto frame = future.get();
             if (frame.empty()) {
-                log->warn("Frame is empty");
+                log->warn("empty frame");
                 return frames;
             }
             frames.push_back(std::move(frame));
         }
-
-        // TODO DELETE?
-//        if (ready.size() < captures.size()) {
-//            return {};
-//        }
 
         return frames;
     }

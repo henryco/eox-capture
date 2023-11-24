@@ -13,7 +13,7 @@ namespace sex {
         setFps(fps);
     }
 
-    DeltaLoop::DeltaLoop(std::function<void(float, float)> runnable, const int fps)
+    DeltaLoop::DeltaLoop(std::function<void(float, float, float)> runnable, const int fps)
     : DeltaLoop(fps) {
         this->runnable = std::move(runnable);
         start();
@@ -23,7 +23,7 @@ namespace sex {
         stop();
     }
 
-    void DeltaLoop::setFunc(std::function<void(float, float)> _runnable) {
+    void DeltaLoop::setFunc(std::function<void(float, float, float)> _runnable) {
         this->runnable = std::move(_runnable);
     }
 
@@ -41,8 +41,17 @@ namespace sex {
         auto loop_post = std::chrono::high_resolution_clock::now();
         auto drift = std::chrono::nanoseconds(0);
 
+        auto fps = 0.f;
+        auto iteration = 0;
+
         while (true) {
             const auto start = std::chrono::high_resolution_clock::now();
+
+            // fps average frame
+            if (++iteration > 5) {
+                iteration = 1;
+                fps = 0;
+            }
 
             {
                 std::unique_lock<std::mutex> lock(mutex);
@@ -57,10 +66,15 @@ namespace sex {
             auto delta = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_post);
             auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(loop_end - loop_pre);
             auto late = duration - frame;
+            fps += 1000000000.f / ((float) duration.count());
 
             loop_pre = std::chrono::high_resolution_clock::now();
 
-            runnable(((float) delta.count()) / 1000000, ((float) late.count()) / 1000000);
+            runnable(
+                    ((float) delta.count()) / 1000000.f, // delta
+                    ((float) late.count()) / 1000000.f,  // latency
+                    fps / (float) iteration              // averaged fps
+                    );
 
             loop_post = std::chrono::high_resolution_clock::now();
 
@@ -123,6 +137,10 @@ namespace sex {
         }
 
         log->debug("stopped");
+    }
+
+    float DeltaLoop::getFrameLength() {
+        return ((float) frame.count()) / 1000000;
     }
 
 } // sex
