@@ -2,6 +2,7 @@
 // Created by henryco on 11/25/23.
 //
 
+#include <gtkmm/label.h>
 #include <gtkmm/cssprovider.h>
 #include "gtk_cam_params.h"
 
@@ -45,9 +46,11 @@ namespace sex::xgtk {
     }
 
     void GtkCamParams::setProperties(std::vector<GtkCamProp> _properties) {
-        for (auto &control: controls) {
-            v_box.remove(*control);
+        auto children = v_box.get_children();
+        for (auto *child: children) {
+            v_box.remove(*child);
         }
+
         properties.clear();
         controls.clear();
 
@@ -55,21 +58,32 @@ namespace sex::xgtk {
         controls.reserve(_properties.size());
 
         for (auto &property: _properties) {
-            properties.push_back(std::move(property));
-
             auto box = std::make_unique<Gtk::Box>();
+            auto label = std::make_unique<Gtk::Label>(property.name);
+
             {
                 // some extra elements and props here
                 box->get_style_context()->add_class("cam-param-box");
+                box->set_orientation(Gtk::ORIENTATION_VERTICAL);
                 box->set_size_request(300, 100);
 
+                box->pack_start(*label, Gtk::PACK_SHRINK);
+
+                // css styling
                 auto css_provider = Gtk::CssProvider::create();
-                css_provider->load_from_data(".cam-param-box { background-color: blue; color: white; }");
+                css_provider->load_from_data(R"css(
+                    .cam-param-box {
+                        background-color: white;
+                        border-bottom: 1px solid black;
+                    }
+                )css");
                 box->get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
             }
 
             v_box.pack_start(*box, Gtk::PACK_SHRINK);
             controls.push_back(std::move(box));
+            controls.push_back(std::move(label));
+            properties.push_back(std::move(property));
         }
 
     }

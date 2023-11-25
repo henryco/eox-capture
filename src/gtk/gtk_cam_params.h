@@ -10,8 +10,12 @@
 
 namespace sex::xgtk {
 
+    class GtkCamParams;
+
     class GtkCamProp {
     protected:
+        friend GtkCamParams;
+
         uint id;
         uint type;
         std::string name;
@@ -24,9 +28,9 @@ namespace sex::xgtk {
         GtkCamProp(uint id, uint type, std::string name, int min,
                    int max, int step, int defaultValue, int value);
 
-        GtkCamProp(const GtkCamProp& other) = default;
+        GtkCamProp(const GtkCamProp &other) = default;
 
-        GtkCamProp(GtkCamProp&& other) noexcept;
+        GtkCamProp(GtkCamProp &&other) noexcept;
     };
 
     class GtkCamParams : public Gtk::Box {
@@ -36,7 +40,8 @@ namespace sex::xgtk {
 
         Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
 
-        std::vector<std::unique_ptr<Gtk::Box>> controls;
+        // preventing memory leak for dynamically allocated widgets
+        std::vector<std::unique_ptr<Gtk::Widget>> controls;
         std::vector<GtkCamProp> properties;
 
         std::function<int(uint, int)> onUpdateCallback;
