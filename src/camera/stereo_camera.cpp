@@ -2,6 +2,7 @@
 // Created by henryco on 11/15/23.
 //
 
+#include "./../v4l2/linux_video.h"
 #include "stereo_camera.h"
 
 #include <utility>
@@ -18,6 +19,18 @@ namespace sex {
     }
 
     void initFromParams(cv::VideoCapture& capture, const CameraProp& prop) {
+
+        auto v4_props = sex::v4l2::get_camera_props(prop.index);
+        for (const auto& queryctrl: v4_props) {
+            std::cout << "Control: " << queryctrl.name << std::endl;
+            std::cout << "  Type: " << queryctrl.type << std::endl;
+            std::cout << "  Minimum: " << queryctrl.minimum << std::endl;
+            std::cout << "  Maximum: " << queryctrl.maximum << std::endl;
+            std::cout << "  Step: " << queryctrl.step << std::endl;
+            std::cout << "  Default: " << queryctrl.default_value << std::endl << std::endl;
+            std::cout << "" << std::endl;
+        }
+
         std::vector<int> params;
         // todo
         params.assign({
@@ -118,6 +131,7 @@ namespace sex {
         int i = 0;
         for (auto& capture : captures) {
             log->debug("release camera [{}]", i);
+
 
             capture->release();
 

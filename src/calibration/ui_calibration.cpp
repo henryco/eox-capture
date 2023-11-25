@@ -15,7 +15,7 @@ void UiCalibration::prepareCamera() {
     // TEMPORAL
     const std::vector<int> index = {
 //            0,
-            2,
+//            2,
             4
     };
     const std::string codec = "MJPG";

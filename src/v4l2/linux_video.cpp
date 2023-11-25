@@ -10,39 +10,32 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-void sex::v4l2::grab_camera_props(int id) {
+
+std::vector<sex::v4l2::V4L2_QueryCtrl> sex::v4l2::get_camera_props(int id) {
+    std::vector<sex::v4l2::V4L2_QueryCtrl> properties;
 
     const std::string device = "/dev/video" + std::to_string(id);
     const int file_descriptor = open(device.c_str(), O_RDWR);
 
     if (file_descriptor == -1) {
         std::cerr << "Cannot open video device: " << device << std::endl;
-        return;
+        return {};
     }
 
     try {
-        struct v4l2_queryctrl queryctrl = {};
-        queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-
-        std::cout << "Controls for device " << device << ":" << std::endl;
+        sex::v4l2::V4L2_QueryCtrl queryctrl = {.id = V4L2_CTRL_FLAG_NEXT_CTRL};
 
         while (0 == ioctl(file_descriptor, VIDIOC_QUERYCTRL, &queryctrl)) {
             if (!(queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)) {
-                std::cout << "Control: " << queryctrl.name << std::endl;
-                std::cout << "  Type: " << queryctrl.type << std::endl;
-                std::cout << "  Minimum: " << queryctrl.minimum << std::endl;
-                std::cout << "  Maximum: " << queryctrl.maximum << std::endl;
-                std::cout << "  Step: " << queryctrl.step << std::endl;
-                std::cout << "  Default: " << queryctrl.default_value << std::endl << std::endl;
+                properties.push_back(queryctrl);
             }
-
             queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
         }
 
         if (errno != EINVAL) {
             close(file_descriptor);
             std::cerr << "fails for reasons other than reaching the end of the control list" << std::endl;
-            return;
+            return {};
         }
 
     } catch (...) {
@@ -51,4 +44,5 @@ void sex::v4l2::grab_camera_props(int id) {
     }
 
     close(file_descriptor);
+    return properties;
 }
