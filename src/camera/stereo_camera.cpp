@@ -40,7 +40,7 @@ namespace sex {
             cv::CAP_PROP_FPS, prop.fps,
             cv::CAP_PROP_BUFFERSIZE, prop.buffer
         });
-        capture.open(prop.index, prop.api, params);
+        capture.open((int) prop.index, prop.api, params);
 
         std::cout << "BUFF: " << capture.get(cv::CAP_PROP_BUFFERSIZE) << std::endl;
     }
