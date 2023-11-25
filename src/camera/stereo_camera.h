@@ -107,6 +107,10 @@ namespace sex {
 
         std::vector<cv::Mat> capture();
 
+        /**
+         * This function releases any resources held by the current instance.
+         */
+
         void release();
 
         /**

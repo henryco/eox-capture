@@ -72,7 +72,7 @@ namespace xgtk {
             initialized.push_back(false);
         }
 
-        set_size_request(_number * _width, height);
+        set_size_request((int) _number * _width, height);
         set_orientation(Gtk::ORIENTATION_VERTICAL);
         pack_end(h_box, Gtk::PACK_SHRINK);
     }

@@ -23,6 +23,7 @@ namespace sex {
         auto v4_props = sex::v4l2::get_camera_props(prop.index);
         for (const auto& queryctrl: v4_props) {
             std::cout << "Control: " << queryctrl.name << std::endl;
+            std::cout << "  ID: " << queryctrl.id << std::endl;
             std::cout << "  Type: " << queryctrl.type << std::endl;
             std::cout << "  Minimum: " << queryctrl.minimum << std::endl;
             std::cout << "  Maximum: " << queryctrl.maximum << std::endl;

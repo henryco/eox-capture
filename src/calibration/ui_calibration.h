@@ -13,6 +13,7 @@
 #include "../ogl/render/texture_1.h"
 #include "../gtk/gl_image.h"
 #include "../utils/loop/delta_loop.h"
+#include "../gtk/gtk_cam_params.h"
 
 class UiCalibration final : public Gtk::Window {
 
@@ -31,8 +32,12 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("ui_calibration");
 
+    Gtk::Box layout_h = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
+    sex::xgtk::GtkCamParams camParams;
+    xgtk::GLImage glImage;
+
     std::unique_ptr<sex::DeltaLoop> deltaLoop;
     Glib::Dispatcher dispatcher;
-    xgtk::GLImage glImage;
+
     sex::StereoCamera camera;
 };

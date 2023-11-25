@@ -52,14 +52,24 @@ void UiCalibration::prepareCamera() {
         deltaLoop = std::make_unique<sex::DeltaLoop>(
                 [this](float d, float l, float f){ update(d, l, f); });
     }
+
+    {
+        std::vector<sex::xgtk::GtkCamProp> parameters = {
+                sex::xgtk::GtkCamProp(1, 1, "Test", 0, 1, 1, 0, 0)
+        };
+
+        camParams.setProperties(parameters);
+    }
 }
 
 void UiCalibration::init() {
     prepareCamera();
 
-    this->set_title("StereoX++ calibration");
-    this->set_default_size(1280, 480);
-    this->add(glImage);
+    set_title("StereoX++ calibration");
+    add(layout_h);
+
+    layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
+    layout_h.pack_start(camParams, Gtk::PACK_SHRINK);
 
     dispatcher.connect(sigc::mem_fun(*this, &UiCalibration::on_dispatcher_signal));
     show_all_children();
