@@ -20,7 +20,7 @@ namespace sex {
 
     class CameraProp {
     public:
-        int index;
+        uint index;
         int api;
         int width;
         int height;
@@ -33,7 +33,7 @@ namespace sex {
          */
 
         explicit CameraProp(
-                const int index = 0,
+                const uint index = 0,
                 const int width = 640,
                 const int height = 480,
                 std::string codec = "YUYV",
@@ -110,7 +110,7 @@ namespace sex {
         void release();
 
         /**
-         * @see StereoCamera::open(std::vector<CameraProp> props)
+         * @see sex::StereoCamera::open(std::vector<CameraProp> props)
          */
         void open();
 
@@ -125,7 +125,7 @@ namespace sex {
          * @param props A vector of CameraProp objects representing the properties of the cameras to be opened.
          * @return void
          *
-         * @see CameraProp
+         * @see sex::CameraProp
          */
 
         void open(std::vector<CameraProp> props);
