@@ -40,7 +40,7 @@ private:
 
     Gtk::Box layout_h = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
     sex::xgtk::GtkCamParams camParams;
-    xgtk::GLImage glImage;
+    sex::xgtk::GLImage glImage;
 
     std::unique_ptr<sex::DeltaLoop> deltaLoop;
     Glib::Dispatcher dispatcher;

@@ -5,7 +5,7 @@
 #include <iostream>
 #include "gl_image.h"
 
-namespace xgtk {
+namespace sex::xgtk {
 
     GLImage::~GLImage() {
         textures.clear();

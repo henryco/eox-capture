@@ -12,7 +12,7 @@
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace xgtk {
+namespace sex::xgtk {
 
 class GLImage : public Gtk::Box {
 private:
