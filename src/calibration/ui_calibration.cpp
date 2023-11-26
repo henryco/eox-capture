@@ -47,8 +47,10 @@ void UiCalibration::prepareCamera() {
 
         glImage.init((int) index.size(), min_w, min_h, GL_BGR);
         camera.open(props);
-        deltaLoop = std::make_unique<sex::DeltaLoop>(
-                [this](float d, float l, float f) { update(d, l, f); });
+
+        deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
+        deltaLoop.setFps(0);
+        deltaLoop.start();
     }
 
     {
@@ -57,7 +59,7 @@ void UiCalibration::prepareCamera() {
         switcher->set_stack(*stack);
 
         const size_t rounds = separate ? index.size() : 1;
-        for (int i = 0; i < rounds; ++i) {
+        for (size_t i = 0; i < rounds; i++) {
             auto v4_props = sex::v4l2::get_camera_props(index[i]);
             std::vector<sex::xgtk::GtkCamProp> parameters;
             for (const auto &p: v4_props) {
@@ -76,7 +78,7 @@ void UiCalibration::prepareCamera() {
                 );
             }
             auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-            cam_params->onUpdate(updateCamera(separate ? i : -1));
+            cam_params->onUpdate(updateCamera(separate ? ((int) i) : -1));
             cam_params->setProperties(parameters);
 
             const auto postfix = separate ? std::to_string(index[i]) : "";
@@ -126,18 +128,20 @@ void UiCalibration::on_dispatcher_signal() {
 UiCalibration::~UiCalibration() {
     log->debug("terminate calibration");
 
-    deltaLoop->stop();
+    deltaLoop.stop();
     camera.release();
 
     log->debug("terminated");
 }
 
-std::function<int(uint, int)> UiCalibration::updateCamera(uint num) {
+std::function<int(uint , int)> UiCalibration::updateCamera(int num) {
     return [num, this] (uint prop_id, int value) -> int {
         log->info("update_property: {}, {}, {}", num, prop_id, value);
         // TODO
         if (num == -1) {
             // TODO
+
+
             return value;
         }
         return value;

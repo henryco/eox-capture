@@ -7,7 +7,7 @@
 #include <memory>
 #include <utility>
 
-namespace sex {
+namespace sex::util {
 
     DeltaLoop::DeltaLoop(const int fps) { // NOLINT(*-pro-type-member-init)
         setFps(fps);

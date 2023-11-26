@@ -33,7 +33,7 @@ protected:
     void prepareCamera();
     void update(float delta, float late, float fps);
 
-    std::function<int(uint, int)> updateCamera(uint num);
+    std::function<int(uint, int)> updateCamera(int num);
 
 private:
     static inline const auto log =
@@ -46,8 +46,8 @@ private:
     std::vector<std::unique_ptr<Gtk::Widget>> widgets;
     sex::xgtk::GLImage glImage;
 
-    std::unique_ptr<sex::DeltaLoop> deltaLoop;
     sex::xocv::StereoCamera camera;
+    sex::util::DeltaLoop deltaLoop;
 
     Glib::Dispatcher dispatcher;
 };
