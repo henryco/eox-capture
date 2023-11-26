@@ -53,16 +53,11 @@ namespace sex::xgtk {
 #pragma ide diagnostic ignored "UnreachableCode"
     void GtkCamParams::setProperties(const std::vector<GtkCamProp>& properties) {
         remove();
-        add(v_box);
-
-        auto children = v_box.get_children();
-        for (auto *child: children) {
-            v_box.remove(*child);
-        }
 
         controls.clear();
-        controls.reserve(properties.size());
+        controls.reserve(properties.size() + 1);
 
+        auto v_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
         for (const auto &prop: properties) {
             auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
             auto h_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
@@ -153,13 +148,16 @@ namespace sex::xgtk {
                 c_box->pack_start(*h_box, Gtk::PACK_SHRINK);
             }
 
-            v_box.pack_start(*c_box, Gtk::PACK_SHRINK);
+            v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
             controls.push_back(std::move(c_box));
             controls.push_back(std::move(h_box));
             controls.push_back(std::move(label));
             controls.push_back(std::move(scale));
             controls.push_back(std::move(entry));
         }
+
+        add(*v_box);
+        controls.push_back(std::move(v_box));
     }
 #pragma clang diagnostic pop
 

@@ -136,6 +136,10 @@ std::function<int(uint, int)> UiCalibration::updateCamera(uint num) {
     return [num, this] (uint prop_id, int value) -> int {
         log->info("update_property: {}, {}, {}", num, prop_id, value);
         // TODO
+        if (num == -1) {
+            // TODO
+            return value;
+        }
         return value;
     };
 }

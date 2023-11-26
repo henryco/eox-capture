@@ -49,6 +49,5 @@ private:
     std::unique_ptr<sex::DeltaLoop> deltaLoop;
     sex::xocv::StereoCamera camera;
 
-    std::vector<sigc::connection> debouncers;
     Glib::Dispatcher dispatcher;
 };
