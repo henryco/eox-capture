@@ -58,9 +58,10 @@ void UiCalibration::prepareCamera() {
     {
         auto v4_props = sex::v4l2::get_camera_props(4);
         std::vector<sex::xgtk::GtkCamProp> parameters;
-        parameters.reserve(v4_props.size());
         for (const auto &p: v4_props) {
             // TODO
+            if (p.type == 6)
+                continue;
             parameters.emplace_back(
                     p.id,
                     p.type,
@@ -79,8 +80,6 @@ void UiCalibration::prepareCamera() {
 
 void UiCalibration::init() {
     prepareCamera();
-
-    set_title("StereoX++ calibration");
     add(layout_h);
 
     layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
@@ -90,8 +89,9 @@ void UiCalibration::init() {
     show_all_children();
 }
 
-void UiCalibration::update(float delta, float latency, float fps) {
-    log->info("update: {}, late: {}, fps: {}", delta, latency, fps);
+void UiCalibration::update(float delta, float latency, float _fps) {
+    log->debug("update: {}, late: {}, fps: {}", delta, latency, _fps);
+    this->FPS = _fps;
 
     auto captured = camera.capture();
     if (captured.empty()) {
@@ -119,6 +119,7 @@ void UiCalibration::update(float delta, float latency, float fps) {
 }
 
 void UiCalibration::on_dispatcher_signal() {
+    set_title("StereoX++ calibration [ " + std::to_string((int) FPS) + " FPS ]");
     glImage.update();
 }
 

@@ -36,6 +36,8 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("ui_calibration");
 
+    float FPS = 0;
+
     Gtk::Box layout_h = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
     sex::xgtk::GtkCamParams camParams;
     xgtk::GLImage glImage;
