@@ -68,7 +68,7 @@ void UiCalibration::prepareCamera() {
                 parameters.emplace_back(
                         p.id,
                         p.type,
-                        std::string(reinterpret_cast<const char*>(p.name), 32),
+                        std::string(reinterpret_cast<const char *>(p.name), 32),
                         p.minimum,
                         p.maximum,
                         p.step,
@@ -84,6 +84,21 @@ void UiCalibration::prepareCamera() {
             stack->add(*cam_params, "cam_prop" + postfix, " Camera " + postfix);
 
             widgets.push_back(std::move(cam_params));
+
+            if (rounds == 1) {
+                // multi-camera config homogenisation
+
+                std::vector<sex::v4l2::V4L2_Control> v4_controls;
+                for (const auto &prop: v4_props) {
+                    if (prop.type == 6)
+                        continue;
+                    v4_controls.push_back(sex::v4l2::V4L2_Control{.id = prop.id, .value = prop.value});
+                }
+
+                for (size_t j = 1; j < index.size(); j++) {
+                    sex::v4l2::set_camera_prop(index[j], v4_controls);
+                }
+            }
         }
 
         layout_v.pack_start(*switcher, Gtk::PACK_SHRINK);
@@ -133,8 +148,8 @@ UiCalibration::~UiCalibration() {
     log->debug("terminated");
 }
 
-std::function<int(uint , int)> UiCalibration::updateCamera(std::vector<uint> devices) {
-    return [ids = std::move(devices), this] (uint prop_id, int value) -> int {
+std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devices) {
+    return [ids = std::move(devices), this](uint prop_id, int value) -> int {
         log->debug("update_property: {}, {}", prop_id, value);
         for (const auto &id: ids) {
             sex::v4l2::set_camera_prop(id, prop_id, value);
