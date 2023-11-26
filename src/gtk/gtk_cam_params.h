@@ -5,8 +5,10 @@
 #ifndef STEREOX_GTK_CAM_PARAMS_H
 #define STEREOX_GTK_CAM_PARAMS_H
 
-#include <gtkmm/box.h>
+#include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <gtkmm/box.h>
+#include <gtkmm/scrolledwindow.h>
 
 namespace sex::xgtk {
 
@@ -33,7 +35,7 @@ namespace sex::xgtk {
         GtkCamProp(GtkCamProp &&other) noexcept;
     };
 
-    class GtkCamParams : public Gtk::Box {
+    class GtkCamParams : public Gtk::ScrolledWindow {
     private:
         static inline const auto log =
                 spdlog::stdout_color_mt("gtk_cam_params");

@@ -9,11 +9,15 @@
 #include <gtkmm/box.h>
 #include <glibmm/dispatcher.h>
 
+#include <spdlog/logger.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 #include "../camera/stereo_camera.h"
 #include "../ogl/render/texture_1.h"
 #include "../gtk/gl_image.h"
 #include "../utils/loop/delta_loop.h"
 #include "../gtk/gtk_cam_params.h"
+
 
 class UiCalibration final : public Gtk::Window {
 

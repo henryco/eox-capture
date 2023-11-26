@@ -8,7 +8,9 @@
 #include "ui_calibration.h"
 
 #define STB_IMAGE_IMPLEMENTATION
+
 #include "../utils/stb_image.h"
+#include "../v4l2/linux_video.h"
 
 void UiCalibration::prepareCamera() {
 
@@ -26,7 +28,7 @@ void UiCalibration::prepareCamera() {
 
     std::vector<sex::CameraProp> props;
     props.reserve(index.size());
-    for (int i : index) {
+    for (int i: index) {
         props.emplace_back(i, width, height, codec, fps);
     }
 
@@ -50,13 +52,26 @@ void UiCalibration::prepareCamera() {
         camera.open(props);
 
         deltaLoop = std::make_unique<sex::DeltaLoop>(
-                [this](float d, float l, float f){ update(d, l, f); });
+                [this](float d, float l, float f) { update(d, l, f); });
     }
 
     {
-        std::vector<sex::xgtk::GtkCamProp> parameters = {
-                sex::xgtk::GtkCamProp(1, 1, "Test", 0, 1, 1, 0, 0)
-        };
+        auto v4_props = sex::v4l2::get_camera_props(4);
+        std::vector<sex::xgtk::GtkCamProp> parameters;
+        parameters.reserve(v4_props.size());
+        for (const auto &p: v4_props) {
+            // TODO
+            parameters.emplace_back(
+                    p.id,
+                    p.type,
+                    std::string(reinterpret_cast<const char*>(p.name), 32),
+                    p.minimum,
+                    p.maximum,
+                    p.step,
+                    p.default_value,
+                    0
+            );
+        }
 
         camParams.setProperties(parameters);
     }

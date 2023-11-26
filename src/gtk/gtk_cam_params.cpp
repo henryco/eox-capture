@@ -37,8 +37,7 @@ namespace sex::xgtk {
               value(other.value) {}
 
     GtkCamParams::GtkCamParams() {
-        set_orientation(Gtk::ORIENTATION_HORIZONTAL);
-        pack_start(v_box, Gtk::PACK_SHRINK);
+        set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
     }
 
     void GtkCamParams::onUpdate(std::function<int(uint, int)> _callback) {
@@ -46,6 +45,9 @@ namespace sex::xgtk {
     }
 
     void GtkCamParams::setProperties(std::vector<GtkCamProp> _properties) {
+        remove();
+        add(v_box);
+
         auto children = v_box.get_children();
         for (auto *child: children) {
             v_box.remove(*child);
@@ -69,6 +71,8 @@ namespace sex::xgtk {
 
                 box->pack_start(*label, Gtk::PACK_SHRINK);
 
+                // TODO
+
                 // css styling
                 auto css_provider = Gtk::CssProvider::create();
                 css_provider->load_from_data(R"css(
@@ -85,7 +89,6 @@ namespace sex::xgtk {
             controls.push_back(std::move(label));
             properties.push_back(std::move(property));
         }
-
     }
 
 } // sex
