@@ -48,7 +48,7 @@ namespace sex::xgtk {
         bool programmatic_change = false;
 
     public:
-        static inline const uint DELAY_MS = 300;
+        static inline const uint DELAY_MS = 500;
 
         GtkCamParams();
 

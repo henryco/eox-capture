@@ -141,7 +141,7 @@ namespace sex::xgtk {
                     entry->set_increments(prop.step, std::min(prop.max, prop.step * 10));
                     entry->set_digits(0);
                     entry->set_width_chars(5);
-                    entry->set_text(std::to_string(prop.value));
+                    entry->set_value(prop.value);
                     entry->signal_value_changed().connect([s_ptr = &*scale, e_ptr = &*entry, prop, this]() {
                         if (programmatic_change)
                             return;

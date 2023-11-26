@@ -33,7 +33,7 @@ protected:
     void prepareCamera();
     void update(float delta, float late, float fps);
 
-    std::function<int(uint, int)> updateCamera(int num);
+    std::function<int(uint, int)> updateCamera(std::vector<uint> devices);
 
 private:
     static inline const auto log =

@@ -63,7 +63,6 @@ void UiCalibration::prepareCamera() {
             auto v4_props = sex::v4l2::get_camera_props(index[i]);
             std::vector<sex::xgtk::GtkCamProp> parameters;
             for (const auto &p: v4_props) {
-                // TODO
                 if (p.type == 6)
                     continue;
                 parameters.emplace_back(
@@ -74,11 +73,11 @@ void UiCalibration::prepareCamera() {
                         p.maximum,
                         p.step,
                         p.default_value,
-                        0
+                        p.value
                 );
             }
             auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-            cam_params->onUpdate(updateCamera(separate ? ((int) i) : -1));
+            cam_params->onUpdate(updateCamera(separate ? std::vector<uint>{index[i]} : index));
             cam_params->setProperties(parameters);
 
             const auto postfix = separate ? std::to_string(index[i]) : "";
@@ -134,15 +133,11 @@ UiCalibration::~UiCalibration() {
     log->debug("terminated");
 }
 
-std::function<int(uint , int)> UiCalibration::updateCamera(int num) {
-    return [num, this] (uint prop_id, int value) -> int {
-        log->info("update_property: {}, {}, {}", num, prop_id, value);
-        // TODO
-        if (num == -1) {
-            // TODO
-
-
-            return value;
+std::function<int(uint , int)> UiCalibration::updateCamera(std::vector<uint> devices) {
+    return [ids = std::move(devices), this] (uint prop_id, int value) -> int {
+        log->debug("update_property: {}, {}", prop_id, value);
+        for (const auto &id: ids) {
+            sex::v4l2::set_camera_prop(id, prop_id, value);
         }
         return value;
     };
