@@ -40,17 +40,16 @@ namespace sex::xgtk {
         static inline const auto log =
                 spdlog::stdout_color_mt("gtk_cam_params");
 
-//        Gtk::Box v_box = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
-
         // preventing memory leak for dynamically allocated widgets
         std::vector<std::unique_ptr<Gtk::Widget>> controls;
 
-        sigc::connection debounce_connection;
-
         std::function<int(uint, int)> onUpdateCallback{};
+        sigc::connection debounce_connection;
         bool programmatic_change = false;
 
     public:
+        static inline const uint DELAY_MS = 300;
+
         GtkCamParams();
 
         ~GtkCamParams() override = default;

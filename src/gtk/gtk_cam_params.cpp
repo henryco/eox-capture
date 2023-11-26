@@ -6,6 +6,7 @@
 #include <gtkmm/cssprovider.h>
 #include <gtkmm/scale.h>
 #include <gtkmm/spinbutton.h>
+#include <glibmm/main.h>
 #include "gtk_cam_params.h"
 #include "gtk_utils.h"
 
@@ -51,6 +52,7 @@ namespace sex::xgtk {
 #pragma ide diagnostic ignored "ConstantConditionsOC"
 #pragma ide diagnostic ignored "UnusedValue"
 #pragma ide diagnostic ignored "UnreachableCode"
+
     void GtkCamParams::setProperties(const std::vector<GtkCamProp>& properties) {
         remove();
 
@@ -106,10 +108,22 @@ namespace sex::xgtk {
                         programmatic_change = true;
                         {
                             const auto value = (int) s_ptr->get_value();
-                            const auto result = onUpdateCallback(prop.id, value);
-                            if (value != result)
-                                s_ptr->set_value(result);
-                            e_ptr->set_value(result);
+                            e_ptr->set_value(value);
+
+                            if (debounce_connection.connected())
+                                debounce_connection.disconnect();
+
+                            debounce_connection = Glib::signal_timeout().connect([this, prop, value, e_ptr, s_ptr]() {
+                                programmatic_change = true;
+                                {
+                                    const auto result = onUpdateCallback(prop.id, value);
+                                    if (value != result)
+                                        s_ptr->set_value(result);
+                                    e_ptr->set_value(result);
+                                }
+                                programmatic_change = false;
+                                return false;
+                            }, DELAY_MS);
                         }
                         programmatic_change = false;
                     });
@@ -134,10 +148,22 @@ namespace sex::xgtk {
                         programmatic_change = true;
                         {
                             const auto value = (int) e_ptr->get_value();
-                            const auto result = onUpdateCallback(prop.id, value);
-                            if (value != result)
-                                e_ptr->set_value(result);
-                            s_ptr->set_value(result);
+                            s_ptr->set_value(value);
+
+                            if (debounce_connection.connected())
+                                debounce_connection.disconnect();
+
+                            debounce_connection = Glib::signal_timeout().connect([this, prop, value, e_ptr, s_ptr]() {
+                                programmatic_change = true;
+                                {
+                                    const auto result = onUpdateCallback(prop.id, value);
+                                    if (value != result)
+                                        e_ptr->set_value(result);
+                                    s_ptr->set_value(result);
+                                }
+                                programmatic_change = false;
+                                return false;
+                            }, DELAY_MS);
                         }
                         programmatic_change = false;
                     });
@@ -159,6 +185,7 @@ namespace sex::xgtk {
         add(*v_box);
         controls.push_back(std::move(v_box));
     }
+
 #pragma clang diagnostic pop
 
 } // sex
