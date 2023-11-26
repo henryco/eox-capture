@@ -37,6 +37,8 @@ std::vector<sex::v4l2::V4L2_QueryCtrl> sex::v4l2::get_camera_props(uint id) {
                     queryctrl.value = ctr.value;
                 }
 
+                // TODO: query menu items name
+
                 properties.push_back(queryctrl);
             }
 
