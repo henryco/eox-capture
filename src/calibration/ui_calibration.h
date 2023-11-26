@@ -11,6 +11,8 @@
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <gtkmm/stack.h>
+#include <gtkmm/stackswitcher.h>
 
 #include "../camera/stereo_camera.h"
 #include "../ogl/render/texture_1.h"
@@ -30,7 +32,8 @@ protected:
     void on_dispatcher_signal();
     void prepareCamera();
     void update(float delta, float late, float fps);
-    int updateCamera(uint prop_id, int value);
+
+    std::function<int(uint, int)> updateCamera(uint num);
 
 private:
     static inline const auto log =
@@ -39,11 +42,13 @@ private:
     float FPS = 0;
 
     Gtk::Box layout_h = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
-    sex::xgtk::GtkCamParams camParams;
+    Gtk::Box layout_v = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
+    std::vector<std::unique_ptr<Gtk::Widget>> widgets;
     sex::xgtk::GLImage glImage;
 
     std::unique_ptr<sex::DeltaLoop> deltaLoop;
-    Glib::Dispatcher dispatcher;
+    sex::xocv::StereoCamera camera;
 
-    sex::StereoCamera camera;
+    std::vector<sigc::connection> debouncers;
+    Glib::Dispatcher dispatcher;
 };

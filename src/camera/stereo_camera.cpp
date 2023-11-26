@@ -8,7 +8,7 @@
 #include <utility>
 #include <iostream>
 
-namespace sex {
+namespace sex::xocv {
 
     int fourCC(std::string name) {
         return cv::VideoWriter::fourcc(

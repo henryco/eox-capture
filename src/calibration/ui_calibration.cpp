@@ -15,8 +15,7 @@
 void UiCalibration::prepareCamera() {
 
     // TEMPORAL
-    const std::vector<int> index = {
-//            0,
+    const std::vector<uint> index = {
             2,
             4
     };
@@ -24,16 +23,16 @@ void UiCalibration::prepareCamera() {
     const int width = 640;
     const int height = 480;
     const int fps = 30;
+    const bool separate = false;
     // TEMPORAL
 
-    std::vector<sex::CameraProp> props;
-    props.reserve(index.size());
-    for (int i: index) {
-        props.emplace_back(i, width, height, codec, fps);
-    }
-
     {
-        // FIND COMMON MIN VALUES
+        std::vector<sex::xocv::CameraProp> props;
+        props.reserve(index.size());
+        for (const auto i: index) {
+            props.emplace_back(i, width, height, codec, fps);
+        }
+
         int min_fps = 0;
         int min_w = 0;
         int min_h = 0;
@@ -46,38 +45,51 @@ void UiCalibration::prepareCamera() {
                 min_h = prop.height;
         }
 
-//        glImage.init((int) index.size(), min_w, min_h, GL_BGR);
-        glImage.init(1, min_w * (int) index.size(), min_h, GL_BGR);
-
+        glImage.init((int) index.size(), min_w, min_h, GL_BGR);
         camera.open(props);
-
         deltaLoop = std::make_unique<sex::DeltaLoop>(
                 [this](float d, float l, float f) { update(d, l, f); });
     }
 
     {
-        auto v4_props = sex::v4l2::get_camera_props(4);
-        std::vector<sex::xgtk::GtkCamProp> parameters;
-        for (const auto &p: v4_props) {
-            // TODO
-            if (p.type == 6)
-                continue;
-            parameters.emplace_back(
-                    p.id,
-                    p.type,
-                    std::string(reinterpret_cast<const char*>(p.name), 32),
-                    p.minimum,
-                    p.maximum,
-                    p.step,
-                    p.default_value,
-                    0
-            );
+        auto stack = std::make_unique<Gtk::Stack>();
+        auto switcher = std::make_unique<Gtk::StackSwitcher>();
+        switcher->set_stack(*stack);
+
+        const size_t rounds = separate ? index.size() : 1;
+        for (int i = 0; i < rounds; ++i) {
+            auto v4_props = sex::v4l2::get_camera_props(index[i]);
+            std::vector<sex::xgtk::GtkCamProp> parameters;
+            for (const auto &p: v4_props) {
+                // TODO
+                if (p.type == 6)
+                    continue;
+                parameters.emplace_back(
+                        p.id,
+                        p.type,
+                        std::string(reinterpret_cast<const char*>(p.name), 32),
+                        p.minimum,
+                        p.maximum,
+                        p.step,
+                        p.default_value,
+                        0
+                );
+            }
+            auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
+            cam_params->onUpdate(updateCamera(separate ? i : -1));
+            cam_params->setProperties(parameters);
+
+            const auto postfix = separate ? std::to_string(index[i]) : "";
+            stack->add(*cam_params, "cam_prop" + postfix, " Camera " + postfix);
+
+            widgets.push_back(std::move(cam_params));
         }
 
-        camParams.setProperties(parameters);
-        camParams.onUpdate([this](auto x, auto y) {
-            return updateCamera(x, y);
-        });
+        layout_v.pack_start(*switcher, Gtk::PACK_SHRINK);
+        layout_v.pack_start(*stack);
+
+        widgets.push_back(std::move(stack));
+        widgets.push_back(std::move(switcher));
     }
 }
 
@@ -86,7 +98,7 @@ void UiCalibration::init() {
     add(layout_h);
 
     layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
-    layout_h.pack_start(camParams, Gtk::PACK_SHRINK);
+    layout_h.pack_start(layout_v, Gtk::PACK_SHRINK);
 
     dispatcher.connect(sigc::mem_fun(*this, &UiCalibration::on_dispatcher_signal));
     show_all_children();
@@ -102,22 +114,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         return;
     }
 
-
-
-    // TODO FIXME =====
-    auto first = captured[0];
-    cv::Mat merged(first.rows, (int) (first.cols * captured.size()), first.type());
-    for (int i = 0; i < captured.size(); i++) {
-        auto source = captured[i];
-        source.copyTo(merged(cv::Rect(source.cols * i, 0, source.cols, source.rows)));
-    }
-    std::vector<cv::Mat> vec = {merged};
-    glImage.setFrames(std::move(vec));
-    // TODO FIXME =====
-
-
-
-//    glImage.setFrames(std::move(captured));
+    glImage.setFrames(std::move(captured));
     dispatcher.emit();
 }
 
@@ -135,10 +132,12 @@ UiCalibration::~UiCalibration() {
     log->debug("terminated");
 }
 
-int UiCalibration::updateCamera(uint prop_id, int value) {
-    log->info("property: {} update: {}", prop_id, value);
-
-    return value;
+std::function<int(uint, int)> UiCalibration::updateCamera(uint num) {
+    return [num, this] (uint prop_id, int value) -> int {
+        log->info("update_property: {}, {}, {}", num, prop_id, value);
+        // TODO
+        return value;
+    };
 }
 
 

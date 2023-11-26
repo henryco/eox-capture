@@ -8,7 +8,7 @@
 #include <opencv2/core/mat.hpp>
 #include "../utils/tp/thread_pool.h"
 
-namespace sex {
+namespace sex::xocv {
 
     /**
      * @class CameraProp
