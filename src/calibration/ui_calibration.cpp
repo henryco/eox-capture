@@ -14,7 +14,7 @@
 
 void UiCalibration::prepareCamera() {
 
-    // TEMPORAL
+    // TEMPORAL (move to CLI later)
     const std::vector<uint> index = {
             2,
             4
@@ -24,13 +24,81 @@ void UiCalibration::prepareCamera() {
     const int height = 480;
     const int fps = 30;
     const bool separate = false;
-    // TEMPORAL
+    const int api = cv::CAP_V4L2;
+    const int buffer = 2;
+    // TEMPORAL (move to CLI later)
+
 
     {
+        // Camera controls and so on
+
+        auto stack = std::make_unique<Gtk::Stack>();
+        auto switcher = std::make_unique<Gtk::StackSwitcher>();
+        switcher->set_stack(*stack);
+
+
+        if (api == cv::CAP_V4L2) {
+            // Camera controls for V4L2 API (video for linux)
+
+            const size_t rounds = separate ? index.size() : 1;
+            for (size_t i = 0; i < rounds; i++) {
+                auto v4_props = sex::v4l2::get_camera_props(index[i]);
+                std::vector<sex::xgtk::GtkCamProp> parameters;
+                for (const auto &p: v4_props) {
+                    if (p.type == 6)
+                        continue;
+                    parameters.emplace_back(
+                            p.id,
+                            p.type,
+                            std::string(reinterpret_cast<const char *>(p.name), 32),
+                            p.minimum,
+                            p.maximum,
+                            p.step,
+                            p.default_value,
+                            p.value
+                    );
+                }
+                auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
+                cam_params->onUpdate(updateCamera(separate ? std::vector<uint>{index[i]} : index));
+                cam_params->setProperties(parameters);
+
+                const auto postfix = separate ? std::to_string(index[i]) : "";
+                stack->add(*cam_params, "cam_prop" + postfix, " Camera " + postfix);
+
+                widgets.push_back(std::move(cam_params));
+
+                if (rounds == 1) {
+                    // multi-camera config homogenisation
+
+                    std::vector<sex::v4l2::V4L2_Control> v4_controls;
+                    for (const auto &prop: v4_props) {
+                        if (prop.type == 6)
+                            continue;
+                        v4_controls.push_back(sex::v4l2::V4L2_Control{.id = prop.id, .value = prop.value});
+                    }
+
+                    for (size_t j = 1; j < index.size(); j++) {
+                        sex::v4l2::set_camera_prop(index[j], v4_controls);
+                    }
+                }
+            }
+        }
+
+        layout_v.pack_start(*switcher, Gtk::PACK_SHRINK);
+        layout_v.pack_start(*stack);
+
+        widgets.push_back(std::move(stack));
+        widgets.push_back(std::move(switcher));
+    }
+
+
+    {
+        // OPENCV camera config
+
         std::vector<sex::xocv::CameraProp> props;
         props.reserve(index.size());
         for (const auto i: index) {
-            props.emplace_back(i, width, height, codec, fps);
+            props.emplace_back(i, width, height, codec, fps, buffer, api);
         }
 
         int min_fps = 0;
@@ -47,66 +115,17 @@ void UiCalibration::prepareCamera() {
 
         glImage.init((int) index.size(), min_w, min_h, GL_BGR);
         camera.open(props);
+    }
+
+
+    {
+        // Stable FPS worker loop
 
         deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
         deltaLoop.setFps(0);
         deltaLoop.start();
     }
 
-    {
-        auto stack = std::make_unique<Gtk::Stack>();
-        auto switcher = std::make_unique<Gtk::StackSwitcher>();
-        switcher->set_stack(*stack);
-
-        const size_t rounds = separate ? index.size() : 1;
-        for (size_t i = 0; i < rounds; i++) {
-            auto v4_props = sex::v4l2::get_camera_props(index[i]);
-            std::vector<sex::xgtk::GtkCamProp> parameters;
-            for (const auto &p: v4_props) {
-                if (p.type == 6)
-                    continue;
-                parameters.emplace_back(
-                        p.id,
-                        p.type,
-                        std::string(reinterpret_cast<const char *>(p.name), 32),
-                        p.minimum,
-                        p.maximum,
-                        p.step,
-                        p.default_value,
-                        p.value
-                );
-            }
-            auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-            cam_params->onUpdate(updateCamera(separate ? std::vector<uint>{index[i]} : index));
-            cam_params->setProperties(parameters);
-
-            const auto postfix = separate ? std::to_string(index[i]) : "";
-            stack->add(*cam_params, "cam_prop" + postfix, " Camera " + postfix);
-
-            widgets.push_back(std::move(cam_params));
-
-            if (rounds == 1) {
-                // multi-camera config homogenisation
-
-                std::vector<sex::v4l2::V4L2_Control> v4_controls;
-                for (const auto &prop: v4_props) {
-                    if (prop.type == 6)
-                        continue;
-                    v4_controls.push_back(sex::v4l2::V4L2_Control{.id = prop.id, .value = prop.value});
-                }
-
-                for (size_t j = 1; j < index.size(); j++) {
-                    sex::v4l2::set_camera_prop(index[j], v4_controls);
-                }
-            }
-        }
-
-        layout_v.pack_start(*switcher, Gtk::PACK_SHRINK);
-        layout_v.pack_start(*stack);
-
-        widgets.push_back(std::move(stack));
-        widgets.push_back(std::move(switcher));
-    }
 }
 
 void UiCalibration::init() {

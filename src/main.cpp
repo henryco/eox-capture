@@ -1,9 +1,12 @@
 #include <gtkmm.h>
+#include "utils/globals/sex_globals.h"
 #include "calibration/ui_calibration.h"
 #include "utils/errors/error_reporter.h"
 #include "spdlog/spdlog.h"
 
 int main(int argc, char **argv) {
+
+    sex::globals::THREAD_POOL_CORES_MAX = 4;
 
     try {
 //        spdlog::set_level(spdlog::level::debug);

@@ -51,6 +51,8 @@ add_executable(${PROJECT_NAME}
         src/gtk/gtk_cam_params.cpp
         src/gtk/gtk_cam_params.h
         src/gtk/gtk_utils.h
+        src/utils/globals/sex_globals.cpp
+        src/utils/globals/sex_globals.h
 )
 
 # Include directories for the specific target

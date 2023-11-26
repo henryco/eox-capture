@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "thread_pool.h"
+#include "../globals/sex_globals.h"
 
 namespace sex {
 
@@ -94,11 +95,14 @@ namespace sex {
     }
 
     void ThreadPool::start(size_t size) {
-        log->debug("start: {}", size);
+        size_t n_cores = std::clamp(size,
+                                    std::size_t(1),
+                                    sex::globals::THREAD_POOL_CORES_MAX);
+        log->debug("start, requested: {}, given: {}", size, n_cores);
         shutdown();
         {
             std::lock_guard<std::mutex> lock(mutex);
-            for (int i = 0; i < size; ++i) {
+            for (int i = 0; i < n_cores; ++i) {
                 threads.emplace(&ThreadPool::worker, this);
             }
             stop = false;
