@@ -6,7 +6,7 @@
 #include "thread_pool.h"
 #include "../globals/sex_globals.h"
 
-namespace sex {
+namespace sex::util {
 
     void ThreadPool::worker() {
         while (true) {

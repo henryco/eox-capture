@@ -63,7 +63,7 @@ namespace sex::xocv {
 
         std::vector<std::unique_ptr<cv::VideoCapture>> captures;
         std::vector<CameraProp> properties;
-        sex::ThreadPool executor;
+        sex::util::ThreadPool executor;
 
         bool fast = false;
 
