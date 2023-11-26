@@ -17,7 +17,7 @@ void UiCalibration::prepareCamera() {
     // TEMPORAL
     const std::vector<int> index = {
 //            0,
-//            2,
+            2,
             4
     };
     const std::string codec = "MJPG";
@@ -75,6 +75,9 @@ void UiCalibration::prepareCamera() {
         }
 
         camParams.setProperties(parameters);
+        camParams.onUpdate([this](auto x, auto y) {
+            return updateCamera(x, y);
+        });
     }
 }
 
@@ -130,6 +133,12 @@ UiCalibration::~UiCalibration() {
     camera.release();
 
     log->debug("terminated");
+}
+
+int UiCalibration::updateCamera(uint prop_id, int value) {
+    log->info("property: {} update: {}", prop_id, value);
+
+    return value;
 }
 
 

@@ -44,9 +44,9 @@ namespace sex::xgtk {
 
         // preventing memory leak for dynamically allocated widgets
         std::vector<std::unique_ptr<Gtk::Widget>> controls;
-        std::vector<GtkCamProp> properties;
 
-        std::function<int(uint, int)> onUpdateCallback;
+        std::function<int(uint, int)> onUpdateCallback{};
+        bool programmatic_change = false;
 
     public:
         GtkCamParams();
@@ -55,7 +55,7 @@ namespace sex::xgtk {
 
         void onUpdate(std::function<int(uint, int)> callback);
 
-        void setProperties(std::vector<GtkCamProp> properties);
+        void setProperties(const std::vector<GtkCamProp>& properties);
     };
 
 } // sex

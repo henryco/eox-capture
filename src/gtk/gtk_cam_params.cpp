@@ -4,7 +4,10 @@
 
 #include <gtkmm/label.h>
 #include <gtkmm/cssprovider.h>
+#include <gtkmm/scale.h>
+#include <gtkmm/spinbutton.h>
 #include "gtk_cam_params.h"
+#include "gtk_utils.h"
 
 namespace sex::xgtk {
 
@@ -24,7 +27,7 @@ namespace sex::xgtk {
             max(max),
             step(step),
             default_value(defaultValue),
-            value(value) {};
+            value(value) {}
 
     GtkCamProp::GtkCamProp(GtkCamProp &&other) noexcept
             : id(other.id),
@@ -44,7 +47,11 @@ namespace sex::xgtk {
         this->onUpdateCallback = std::move(_callback);
     }
 
-    void GtkCamParams::setProperties(std::vector<GtkCamProp> _properties) {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "ConstantConditionsOC"
+#pragma ide diagnostic ignored "UnusedValue"
+#pragma ide diagnostic ignored "UnreachableCode"
+    void GtkCamParams::setProperties(const std::vector<GtkCamProp>& properties) {
         remove();
         add(v_box);
 
@@ -53,42 +60,107 @@ namespace sex::xgtk {
             v_box.remove(*child);
         }
 
-        properties.clear();
         controls.clear();
+        controls.reserve(properties.size());
 
-        properties.reserve(_properties.size());
-        controls.reserve(_properties.size());
-
-        for (auto &property: _properties) {
-            auto box = std::make_unique<Gtk::Box>();
-            auto label = std::make_unique<Gtk::Label>(property.name);
+        for (const auto &prop: properties) {
+            auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+            auto h_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+            auto scale = std::make_unique<Gtk::Scale>(Gtk::ORIENTATION_HORIZONTAL);
+            auto entry = std::make_unique<Gtk::SpinButton>();
+            auto label = std::make_unique<Gtk::Label>();
 
             {
-                // some extra elements and props here
-                box->get_style_context()->add_class("cam-param-box");
-                box->set_orientation(Gtk::ORIENTATION_VERTICAL);
-                box->set_size_request(300, 100);
-
-                box->pack_start(*label, Gtk::PACK_SHRINK);
-
-                // TODO
-
-                // css styling
-                auto css_provider = Gtk::CssProvider::create();
-                css_provider->load_from_data(R"css(
-                    .cam-param-box {
+                // Control container
+                c_box->set_size_request(300, 100);
+                c_box->get_style_context()->add_class("cam-param-c_box");
+                sex::xgtk::add_style(*c_box, R"css(
+                    .cam-param-c_box {
                         background-color: white;
-                        border-bottom: 1px solid black;
+                        border-bottom: 1px solid lightgrey;
+                        padding-right: 20px;
+                        padding-left: 15px;
+                        padding-top: 10px;
                     }
                 )css");
-                box->get_style_context()->add_provider(css_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+
+                {
+                    // Label
+                    label->set_text(prop.name);
+                    label->set_alignment(0);
+                    label->get_style_context()->add_class("cam-param-label");
+                    sex::xgtk::add_style(*label, R"css(
+                        .cam-param-label {
+                            padding-bottom: 10px;
+                        }
+                    )css");
+                }
+
+                {
+                    // Slider
+                    scale->set_size_request(260);
+                    scale->set_range(prop.min, prop.max);
+                    scale->set_increments(prop.step, std::min(prop.max, prop.step * 10));
+                    scale->set_digits(0);
+                    scale->set_value_pos(Gtk::POS_TOP);
+                    scale->set_value(prop.value);
+                    scale->signal_value_changed().connect([s_ptr = &*scale, e_ptr = &*entry, prop, this]() {
+                        if (programmatic_change)
+                            return;
+                        programmatic_change = true;
+                        {
+                            const auto value = (int) s_ptr->get_value();
+                            const auto result = onUpdateCallback(prop.id, value);
+                            if (value != result)
+                                s_ptr->set_value(result);
+                            e_ptr->set_value(result);
+                        }
+                        programmatic_change = false;
+                    });
+
+                    h_box->pack_start(*scale, Gtk::PACK_SHRINK);
+                }
+
+                {
+                    // Spin button
+                    entry->set_numeric(true);
+                    entry->set_snap_to_ticks(true);
+                    entry->set_update_policy(Gtk::UPDATE_IF_VALID);
+                    entry->set_size_request(50, 50);
+                    entry->set_range(prop.min, prop.max);
+                    entry->set_increments(prop.step, std::min(prop.max, prop.step * 10));
+                    entry->set_digits(0);
+                    entry->set_width_chars(5);
+                    entry->set_text(std::to_string(prop.value));
+                    entry->signal_value_changed().connect([s_ptr = &*scale, e_ptr = &*entry, prop, this]() {
+                        if (programmatic_change)
+                            return;
+                        programmatic_change = true;
+                        {
+                            const auto value = (int) e_ptr->get_value();
+                            const auto result = onUpdateCallback(prop.id, value);
+                            if (value != result)
+                                e_ptr->set_value(result);
+                            s_ptr->set_value(result);
+                        }
+                        programmatic_change = false;
+                    });
+
+                    h_box->pack_end(*entry, Gtk::PACK_SHRINK);
+                }
+
+                c_box->pack_start(*label, Gtk::PACK_SHRINK);
+                c_box->pack_start(*h_box, Gtk::PACK_SHRINK);
             }
 
-            v_box.pack_start(*box, Gtk::PACK_SHRINK);
-            controls.push_back(std::move(box));
+            v_box.pack_start(*c_box, Gtk::PACK_SHRINK);
+            controls.push_back(std::move(c_box));
+            controls.push_back(std::move(h_box));
             controls.push_back(std::move(label));
-            properties.push_back(std::move(property));
+            controls.push_back(std::move(scale));
+            controls.push_back(std::move(entry));
         }
     }
+#pragma clang diagnostic pop
 
 } // sex

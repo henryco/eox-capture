@@ -50,6 +50,7 @@ add_executable(${PROJECT_NAME}
         src/v4l2/linux_video.h
         src/gtk/gtk_cam_params.cpp
         src/gtk/gtk_cam_params.h
+        src/gtk/gtk_utils.h
 )
 
 # Include directories for the specific target
