@@ -94,6 +94,7 @@ namespace sex::xgtk {
                             padding-bottom: 10px;
                         }
                     )css");
+                    c_box->pack_start(*label, Gtk::PACK_SHRINK);
                 }
 
                 {
@@ -149,7 +150,6 @@ namespace sex::xgtk {
                     h_box->pack_end(*entry, Gtk::PACK_SHRINK);
                 }
 
-                c_box->pack_start(*label, Gtk::PACK_SHRINK);
                 c_box->pack_start(*h_box, Gtk::PACK_SHRINK);
             }
 
