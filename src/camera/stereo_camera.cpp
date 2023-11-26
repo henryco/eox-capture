@@ -28,7 +28,8 @@ namespace sex {
             std::cout << "  Minimum: " << queryctrl.minimum << std::endl;
             std::cout << "  Maximum: " << queryctrl.maximum << std::endl;
             std::cout << "  Step: " << queryctrl.step << std::endl;
-            std::cout << "  Default: " << queryctrl.default_value << std::endl << std::endl;
+            std::cout << "  Default: " << queryctrl.default_value << std::endl;
+            std::cout << "  Value: " << queryctrl.value << std::endl << std::endl;
             std::cout << "" << std::endl;
         }
 

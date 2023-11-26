@@ -23,11 +23,23 @@ std::vector<sex::v4l2::V4L2_QueryCtrl> sex::v4l2::get_camera_props(uint id) {
 
     try {
 
-        sex::v4l2::V4L2_QueryCtrl queryctrl = {.id = V4L2_CTRL_FLAG_NEXT_CTRL};
+        sex::v4l2::V4L2_QueryCtrl queryctrl;
+        queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
 
         while (0 == ioctl(file_descriptor, VIDIOC_QUERYCTRL, &queryctrl)) {
-            if (!(queryctrl.flags & V4L2_CTRL_FLAG_DISABLED))
+            if (!(queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)) {
+
+                if (queryctrl.type != V4L2_CTRL_TYPE_CTRL_CLASS) {
+                    sex::v4l2::V4L2_Control ctr = {.id = queryctrl.id};
+                    if (ioctl(file_descriptor, VIDIOC_G_CTRL, &ctr) == -1) {
+                        std::cerr << "Cannot retrieve value for control: " << ctr.id << " [" << device << "]" << std::endl;
+                    }
+                    queryctrl.value = ctr.value;
+                }
+
                 properties.push_back(queryctrl);
+            }
+
             queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
         }
 

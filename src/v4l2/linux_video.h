@@ -10,7 +10,11 @@
 
 namespace sex::v4l2 {
 
-    typedef struct v4l2_queryctrl V4L2_QueryCtrl;
+    struct v4l2_queryctrl_ext : public v4l2_queryctrl {
+        __s32 value;
+    };
+
+    typedef struct v4l2_queryctrl_ext V4L2_QueryCtrl;
     typedef struct v4l2_control V4L2_Control;
 
     /**
