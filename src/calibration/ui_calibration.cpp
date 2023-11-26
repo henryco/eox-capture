@@ -84,6 +84,11 @@ void UiCalibration::prepareCamera() {
             }
         }
 
+        else if (api == cv::CAP_DSHOW) {
+            // DirectShow windows
+            // TODO windows support
+        }
+
         layout_v.pack_start(*switcher, Gtk::PACK_SHRINK);
         layout_v.pack_start(*stack);
 
