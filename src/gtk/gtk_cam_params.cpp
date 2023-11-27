@@ -7,6 +7,7 @@
 #include <gtkmm/scale.h>
 #include <gtkmm/spinbutton.h>
 #include <glibmm/main.h>
+#include <gtkmm/button.h>
 #include "gtk_cam_params.h"
 #include "gtk_utils.h"
 
@@ -44,8 +45,16 @@ namespace sex::xgtk {
         set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_AUTOMATIC);
     }
 
-    void GtkCamParams::onUpdate(std::function<int(uint, int)> _callback) {
-        this->onUpdateCallback = std::move(_callback);
+    void GtkCamParams::onUpdate(std::function<int(uint, int)> callback) {
+        this->onUpdateCallback = std::move(callback);
+    }
+
+    void GtkCamParams::onReset(std::function<void()> callback) {
+        this->onResetCallback = std::move(callback);
+    }
+
+    void GtkCamParams::onSave(std::function<void()> callback) {
+        this->onSaveCallback = std::move(callback);
     }
 
 #pragma clang diagnostic push
@@ -60,6 +69,35 @@ namespace sex::xgtk {
         controls.reserve(properties.size() + 1);
 
         auto v_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+        auto button_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+        v_box->pack_start(*button_box, Gtk::PACK_SHRINK);
+
+        auto reset = std::make_unique<Gtk::Button>();
+        reset->signal_clicked().connect([this]() { onResetCallback(); });
+        reset->get_style_context()->add_class("button-reset");
+        reset->set_size_request(-1, 30);
+        reset->set_label("Hardware Defaults");
+        sex::xgtk::add_style(*reset, R"css(
+            .button-reset {
+                 margin-right: 5px;
+                 margin-bottom: 5px;
+             }
+        )css");
+        button_box->pack_start(*reset, Gtk::PACK_SHRINK);
+
+        auto save = std::make_unique<Gtk::Button>();
+        save->signal_clicked().connect([this]() { onSaveCallback(); });
+        save->get_style_context()->add_class("button-save");
+        save->set_size_request(-1, 30);
+        save->set_label("Save settings");
+        sex::xgtk::add_style(*save, R"css(
+            .button-save {
+                 margin-right: 5px;
+                 margin-bottom: 5px;
+             }
+        )css");
+        button_box->pack_start(*save, Gtk::PACK_SHRINK);
+
         for (const auto &prop: properties) {
             auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
             auto h_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
@@ -183,7 +221,10 @@ namespace sex::xgtk {
         }
 
         add(*v_box);
+        controls.push_back(std::move(save));
         controls.push_back(std::move(v_box));
+        controls.push_back(std::move(reset));
+        controls.push_back(std::move(button_box));
     }
 
 #pragma clang diagnostic pop

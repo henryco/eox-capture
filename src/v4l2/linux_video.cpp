@@ -111,9 +111,10 @@ std::vector<bool> sex::v4l2::set_camera_prop(uint device_id, std::vector<sex::v4
 void sex::v4l2::reset_defaults(uint device_id) {
     const auto props = get_camera_props(device_id);
     std::vector<sex::v4l2::V4L2_Control> controls;
-    controls.reserve(props.size());
 
     for (const auto &prop: props) {
+        if (prop.type == 6)
+            continue;
         controls.push_back({
             .id = prop.id,
             .value = prop.default_value

@@ -40,6 +40,8 @@ void UiCalibration::prepareCamera() {
         if (api == cv::CAP_V4L2) {
             // Camera controls for V4L2 API (video for linux)
 
+            // TODO DESERIALIZATION
+
             const size_t rounds = separate ? index.size() : 1;
             for (size_t i = 0; i < rounds; i++) {
                 auto v4_props = sex::v4l2::get_camera_props(index[i]);
@@ -58,8 +60,11 @@ void UiCalibration::prepareCamera() {
                             p.value
                     );
                 }
+
                 auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
                 cam_params->onUpdate(updateCamera(separate ? std::vector<uint>{index[i]} : index));
+                cam_params->onReset(resetCamera(separate ? std::vector<uint>{index[i]} : index));
+                cam_params->onSave(saveCamera(separate ? std::vector<uint>{index[i]} : index));
                 cam_params->setProperties(parameters);
 
                 const auto postfix = separate ? std::to_string(index[i]) : "";
@@ -179,6 +184,22 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
             sex::v4l2::set_camera_prop(id, prop_id, value);
         }
         return value;
+    };
+}
+
+std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
+    return [ids = std::move(devices)]() {
+        log->debug("saveCamera");
+        // TODO SERIALIZATION
+    };
+}
+
+std::function<void()> UiCalibration::resetCamera(std::vector<uint> devices) {
+    return [ids = std::move(devices)]() {
+        log->debug("resetCamera");
+        for (const auto &id: ids) {
+            sex::v4l2::reset_defaults(id);
+        }
     };
 }
 

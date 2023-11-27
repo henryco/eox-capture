@@ -44,6 +44,9 @@ namespace sex::xgtk {
         std::vector<std::unique_ptr<Gtk::Widget>> controls;
 
         std::function<int(uint, int)> onUpdateCallback{};
+        std::function<void()> onResetCallback = [](){};
+        std::function<void()> onSaveCallback = [](){};
+
         sigc::connection debounce_connection;
         bool programmatic_change = false;
 
@@ -55,6 +58,10 @@ namespace sex::xgtk {
         ~GtkCamParams() override = default;
 
         void onUpdate(std::function<int(uint, int)> callback);
+
+        void onReset(std::function<void()> callback);
+
+        void onSave(std::function<void()> callback);
 
         void setProperties(const std::vector<GtkCamProp>& properties);
     };
