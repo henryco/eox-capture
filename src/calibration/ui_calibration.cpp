@@ -4,7 +4,6 @@
 
 #include <glibmm/main.h>
 #include <iostream>
-#include <gtkmm/textview.h>
 #include "ui_calibration.h"
 
 #define STB_IMAGE_IMPLEMENTATION
