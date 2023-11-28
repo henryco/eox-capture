@@ -45,16 +45,8 @@ void UiCalibration::prepareCamera() {
                     if (p.type == 6)
                         continue;
 
-                    parameters.emplace_back(
-                            p.id,
-                            p.type,
-                            sex::utils::to_string(p.name, 32),
-                            p.minimum,
-                            p.maximum,
-                            p.step,
-                            p.default_value,
-                            p.value
-                    );
+                    parameters.emplace_back(p.id, p.type, sex::utils::to_string(p.name, 32),
+                                            p.minimum, p.maximum, p.step, p.default_value, p.value);
                 }
 
                 auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
@@ -81,9 +73,7 @@ void UiCalibration::prepareCamera() {
                 configStack.add(*cam_params, " Camera " + (separate ? std::to_string(index[i]) : ""));
                 widgets.push_back(std::move(cam_params));
             }
-        }
-
-        else if (api == cv::CAP_DSHOW) {
+        } else if (api == cv::CAP_DSHOW) {
             // DirectShow windows
             // TODO windows support
         }
