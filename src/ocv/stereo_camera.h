@@ -26,6 +26,7 @@ namespace sex::xocv {
         int height;
         int fps;
         int buffer;
+        bool homogeneous;
         std::string codec;
 
         /**
@@ -39,13 +40,15 @@ namespace sex::xocv {
                 std::string codec = "YUYV",
                 const int fps = 30,
                 const int buffer = 2,
-                const int api = cv::CAP_V4L2)
+                const int api = cv::CAP_V4L2,
+                const bool homogeneous = true)
                 : index(index),
                   width(width),
                   height(height),
                   fps(fps),
                   codec(std::move(codec)),
                   buffer(buffer),
+                  homogeneous(homogeneous),
                   api(api)
         {};
     };

@@ -21,7 +21,7 @@ void UiCalibration::prepareCamera() {
     const int width = 640;
     const int height = 480;
     const int fps = 30;
-    const bool separate = false;
+    const bool homogeneous = true;
     const int api = cv::CAP_V4L2;
     const int buffer = 2;
     // TEMPORAL (move to CLI later)
@@ -35,23 +35,10 @@ void UiCalibration::prepareCamera() {
 
             // TODO DESERIALIZATION
 
-            const size_t rounds = separate ? index.size() : 1;
+            const size_t rounds = !homogeneous ? index.size() : 1;
             for (size_t i = 0; i < rounds; i++) {
+
                 auto v4_props = sex::v4l2::get_camera_props(index[i]);
-                std::vector<sex::xgtk::GtkCamProp> parameters;
-                for (const auto &p: v4_props) {
-                    if (p.type == 6)
-                        continue;
-
-                    parameters.emplace_back(p.id, p.type, sex::utils::to_string(p.name, 32),
-                                            p.minimum, p.maximum, p.step, p.default_value, p.value);
-                }
-
-                auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-                cam_params->onUpdate(updateCamera(separate ? std::vector<uint>{index[i]} : index));
-                cam_params->onReset(resetCamera(separate ? std::vector<uint>{index[i]} : index));
-                cam_params->onSave(saveCamera(separate ? std::vector<uint>{index[i]} : index));
-                cam_params->setProperties(parameters);
 
                 if (rounds == 1) {
                     // multi-camera config homogenisation
@@ -68,7 +55,22 @@ void UiCalibration::prepareCamera() {
                     }
                 }
 
-                configStack.add(*cam_params, " Camera " + (separate ? std::to_string(index[i]) : ""));
+                std::vector<sex::xgtk::GtkCamProp> parameters;
+                for (const auto &p: v4_props) {
+                    if (p.type == 6)
+                        continue;
+
+                    parameters.emplace_back(p.id, p.type, sex::utils::to_string(p.name, 32),
+                                            p.minimum, p.maximum, p.step, p.default_value, p.value);
+                }
+
+                auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
+                cam_params->onUpdate(updateCamera(!homogeneous ? std::vector<uint>{index[i]} : index));
+                cam_params->onReset(resetCamera(!homogeneous ? std::vector<uint>{index[i]} : index));
+                cam_params->onSave(saveCamera(!homogeneous ? std::vector<uint>{index[i]} : index));
+                cam_params->setProperties(parameters);
+
+                configStack.add(*cam_params, " Camera " + (!homogeneous ? std::to_string(index[i]) : ""));
                 keep(std::move(cam_params));
 
             }
