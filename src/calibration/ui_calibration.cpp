@@ -10,6 +10,7 @@
 
 #include "../utils/stb_image.h"
 #include "../v4l2/linux_video.h"
+#include "../utils/utils.h"
 
 void UiCalibration::prepareCamera() {
 
@@ -43,10 +44,11 @@ void UiCalibration::prepareCamera() {
                 for (const auto &p: v4_props) {
                     if (p.type == 6)
                         continue;
+
                     parameters.emplace_back(
                             p.id,
                             p.type,
-                            std::string(reinterpret_cast<const char *>(p.name), 32),
+                            sex::utils::to_string(p.name, 32),
                             p.minimum,
                             p.maximum,
                             p.step,
