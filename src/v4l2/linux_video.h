@@ -7,12 +7,19 @@
 
 #include <linux/videodev2.h>
 #include <vector>
+#include <ostream>
+#include <map>
 
 namespace sex::v4l2 {
 
     struct v4l2_queryctrl_ext : public v4l2_queryctrl {
         __s32 value;
     };
+
+    typedef struct {
+        uint32_t id;
+        int32_t value;
+    } serial_v4l2_control;
 
     typedef struct v4l2_queryctrl_ext V4L2_QueryCtrl;
     typedef struct v4l2_control V4L2_Control;
@@ -28,7 +35,6 @@ namespace sex::v4l2 {
      * @note This function requires the v4l2 library to be installed.
      * In general it is already installed in most of linux distributions.
      */
-
     std::vector<sex::v4l2::V4L2_QueryCtrl> get_camera_props(uint device_id);
 
     /**
@@ -43,7 +49,6 @@ namespace sex::v4l2 {
      *
      * @return True if the camera property was set successfully, false otherwise.
      */
-
     bool set_camera_prop(uint device_id, uint prop_id, int prop_value);
 
     /**
@@ -54,8 +59,7 @@ namespace sex::v4l2 {
      *
      * @return True if the camera property was successfully set, false otherwise.
      */
-
-    bool set_camera_prop(uint device_id, sex::v4l2::V4L2_Control control);
+    bool set_camera_prop(uint device_id, V4L2_Control control);
 
     /**
      * @brief Sets the camera properties for the specified device.
@@ -69,8 +73,7 @@ namespace sex::v4l2 {
      *
      * @see sex::v4l2::V4L2_Control
      */
-
-    std::vector<bool> set_camera_prop(uint device_id, std::vector<sex::v4l2::V4L2_Control> controls);
+    std::vector<bool> set_camera_prop(uint device_id, std::vector<V4L2_Control> controls);
 
     /**
      * @brief Reset the settings of the specified video device to its default values.
@@ -80,8 +83,80 @@ namespace sex::v4l2 {
      *
      * @param device_id The ID of the video device to reset the settings of.
      */
-
     void reset_defaults(uint device_id);
+
+    /**
+     * @brief Writes the V4L2 control to the output stream.
+     *
+     * This function serializes the V4L2 control object into the provided output stream.
+     *
+     * @param os The output stream to write the control to.
+     * @param control The V4L2 control object to be serialized.
+     *
+     * @note It DOES NOT close nor flush the stream
+     */
+    void write_control(std::ostream &out, const V4L2_Control &control);
+
+    /**
+     * @brief Write V4L2 controls to an output stream
+     *
+     * This function writes the given V4L2 controls to the specified output stream.
+     *
+     * @param os The output stream to write to
+     * @param device_id The ID of the V4L2 device
+     * @param controls The vector of V4L2 controls to write
+     *
+     * @note It DOES NOT close nor flush the stream
+     */
+    void write_control(std::ostream &os, uint device_id, const std::vector<V4L2_Control> &controls);
+
+    /**
+     * @brief Reads control values from the given input stream.
+     *
+     * This function is responsible for reading control values from the
+     * provided input stream. It expects the values to be in a certain
+     * format and will extract them accordingly. The format of the input
+     * stream should follow the requirements of the V4L2 API.
+     *
+     * @note This function assumes the input stream is open and can be read.
+     *
+     * @param is The input stream to read control values from.
+     */
+    V4L2_Control read_control(std::istream &is);
+
+    /**
+     * @brief Reads control values from the input stream.
+     *
+     * This function reads a specified number of control values from the given input stream.
+     *
+     * @param is    The input stream from which to read the control values.
+     * @param num   The number of control values to read.
+     *
+     * @note This function assumes the input stream is open and can be read.
+     */
+    std::vector<V4L2_Control> read_control(std::istream &is, size_t num);
+
+    /**
+     * @brief Reads control information for multiple V4L2 devices from an input stream.
+     *
+     * This function parses a stream of V4L2 control data, organizing it into a map. Each entry in the map
+     * corresponds to a V4L2 device identified by its ID. The value for each entry is a vector of V4L2_Control
+     * structures representing the control settings for that device.
+     *
+     * The input stream should have data in a specific format: pairs of headers and control data. Each pair
+     * consists of a device ID (as uint) and the number of controls (as size_t), followed by the control data.
+     *
+     * @param is An input stream (std::istream&) from which V4L2 control data is read. The stream should be in
+     *           binary format and must be already opened and in a good state.
+     *
+     * @return std::map<uint, std::vector<sex::v4l2::V4L2_Control>> - A map where each key is a device ID and
+     *         the corresponding value is a vector of V4L2_Control structures for that device. If no data is read,
+     *         or if the input stream is not in the expected format, the returned map may be empty.
+     *
+     * @note The function will continue reading from the stream until EOF is reached. It is assumed that the
+     *       stream is well-formed and correctly formatted according to the expected V4L2 control data structure.
+     */
+    std::map<uint, std::vector<V4L2_Control>> read_controls(std::istream &is);
 }
 
 

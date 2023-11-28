@@ -9,6 +9,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <map>
 
 std::vector<sex::v4l2::V4L2_QueryCtrl> sex::v4l2::get_camera_props(uint id) {
     std::vector<sex::v4l2::V4L2_QueryCtrl> properties;
@@ -32,7 +33,9 @@ std::vector<sex::v4l2::V4L2_QueryCtrl> sex::v4l2::get_camera_props(uint id) {
                 if (queryctrl.type != V4L2_CTRL_TYPE_CTRL_CLASS) {
                     sex::v4l2::V4L2_Control ctr = {.id = queryctrl.id};
                     if (ioctl(file_descriptor, VIDIOC_G_CTRL, &ctr) == -1) {
-                        std::cerr << "Cannot retrieve value for control: " << ctr.id << " [" << device << "]" << std::endl;
+                        std::cerr << "Cannot retrieve value for control: "
+                                  << ctr.id << " [" << device << "]"
+                                  << std::endl;
                     }
                     queryctrl.value = ctr.value;
                 }
@@ -63,8 +66,8 @@ std::vector<sex::v4l2::V4L2_QueryCtrl> sex::v4l2::get_camera_props(uint id) {
 bool sex::v4l2::set_camera_prop(uint device_id, uint prop_id, int prop_value) {
     // not the most efficient way to pass data, but it's ok
     return set_camera_prop(device_id, {
-        .id = prop_id,
-        .value = prop_value
+            .id = prop_id,
+            .value = prop_value
     });
 }
 
@@ -73,7 +76,7 @@ bool sex::v4l2::set_camera_prop(uint device_id, sex::v4l2::V4L2_Control control)
     return set_camera_prop(
             device_id,
             std::vector<sex::v4l2::V4L2_Control>({control})
-            )[0];
+    )[0];
 }
 
 std::vector<bool> sex::v4l2::set_camera_prop(uint device_id, std::vector<sex::v4l2::V4L2_Control> controls) {
@@ -90,7 +93,7 @@ std::vector<bool> sex::v4l2::set_camera_prop(uint device_id, std::vector<sex::v4
     try {
 
         for (int i = 0; i < controls.size(); ++i) {
-            auto& control = controls[i];
+            auto &control = controls[i];
             if (ioctl(file_descriptor, VIDIOC_S_CTRL, &control) == -1) {
                 std::cerr << "Cannot set control value: " << control.id << std::endl;
                 results[i] = false;
@@ -116,10 +119,61 @@ void sex::v4l2::reset_defaults(uint device_id) {
         if (prop.type == 6)
             continue;
         controls.push_back({
-            .id = prop.id,
-            .value = prop.default_value
-        });
+                                   .id = prop.id,
+                                   .value = prop.default_value
+                           });
     }
 
     set_camera_prop(device_id, controls);
+}
+
+void sex::v4l2::write_control(std::ostream &os, const sex::v4l2::V4L2_Control &control) {
+    const sex::v4l2::serial_v4l2_control serial = { .id = control.id, .value = control.value };
+    const auto data = reinterpret_cast<const char *>(&serial);
+    os.write(data, sizeof(sex::v4l2::serial_v4l2_control));
+}
+
+void sex::v4l2::write_control(std::ostream &os, uint device_id, const std::vector<sex::v4l2::V4L2_Control>& controls) {
+    const uint32_t header[] = {
+            (uint32_t) device_id,
+            (uint32_t) controls.size()
+    };
+    os.write(reinterpret_cast<const char *>(header), sizeof(header));
+    for (const auto &control: controls) {
+        sex::v4l2::write_control(os, control);
+    }
+}
+
+sex::v4l2::V4L2_Control sex::v4l2::read_control(std::istream &is) {
+    sex::v4l2::serial_v4l2_control data;
+    is.read(reinterpret_cast<char *>(&data), sizeof(sex::v4l2::serial_v4l2_control));
+    return {
+        .id = data.id,
+        .value = data.value
+    };
+}
+
+std::vector<sex::v4l2::V4L2_Control> sex::v4l2::read_control(std::istream &is, size_t num) {
+    std::vector<sex::v4l2::V4L2_Control> vec;
+    vec.reserve(num);
+    for (int i = 0; i < num; i++) {
+        vec.push_back(sex::v4l2::read_control(is));
+    }
+    return vec;
+}
+
+std::map<uint, std::vector<sex::v4l2::V4L2_Control>> sex::v4l2::read_controls(std::istream &is) {
+    std::map<uint, std::vector<sex::v4l2::V4L2_Control>> map;
+
+    while (is.peek() != EOF) {
+        uint32_t header[2];
+        is.read(reinterpret_cast<char *>(header), sizeof(header));
+
+        const uint device_id = header[0];
+        const size_t total = header[1];
+
+        map.emplace(device_id, sex::v4l2::read_control(is, total));
+    }
+
+    return map;
 }
