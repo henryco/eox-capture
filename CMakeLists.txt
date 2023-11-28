@@ -56,6 +56,7 @@ add_executable(${PROJECT_NAME}
         src/gtk/gtk_config_stack.cpp
         src/gtk/gtk_config_stack.h
         src/utils/utils.h
+        src/gtk/gtk_sex_window.h
 )
 
 # Include directories for the specific target

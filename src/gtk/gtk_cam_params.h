@@ -40,7 +40,7 @@ namespace sex::xgtk {
         static inline const auto log =
                 spdlog::stdout_color_mt("gtk_cam_params");
 
-        // preventing memory leak for dynamically allocated widgets
+        // preventing memory leak for dynamically allocated u_widgets
         std::vector<std::unique_ptr<Gtk::Widget>> controls;
 
         std::function<int(uint, int)> onUpdateCallback{};
