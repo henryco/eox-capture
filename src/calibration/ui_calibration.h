@@ -11,14 +11,13 @@
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <gtkmm/stack.h>
-#include <gtkmm/stackswitcher.h>
 
 #include "../camera/stereo_camera.h"
 #include "../ogl/render/texture_1.h"
 #include "../gtk/gl_image.h"
 #include "../utils/loop/delta_loop.h"
 #include "../gtk/gtk_cam_params.h"
+#include "../gtk/gtk_config_stack.h"
 
 
 class UiCalibration final : public Gtk::Window {
@@ -44,8 +43,9 @@ private:
     float FPS = 0;
 
     Gtk::Box layout_h = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
-    Gtk::Box layout_v = Gtk::Box(Gtk::ORIENTATION_VERTICAL);
     std::vector<std::unique_ptr<Gtk::Widget>> widgets;
+
+    sex::xgtk::GtkConfigStack configStack;
     sex::xgtk::GLImage glImage;
 
     sex::xocv::StereoCamera camera;

@@ -32,11 +32,6 @@ void UiCalibration::prepareCamera() {
     {
         // Camera controls and so on
 
-        auto stack = std::make_unique<Gtk::Stack>();
-        auto switcher = std::make_unique<Gtk::StackSwitcher>();
-        switcher->set_stack(*stack);
-
-
         if (api == cv::CAP_V4L2) {
             // Camera controls for V4L2 API (video for linux)
 
@@ -67,11 +62,6 @@ void UiCalibration::prepareCamera() {
                 cam_params->onSave(saveCamera(separate ? std::vector<uint>{index[i]} : index));
                 cam_params->setProperties(parameters);
 
-                const auto postfix = separate ? std::to_string(index[i]) : "";
-                stack->add(*cam_params, "cam_prop" + postfix, " Camera " + postfix);
-
-                widgets.push_back(std::move(cam_params));
-
                 if (rounds == 1) {
                     // multi-camera config homogenisation
 
@@ -86,6 +76,9 @@ void UiCalibration::prepareCamera() {
                         sex::v4l2::set_camera_prop(index[j], v4_controls);
                     }
                 }
+
+                configStack.add(*cam_params, " Camera " + (separate ? std::to_string(index[i]) : ""));
+                widgets.push_back(std::move(cam_params));
             }
         }
 
@@ -93,12 +86,6 @@ void UiCalibration::prepareCamera() {
             // DirectShow windows
             // TODO windows support
         }
-
-        layout_v.pack_start(*switcher, Gtk::PACK_SHRINK);
-        layout_v.pack_start(*stack);
-
-        widgets.push_back(std::move(stack));
-        widgets.push_back(std::move(switcher));
     }
 
 
@@ -111,19 +98,7 @@ void UiCalibration::prepareCamera() {
             props.emplace_back(i, width, height, codec, fps, buffer, api);
         }
 
-        int min_fps = 0;
-        int min_w = 0;
-        int min_h = 0;
-        for (const auto &prop: props) {
-            if (min_fps == 0 || prop.fps < min_fps)
-                min_fps = prop.fps;
-            if (min_w == 0 || prop.width < min_w)
-                min_w = prop.width;
-            if (min_h == 0 || prop.height < min_h)
-                min_h = prop.height;
-        }
-
-        glImage.init((int) index.size(), min_w, min_h, GL_BGR);
+        glImage.init((int) index.size(), width, height, GL_BGR);
         camera.open(props);
     }
 
@@ -143,7 +118,7 @@ void UiCalibration::init() {
     add(layout_h);
 
     layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
-    layout_h.pack_start(layout_v, Gtk::PACK_SHRINK);
+    layout_h.pack_start(configStack, Gtk::PACK_SHRINK);
 
     dispatcher.connect(sigc::mem_fun(*this, &UiCalibration::on_dispatcher_signal));
     show_all_children();

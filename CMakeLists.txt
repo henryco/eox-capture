@@ -53,6 +53,8 @@ add_executable(${PROJECT_NAME}
         src/gtk/gtk_utils.h
         src/utils/globals/sex_globals.cpp
         src/utils/globals/sex_globals.h
+        src/gtk/gtk_config_stack.cpp
+        src/gtk/gtk_config_stack.h
 )
 
 # Include directories for the specific target
