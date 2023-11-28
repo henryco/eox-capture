@@ -71,7 +71,8 @@ void UiCalibration::prepareCamera() {
                 }
 
                 configStack.add(*cam_params, " Camera " + (separate ? std::to_string(index[i]) : ""));
-                widgets.push_back(std::move(cam_params));
+                keep(std::move(cam_params));
+
             }
         } else if (api == cv::CAP_DSHOW) {
             // DirectShow windows
@@ -107,11 +108,8 @@ void UiCalibration::prepareCamera() {
 void UiCalibration::init() {
     prepareCamera();
     add(layout_h);
-
     layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
     layout_h.pack_start(configStack, Gtk::PACK_SHRINK);
-
-    dispatcher.connect(sigc::mem_fun(*this, &UiCalibration::on_dispatcher_signal));
     show_all_children();
 }
 
@@ -125,22 +123,15 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         return;
     }
 
-    glImage.setFrames(std::move(captured));
-    dispatcher.emit();
+    // LOGIC HERE
+
+    glImage.setFrames(captured);
+    refresh();
 }
 
-void UiCalibration::on_dispatcher_signal() {
+void UiCalibration::onRefresh() {
     set_title("StereoX++ calibration [ " + std::to_string((int) FPS) + " FPS ]");
     glImage.update();
-}
-
-UiCalibration::~UiCalibration() {
-    log->debug("terminate calibration");
-
-    deltaLoop.stop();
-    camera.release();
-
-    log->debug("terminated");
 }
 
 std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devices) {
@@ -169,4 +160,11 @@ std::function<void()> UiCalibration::resetCamera(std::vector<uint> devices) {
     };
 }
 
+UiCalibration::~UiCalibration() {
+    log->debug("terminate calibration");
 
+    deltaLoop.stop();
+    camera.release();
+
+    log->debug("terminated");
+}

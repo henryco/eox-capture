@@ -8,46 +8,9 @@
 #include <gtkmm/window.h>
 #include <glibmm/dispatcher.h>
 
-namespace sex {
+namespace sex::xgtk {
 
     class GtkSexWindow : public Gtk::Window {
-    public:
-        virtual void init() = 0;
-
-        GtkSexWindow() {
-            dispatcher.connect(sigc::mem_fun(*this, &GtkSexWindow::on_dispatcher_signal));
-        }
-
-        virtual ~GtkSexWindow() = default; // NOLINT(*-use-override)
-
-    protected:
-
-        virtual void onRefresh() { /* Nothing goings-on here */ }
-
-        void emit() {
-            dispatcher.emit();
-        }
-
-        void keep(std::unique_ptr<Gtk::Widget> &widget) {
-            u_widgets.push_back(std::move(widget));
-        }
-
-        void keep(std::unique_ptr<Gtk::Widget> &&widget) {
-            u_widgets.push_back(std::move(widget));
-        }
-
-        void keep(std::shared_ptr<Gtk::Widget> &widget) {
-            s_widgets.push_back(widget);
-        }
-
-        void keep(std::shared_ptr<Gtk::Widget> &&widget) {
-            s_widgets.push_back(widget);
-        }
-
-        void un_keep() {
-            u_widgets.clear();
-            s_widgets.clear();
-        }
 
     private:
         std::vector<std::unique_ptr<Gtk::Widget>> u_widgets;
@@ -56,6 +19,40 @@ namespace sex {
 
         void on_dispatcher_signal() {
             onRefresh();
+        }
+
+    public:
+        virtual void init() = 0;
+
+        virtual ~GtkSexWindow() = default; // NOLINT(*-use-override)
+
+        GtkSexWindow() {
+            dispatcher.connect(sigc::mem_fun(*this, &GtkSexWindow::on_dispatcher_signal));
+        }
+
+    protected:
+
+        virtual void onRefresh() { /* Nothing goings-on here */ }
+
+        void refresh() {
+            dispatcher.emit();
+        }
+
+        void keep(std::unique_ptr<Gtk::Widget> &&widget) {
+            u_widgets.push_back(std::move(widget));
+        }
+
+        void keep_shared(std::shared_ptr<Gtk::Widget> &widget) {
+            s_widgets.push_back(widget);
+        }
+
+        void keep_shared(std::shared_ptr<Gtk::Widget> &&widget) {
+            s_widgets.push_back(widget);
+        }
+
+        void un_keep() {
+            u_widgets.clear();
+            s_widgets.clear();
         }
     };
 

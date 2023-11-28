@@ -18,38 +18,40 @@
 #include "../utils/loop/delta_loop.h"
 #include "../gtk/gtk_cam_params.h"
 #include "../gtk/gtk_config_stack.h"
+#include "../gtk/gtk_sex_window.h"
 
 
-class UiCalibration final : public Gtk::Window {
-
-public:
-    UiCalibration() = default;
-    ~UiCalibration() override;
-    void init();
-
-protected:
-    void on_dispatcher_signal();
-    void prepareCamera();
-    void update(float delta, float late, float fps);
-
-    std::function<int(uint, int)> updateCamera(std::vector<uint> devices);
-    std::function<void()> saveCamera(std::vector<uint> devices);
-    std::function<void()> resetCamera(std::vector<uint> devices);
+class UiCalibration final : public sex::xgtk::GtkSexWindow {
 
 private:
     static inline const auto log =
             spdlog::stdout_color_mt("ui_calibration");
 
-    float FPS = 0;
-
     Gtk::Box layout_h = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
-    std::vector<std::unique_ptr<Gtk::Widget>> widgets;
-
     sex::xgtk::GtkConfigStack configStack;
     sex::xgtk::GLImage glImage;
-
     sex::xocv::StereoCamera camera;
     sex::util::DeltaLoop deltaLoop;
 
-    Glib::Dispatcher dispatcher;
+    float FPS = 0;
+
+public:
+    UiCalibration() = default;
+    ~UiCalibration() override;
+
+    void init() override;
+
+protected:
+    void onRefresh() override;
+
+    void prepareCamera();
+
+    void update(float delta, float late, float fps);
+
+    std::function<int(uint, int)> updateCamera(std::vector<uint> devices);
+
+    std::function<void()> saveCamera(std::vector<uint> devices);
+
+    std::function<void()> resetCamera(std::vector<uint> devices);
+
 };

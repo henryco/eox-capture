@@ -83,15 +83,15 @@ namespace sex::xgtk {
         }
     }
 
-    void GLImage::setFrames(std::vector<cv::Mat> _frames) { // NOLINT(*-unnecessary-value-param)
+    void GLImage::setFrames(const std::vector<cv::Mat>& _frames) {
         frames.clear();
         for (auto item: _frames) {
+            // YES, we NEED TO COPY IT
             frames.push_back(std::move(item));
         }
     }
-
-    void GLImage::update(std::vector<cv::Mat> _frames) {
-        setFrames(std::move(_frames));
+    void GLImage::update(const std::vector<cv::Mat>& _frames) {
+        setFrames(_frames);
         update();
     }
 

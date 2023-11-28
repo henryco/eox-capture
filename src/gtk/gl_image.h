@@ -40,8 +40,8 @@ public:
     ~GLImage() override;
 
     void init(size_t number, int width, int height, GLenum format = GL_RGB);
-    void setFrames(std::vector<cv::Mat> _frames);
-    void update(std::vector<cv::Mat> _frames);
+    void setFrames(const std::vector<cv::Mat>& _frames);
+    void update(const std::vector<cv::Mat>& _frames);
     void update();
 
 };
