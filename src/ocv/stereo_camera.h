@@ -52,7 +52,7 @@ namespace sex::xocv {
 
     /**
      * @class StereoCamera
-     * @brief The StereoCamera class represents a stereo camera for capturing stereo images.
+     * @brief The StereoCamera class represents a stereo ocv for capturing stereo images.
      */
 
     class StereoCamera final {
@@ -75,12 +75,12 @@ namespace sex::xocv {
 
         /**
          * @class StereoCamera
-         * @brief Represents a stereo camera composed of multiple individual cameras.
+         * @brief Represents a stereo ocv composed of multiple individual cameras.
          *
          * The StereoCamera class provides a convenient way to manage and control a set
          * of individual cameras that capture stereo imagery. It takes a vector of
          * CameraProp objects as input during construction, where each CameraProp object
-         * represents the properties of an individual camera, such as its resolution, etc.
+         * represents the properties of an individual ocv, such as its resolution, etc.
          */
 
         explicit StereoCamera(const std::vector<CameraProp>& props);
@@ -95,9 +95,9 @@ namespace sex::xocv {
         StereoCamera(StereoCamera&& other) noexcept;
 
         /**
-         * @brief Captures an image using the stereo camera.
+         * @brief Captures an image using the stereo ocv.
          *
-         * This function captures an image using the stereo camera. It retrieves the
+         * This function captures an image using the stereo ocv. It retrieves the
          * frames simultaneously and returns them as a vector of cv::Mat objects.
          *
          * @return A vector of cv::Mat objects representing the frames (usually left and right).

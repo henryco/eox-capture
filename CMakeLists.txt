@@ -33,8 +33,8 @@ add_executable(${PROJECT_NAME}
         src/main.cpp
         src/calibration/ui_calibration.cpp
         src/utils/errors/error_reporter.cpp
-        src/camera/stereo_camera.cpp
-        src/camera/stereo_camera.h
+        src/ocv/stereo_camera.cpp
+        src/ocv/stereo_camera.h
         src/utils/tp/thread_pool.cpp
         src/utils/tp/thread_pool.h
         src/utils/stb_image.h

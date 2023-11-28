@@ -12,7 +12,7 @@
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "../camera/stereo_camera.h"
+#include "../ocv/stereo_camera.h"
 #include "../ogl/render/texture_1.h"
 #include "../gtk/gl_image.h"
 #include "../utils/loop/delta_loop.h"
