@@ -2,8 +2,6 @@
 // Created by henryco on 8/20/23.
 //
 
-#include <glibmm/main.h>
-#include <iostream>
 #include "ui_calibration.h"
 
 #define STB_IMAGE_IMPLEMENTATION
