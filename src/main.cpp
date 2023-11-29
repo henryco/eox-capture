@@ -8,7 +8,47 @@ int main(int argc, char **argv) {
 
     sex::globals::THREAD_POOL_CORES_MAX = 4;
 
+
+    // TEMPORAL (move to CLI later)
+    const std::map<uint, uint> devices = {
+            // ID, INDEX
+            {1, 4},
+            {2, 2}
+    };
+    const std::string codec = "MJPG";
+    const int width = 640;
+    const int height = 480;
+    const int fps = 30;
+    const bool homogeneous = true;
+    const bool fast = false;
+    const int api = cv::CAP_V4L2;
+    const int buffer = 2;
+    // TEMPORAL (move to CLI later)
+
+
+    std::vector<sex::data::camera_properties> props;
+    props.reserve(devices.size());
+    for (const auto &[id, index]: devices) {
+        props.push_back({
+                                .id = id,
+                                .index = index,
+                                .width = width,
+                                .height = height,
+                                .fps = fps,
+                                .buffer = buffer,
+                                .codec = {codec[0],
+                                          codec[1],
+                                          codec[2],
+                                          codec[3]},
+                                .fast = fast,
+                                .homogeneous = homogeneous,
+                                .api = api
+                        });
+    }
+
+
     try {
+
 //        spdlog::set_level(spdlog::level::debug);
         spdlog::set_level(spdlog::level::info);
 
@@ -19,7 +59,7 @@ int main(int argc, char **argv) {
         );
 
         sex::xgtk::GtkSexWindow* window = new UiCalibration();
-        window->init();
+        window->init({ .camera = props });
         window->show();
         return app->run(*window);
 

@@ -7,7 +7,7 @@
 
 #include <gtkmm/window.h>
 #include <glibmm/dispatcher.h>
-#include "../data/data_structures.h"
+#include "../data/common_structures.h"
 
 namespace sex::xgtk {
 
@@ -23,10 +23,10 @@ namespace sex::xgtk {
         }
 
     public:
-        virtual void init(const std::map<std::string, sex::data::config_value>& configuration) = 0;
+        virtual void init(const sex::data::basic_config& configuration) = 0;
 
         void init() {
-            init(std::map<std::string, sex::data::config_value>());
+            init({});
         }
 
         virtual ~GtkSexWindow() = default; // NOLINT(*-use-override)

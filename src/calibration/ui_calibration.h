@@ -19,7 +19,7 @@
 #include "../gtk/gtk_cam_params.h"
 #include "../gtk/gtk_config_stack.h"
 #include "../gtk/gtk_sex_window.h"
-#include "../data/data_structures.h"
+#include "../data/common_structures.h"
 
 
 class UiCalibration final : public sex::xgtk::GtkSexWindow {
@@ -40,7 +40,7 @@ public:
     UiCalibration() = default;
     ~UiCalibration() override;
 
-    void init(const std::map<std::string, sex::data::config_value>& configuration) override;
+    void init(const sex::data::basic_config& configuration) override;
 
 protected:
     void onRefresh() override;

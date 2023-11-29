@@ -11,42 +11,21 @@
 #include "../utils/utils.h"
 #include "../utils/mappers/cam_gtk_mapper.h"
 
-void UiCalibration::init(const std::map<std::string, sex::data::config_value>& configuration) {
-
-    // TEMPORAL (move to CLI later)
-    const std::map<uint, uint> devices = {
-            // ID, INDEX
-            {1, 4},
-            {2, 2}
-    };
-    const std::string codec = "MJPG";
-    const int width = 640;
-    const int height = 480;
-    const int fps = 30;
-    const bool homogeneous = true;
-    const bool fast = false;
-    const int api = cv::CAP_V4L2;
-    const int buffer = 2;
-    // TEMPORAL (move to CLI later)
+void UiCalibration::init(const sex::data::basic_config &configuration) {
+    const auto& props = configuration.camera;
 
     {
         // Init camera
-        std::vector<sex::xocv::CameraProp> props;
-        props.reserve(devices.size());
-        for (const auto &[id, index]: devices) {
-            props.emplace_back(id, index, width, height, codec, fps, buffer);
-        }
-
-        camera.setHomogeneous(homogeneous);
-        camera.setFast(fast);
-        camera.setApi(api);
+        camera.setHomogeneous(props[0].homogeneous);
+        camera.setFast(props[0].fast);
+        camera.setApi(props[0].api);
         camera.open(props);
 
         const auto controls = camera.getControls();
         for (const auto &control: controls) {
 
             const auto indexes = sex::mappers::cam_gtk::index(
-                    props,control.id, homogeneous);
+                    props, control.id, props[0].homogeneous);
 
             auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
             cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
@@ -61,7 +40,7 @@ void UiCalibration::init(const std::map<std::string, sex::data::config_value>& c
 
     {
         // Init oGL canvas
-        glImage.init((int) devices.size(), width, height, GL_BGR);
+        glImage.init((int) props.size(), props[0].width, props[0].height, GL_BGR);
     }
 
     {

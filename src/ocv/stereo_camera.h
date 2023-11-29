@@ -7,6 +7,7 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/core/mat.hpp>
 #include "../utils/tp/thread_pool.h"
+#include "../data/common_structures.h"
 
 namespace sex::xocv {
 
@@ -27,46 +28,6 @@ namespace sex::xocv {
     } camera_controls;
 
     /**
-     * @class CameraProp
-     * @brief The CameraProp class represents the properties for capturing camera.
-     *
-     * This class contains various properties related to camera capture, such as index, API type,
-     * width, height, frames per second (FPS), buffer size, and codec used.
-     */
-
-    class CameraProp {
-    public:
-        uint id;
-        uint index;
-        int width;
-        int height;
-        int fps;
-        int buffer;
-        std::string codec;
-
-        /**
-         * @brief The CameraProp class represents the properties for capturing camera.
-         */
-
-        explicit CameraProp(
-                const uint id,
-                const uint index = 0,
-                const int width = 640,
-                const int height = 480,
-                std::string codec = "YUYV",
-                const int fps = 30,
-                const int buffer = 2)
-                : id(id),
-                  index(index),
-                  width(width),
-                  height(height),
-                  codec(std::move(codec)),
-                  fps(fps),
-                  buffer(buffer)
-        {};
-    };
-
-    /**
      * @class StereoCamera
      * @brief The StereoCamera class represents a stereo ocv for capturing stereo images.
      */
@@ -78,7 +39,7 @@ namespace sex::xocv {
                 spdlog::stdout_color_mt("stereo_camera");
 
         std::vector<std::unique_ptr<cv::VideoCapture>> captures;
-        std::vector<CameraProp> properties;
+        std::vector<sex::data::camera_properties> properties;
         sex::util::ThreadPool executor;
 
         bool homogeneous = true;
@@ -138,7 +99,7 @@ namespace sex::xocv {
          * @see sex::CameraProp
          */
 
-        void open(std::vector<CameraProp> props);
+        void open(std::vector<sex::data::camera_properties> props);
 
         /**
          * @brief Get the properties of the stereo camera.
@@ -148,7 +109,7 @@ namespace sex::xocv {
          *
          * @return A structure containing the properties of the stereo camera.
          */
-        [[nodiscard]] const std::vector<CameraProp>& getProperties() const;
+        [[nodiscard]] const std::vector<sex::data::camera_properties>& getProperties() const;
 
         /**
          * @brief Set the fast mode for the StereoCamera.
@@ -170,7 +131,7 @@ namespace sex::xocv {
 
         std::vector<camera_controls> getControls();
 
-        void setProperties(std::vector<CameraProp> props);
+        void setProperties(std::vector<sex::data::camera_properties> props);
     };
 
 }

@@ -11,7 +11,7 @@
 
 namespace sex::xocv {
 
-    int fourCC(std::string name) {
+    int fourCC(const char* name) {
         return cv::VideoWriter::fourcc(
                 name[0],
                 name[1],
@@ -19,7 +19,7 @@ namespace sex::xocv {
                 name[3]);
     }
 
-    void init_from_params(cv::VideoCapture &capture, const CameraProp &prop, int api) {
+    void init_from_params(cv::VideoCapture &capture, const sex::data::camera_properties &prop, int api) {
         std::vector<int> params;
         params.assign({
                               cv::CAP_PROP_FOURCC, fourCC(prop.codec),
@@ -204,7 +204,7 @@ namespace sex::xocv {
         log->debug("opened: {}", captures.size());
     }
 
-    void StereoCamera::open(std::vector<CameraProp> props) {
+    void StereoCamera::open(std::vector<sex::data::camera_properties> props) {
         properties = std::move(props);
         open();
     }
@@ -230,7 +230,7 @@ namespace sex::xocv {
         release();
     }
 
-    const std::vector<CameraProp> &StereoCamera::getProperties() const {
+    const std::vector<sex::data::camera_properties>& StereoCamera::getProperties() const {
         return properties;
     }
 
@@ -246,7 +246,7 @@ namespace sex::xocv {
         this->api = _api;
     }
 
-    void StereoCamera::setProperties(std::vector<CameraProp> props) {
+    void StereoCamera::setProperties(std::vector<sex::data::camera_properties> props) {
         this->properties = std::move(props);
     }
 }
