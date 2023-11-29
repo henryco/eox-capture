@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME}
         src/ocv/stereo_camera.h
         src/utils/tp/thread_pool.cpp
         src/utils/tp/thread_pool.h
-        src/utils/stb_image.h
+        src/libs/stb/stb_image.h
         src/ogl/render/texture_1.cpp
         src/ogl/render/texture_1.h
         src/ogl/shader/simple_shader.cpp
@@ -59,6 +59,7 @@ add_executable(${PROJECT_NAME}
         src/gtk/gtk_sex_window.h
         src/utils/mappers/cam_gtk_mapper.h
         src/data/common_structures.h
+        src/libs/argparse/argparse.h
 )
 
 # Include directories for the specific target
