@@ -47,12 +47,9 @@ namespace sex::xocv {
         std::cout << "BUFF: " << capture.get(cv::CAP_PROP_BUFFERSIZE) << std::endl;
     }
 
-    StereoCamera::StereoCamera(const std::vector<CameraProp>& props, int api, bool homogeneous) {
-        open(props, api, homogeneous);
-    }
-
-    StereoCamera::StereoCamera(StereoCamera&& other) noexcept
-            : captures(std::move(other.captures)), properties(std::move(other.properties)) {}
+    StereoCamera::StereoCamera(StereoCamera&& other) noexcept :
+            captures(std::move(other.captures)),
+            properties(std::move(other.properties)) {}
 
     std::vector<cv::Mat> StereoCamera::capture() {
         std::vector<cv::Mat> frames;
@@ -105,7 +102,7 @@ namespace sex::xocv {
         return frames;
     }
 
-    void StereoCamera::open(int api, bool homogeneous) {
+    void StereoCamera::open() {
 
         if (api == cv::CAP_V4L2) {
             // TODO
@@ -129,9 +126,9 @@ namespace sex::xocv {
         log->debug("opened: {}", captures.size());
     }
 
-    void StereoCamera::open(std::vector<CameraProp> props, int api, bool homogeneous) {
+    void StereoCamera::open(std::vector<CameraProp> props) {
         properties = std::move(props);
-        open(api, homogeneous);
+        open();
     }
 
     void StereoCamera::release() {
@@ -161,7 +158,14 @@ namespace sex::xocv {
     }
 
     void StereoCamera::setFast(bool _fast) {
-        fast = _fast;
+        this->fast = _fast;
     }
 
+    void StereoCamera::setHomogeneous(bool _homogeneous) {
+        this->homogeneous = _homogeneous;
+    }
+
+    void StereoCamera::setApi(int _api) {
+        this->api = _api;
+    }
 }

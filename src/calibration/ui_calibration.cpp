@@ -91,7 +91,10 @@ void UiCalibration::prepareCamera() {
         }
 
         glImage.init((int) index.size(), width, height, GL_BGR);
-        camera.open(props, api, homogeneous);
+
+        camera.setHomogeneous(homogeneous);
+        camera.setApi(api);
+        camera.open(props);
     }
 
 

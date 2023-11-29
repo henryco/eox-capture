@@ -65,25 +65,15 @@ namespace sex::xocv {
         std::vector<CameraProp> properties;
         sex::util::ThreadPool executor;
 
+        bool homogeneous = true;
         bool fast = false;
+        int api = cv::CAP_V4L2;
 
     public:
 
         StereoCamera() = default;
 
         ~StereoCamera();
-
-        /**
-         * @class StereoCamera
-         * @brief Represents a stereo ocv composed of multiple individual cameras.
-         *
-         * The StereoCamera class provides a convenient way to manage and control a set
-         * of individual cameras that capture stereo imagery. It takes a vector of
-         * CameraProp objects as input during construction, where each CameraProp object
-         * represents the properties of an individual ocv, such as its resolution, etc.
-         */
-
-        explicit StereoCamera(const std::vector<CameraProp>& props, int api, bool homogeneous = true);
 
         /**
          * @brief Move constructor for StereoCamera objects.
@@ -116,7 +106,7 @@ namespace sex::xocv {
         /**
          * @see sex::StereoCamera::open(std::vector<CameraProp> props)
          */
-        void open(int api, bool homogeneous = true);
+        void open();
 
         /**
          * @brief Opens the cameras based on the provided properties.
@@ -132,7 +122,7 @@ namespace sex::xocv {
          * @see sex::CameraProp
          */
 
-        void open(std::vector<CameraProp> props, int api, bool homogeneous = true);
+        void open(std::vector<CameraProp> props);
 
         /**
          * @brief Get the properties of the stereo camera.
@@ -155,6 +145,10 @@ namespace sex::xocv {
          * @note Fast mode is disabled by default.
          */
         void setFast(bool fast);
+
+        void setHomogeneous(bool homogeneous);
+
+        void setApi(int api);
     };
 
 }
