@@ -18,7 +18,7 @@ namespace sex::xocv {
                 name[3]);
     }
 
-    void initFromParams(cv::VideoCapture& capture, const CameraProp& prop) {
+    void init_from_params(cv::VideoCapture& capture, const CameraProp& prop, int api) {
 
         auto v4_props = sex::v4l2::get_camera_props(prop.index);
         for (const auto& queryctrl: v4_props) {
@@ -42,13 +42,13 @@ namespace sex::xocv {
             cv::CAP_PROP_FPS, prop.fps,
             cv::CAP_PROP_BUFFERSIZE, prop.buffer
         });
-        capture.open((int) prop.index, prop.api, params);
+        capture.open((int) prop.index, api, params);
 
         std::cout << "BUFF: " << capture.get(cv::CAP_PROP_BUFFERSIZE) << std::endl;
     }
 
-    StereoCamera::StereoCamera(const std::vector<CameraProp>& props) {
-        open(props);
+    StereoCamera::StereoCamera(const std::vector<CameraProp>& props, int api, bool homogeneous) {
+        open(props, api, homogeneous);
     }
 
     StereoCamera::StereoCamera(StereoCamera&& other) noexcept
@@ -105,13 +105,20 @@ namespace sex::xocv {
         return frames;
     }
 
-    void StereoCamera::open() {
+    void StereoCamera::open(int api, bool homogeneous) {
+
+        if (api == cv::CAP_V4L2) {
+            // TODO
+        }
+
         for (const auto& property : properties) {
 
             log->debug("open [{}]", property.index);
 
             auto capture = std::make_unique<cv::VideoCapture>();
-            initFromParams(*capture, property);
+
+            init_from_params(*capture, property, api);
+
             if (!capture->isOpened())
                 throw std::runtime_error("Failed to open camera: " + std::to_string(property.index));
             captures.push_back(std::move(capture));
@@ -122,9 +129,9 @@ namespace sex::xocv {
         log->debug("opened: {}", captures.size());
     }
 
-    void StereoCamera::open(std::vector<CameraProp> props) {
+    void StereoCamera::open(std::vector<CameraProp> props, int api, bool homogeneous) {
         properties = std::move(props);
-        open();
+        open(api, homogeneous);
     }
 
     void StereoCamera::release() {

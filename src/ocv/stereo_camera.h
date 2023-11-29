@@ -20,13 +20,12 @@ namespace sex::xocv {
 
     class CameraProp {
     public:
+        uint id;
         uint index;
-        int api;
         int width;
         int height;
         int fps;
         int buffer;
-        bool homogeneous;
         std::string codec;
 
         /**
@@ -34,22 +33,20 @@ namespace sex::xocv {
          */
 
         explicit CameraProp(
+                const uint id,
                 const uint index = 0,
                 const int width = 640,
                 const int height = 480,
                 std::string codec = "YUYV",
                 const int fps = 30,
-                const int buffer = 2,
-                const int api = cv::CAP_V4L2,
-                const bool homogeneous = true)
-                : index(index),
+                const int buffer = 2)
+                : id(id),
+                  index(index),
                   width(width),
                   height(height),
-                  fps(fps),
                   codec(std::move(codec)),
-                  buffer(buffer),
-                  homogeneous(homogeneous),
-                  api(api)
+                  fps(fps),
+                  buffer(buffer)
         {};
     };
 
@@ -86,7 +83,7 @@ namespace sex::xocv {
          * represents the properties of an individual ocv, such as its resolution, etc.
          */
 
-        explicit StereoCamera(const std::vector<CameraProp>& props);
+        explicit StereoCamera(const std::vector<CameraProp>& props, int api, bool homogeneous = true);
 
         /**
          * @brief Move constructor for StereoCamera objects.
@@ -119,7 +116,7 @@ namespace sex::xocv {
         /**
          * @see sex::StereoCamera::open(std::vector<CameraProp> props)
          */
-        void open();
+        void open(int api, bool homogeneous = true);
 
         /**
          * @brief Opens the cameras based on the provided properties.
@@ -135,7 +132,7 @@ namespace sex::xocv {
          * @see sex::CameraProp
          */
 
-        void open(std::vector<CameraProp> props);
+        void open(std::vector<CameraProp> props, int api, bool homogeneous = true);
 
         /**
          * @brief Get the properties of the stereo camera.

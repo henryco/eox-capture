@@ -87,11 +87,11 @@ void UiCalibration::prepareCamera() {
         std::vector<sex::xocv::CameraProp> props;
         props.reserve(index.size());
         for (const auto i: index) {
-            props.emplace_back(i, width, height, codec, fps, buffer, api);
+            props.emplace_back(i, i, width, height, codec, fps, buffer);
         }
 
         glImage.init((int) index.size(), width, height, GL_BGR);
-        camera.open(props);
+        camera.open(props, api, homogeneous);
     }
 
 
