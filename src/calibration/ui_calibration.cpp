@@ -50,10 +50,13 @@ void UiCalibration::init(const sex::data::basic_config &configuration) {
         deltaLoop.start();
     }
 
-    add(layout_h);
-    layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
-    layout_h.pack_start(configStack, Gtk::PACK_SHRINK);
-    show_all_children();
+    {
+        // Init Window
+        add(layout_h);
+        layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
+        layout_h.pack_start(configStack, Gtk::PACK_SHRINK);
+        show_all_children();
+    }
 }
 
 void UiCalibration::update(float delta, float latency, float _fps) {
