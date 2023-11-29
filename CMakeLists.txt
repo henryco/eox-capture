@@ -58,6 +58,7 @@ add_executable(${PROJECT_NAME}
         src/utils/utils.h
         src/gtk/gtk_sex_window.h
         src/utils/mappers/cam_gtk_mapper.h
+        src/data/data_structures.h
 )
 
 # Include directories for the specific target

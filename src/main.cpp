@@ -18,10 +18,10 @@ int main(int argc, char **argv) {
                 "dev.tindersamurai.stereox"
         );
 
-        UiCalibration calibration;
-        calibration.init();
-        calibration.show();
-        return app->run(calibration);
+        sex::xgtk::GtkSexWindow* window = new UiCalibration();
+        window->init();
+        window->show();
+        return app->run(*window);
 
     } catch (const std::exception &e) {
         ErrorReporter::printStackTrace(e);

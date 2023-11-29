@@ -11,7 +11,7 @@
 #include "../utils/utils.h"
 #include "../utils/mappers/cam_gtk_mapper.h"
 
-void UiCalibration::prepareCamera() {
+void UiCalibration::init(const std::map<std::string, sex::data::config_value>& configuration) {
 
     // TEMPORAL (move to CLI later)
     const std::map<uint, uint> devices = {
@@ -28,7 +28,6 @@ void UiCalibration::prepareCamera() {
     const int api = cv::CAP_V4L2;
     const int buffer = 2;
     // TEMPORAL (move to CLI later)
-
 
     {
         // Init camera
@@ -72,10 +71,6 @@ void UiCalibration::prepareCamera() {
         deltaLoop.start();
     }
 
-}
-
-void UiCalibration::init() {
-    prepareCamera();
     add(layout_h);
     layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
     layout_h.pack_start(configStack, Gtk::PACK_SHRINK);
