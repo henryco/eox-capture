@@ -9,95 +9,62 @@
 #include "../utils/stb_image.h"
 #include "../v4l2/linux_video.h"
 #include "../utils/utils.h"
+#include "../utils/mappers/cam_gtk_mapper.h"
 
 void UiCalibration::prepareCamera() {
 
     // TEMPORAL (move to CLI later)
-    const std::vector<uint> index = {
-            2,
-            4
+    const std::map<uint, uint> devices = {
+            // ID, INDEX
+            {1, 2},
+            {2, 4}
     };
     const std::string codec = "MJPG";
     const int width = 640;
     const int height = 480;
     const int fps = 30;
     const bool homogeneous = true;
+    const bool fast = false;
     const int api = cv::CAP_V4L2;
     const int buffer = 2;
     // TEMPORAL (move to CLI later)
 
 
     {
-        // Camera controls and so on
-
-        if (api == cv::CAP_V4L2) {
-            // Camera controls for V4L2 API (video for linux)
-
-            // TODO DESERIALIZATION
-
-            const size_t rounds = !homogeneous ? index.size() : 1;
-            for (size_t i = 0; i < rounds; i++) {
-
-                auto v4_props = sex::v4l2::get_camera_props(index[i]);
-
-                if (rounds == 1) {
-                    // multi-camera config homogenisation
-
-                    std::vector<sex::v4l2::V4L2_Control> v4_controls;
-                    for (const auto &prop: v4_props) {
-                        if (prop.type == 6)
-                            continue;
-                        v4_controls.push_back(sex::v4l2::V4L2_Control{.id = prop.id, .value = prop.value});
-                    }
-
-                    for (size_t j = 1; j < index.size(); j++) {
-                        sex::v4l2::set_camera_prop(index[j], v4_controls);
-                    }
-                }
-
-                std::vector<sex::xgtk::GtkCamProp> parameters;
-                for (const auto &p: v4_props) {
-                    if (p.type == 6)
-                        continue;
-
-                    parameters.emplace_back(p.id, p.type, sex::utils::to_string(p.name, 32),
-                                            p.minimum, p.maximum, p.step, p.default_value, p.value);
-                }
-
-                auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-                cam_params->onUpdate(updateCamera(!homogeneous ? std::vector<uint>{index[i]} : index));
-                cam_params->onReset(resetCamera(!homogeneous ? std::vector<uint>{index[i]} : index));
-                cam_params->onSave(saveCamera(!homogeneous ? std::vector<uint>{index[i]} : index));
-                cam_params->setProperties(parameters);
-
-                configStack.add(*cam_params, " Camera " + (!homogeneous ? std::to_string(index[i]) : ""));
-                keep(std::move(cam_params));
-
-            }
-        } else if (api == cv::CAP_DSHOW) {
-            // DirectShow windows
-            // TODO windows support
-        }
-    }
-
-
-    {
-        // OPENCV camera config
-
+        // Init camera
         std::vector<sex::xocv::CameraProp> props;
-        props.reserve(index.size());
-        for (const auto i: index) {
-            props.emplace_back(i, i, width, height, codec, fps, buffer);
+        props.reserve(devices.size());
+        for (const auto &[id, index]: devices) {
+            props.emplace_back(id, index, width, height, codec, fps, buffer);
         }
-
-        glImage.init((int) index.size(), width, height, GL_BGR);
 
         camera.setHomogeneous(homogeneous);
-        camera.setFast(false);
+        camera.setFast(fast);
         camera.setApi(api);
         camera.open(props);
+
+        const auto controls = camera.getControls();
+        for (const auto &control: controls) {
+
+            const auto indexes = sex::mappers::cam_gtk::index(
+                    props,control.id,controls.size() == 1);
+
+            auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
+            cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
+            cam_params->onUpdate(updateCamera(indexes));
+            cam_params->onReset(resetCamera(indexes));
+            cam_params->onSave(saveCamera(indexes));
+
+            configStack.add(*cam_params, " Camera " + std::to_string(control.id));
+            keep(std::move(cam_params));
+        }
+
     }
 
+    {
+        // Init oGL canvas
+        glImage.init((int) devices.size(), width, height, GL_BGR);
+    }
 
     {
         // Stable FPS worker loop

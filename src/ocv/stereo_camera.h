@@ -10,6 +10,22 @@
 
 namespace sex::xocv {
 
+    typedef struct {
+        uint id;
+        uint type;
+        std::string name;
+        int min;
+        int max;
+        int step;
+        int default_value;
+        int value;
+    } camera_control;
+
+    typedef struct {
+        uint id;
+        std::vector<camera_control> controls;
+    } camera_controls;
+
     /**
      * @class CameraProp
      * @brief The CameraProp class represents the properties for capturing camera.
@@ -149,6 +165,12 @@ namespace sex::xocv {
         void setHomogeneous(bool homogeneous);
 
         void setApi(int api);
+
+        void restore(const std::string& file);
+
+        std::vector<camera_controls> getControls();
+
+        void setProperties(std::vector<CameraProp> props);
     };
 
 }
