@@ -47,7 +47,7 @@ void UiCalibration::prepareCamera() {
         for (const auto &control: controls) {
 
             const auto indexes = sex::mappers::cam_gtk::index(
-                    props,control.id,controls.size() == 1);
+                    props,control.id, homogeneous);
 
             auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
             cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
