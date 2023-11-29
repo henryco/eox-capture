@@ -68,7 +68,6 @@ void UiCalibration::prepareCamera() {
 
     {
         // Stable FPS worker loop
-
         deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
         deltaLoop.setFps(0);
         deltaLoop.start();
