@@ -58,7 +58,6 @@ void UiCalibration::prepareCamera() {
             configStack.add(*cam_params, " Camera " + std::to_string(control.id));
             keep(std::move(cam_params));
         }
-
     }
 
     {
