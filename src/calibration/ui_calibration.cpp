@@ -16,8 +16,8 @@ void UiCalibration::prepareCamera() {
     // TEMPORAL (move to CLI later)
     const std::map<uint, uint> devices = {
             // ID, INDEX
-            {1, 2},
-            {2, 4}
+            {1, 4},
+            {2, 2}
     };
     const std::string codec = "MJPG";
     const int width = 640;
