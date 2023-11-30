@@ -23,7 +23,7 @@ namespace sex::xgtk {
         }
 
     public:
-        virtual void init(const sex::data::basic_config& configuration) = 0;
+        virtual void init(sex::data::basic_config configuration) = 0;
 
         void init() {
             init({});

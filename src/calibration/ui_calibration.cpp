@@ -14,9 +14,10 @@
 #include "../aux/gtk/gtk_config_stack.h"
 #include <gtkmm/box.h>
 
-void UiCalibration::init(const sex::data::basic_config &configuration) {
+void UiCalibration::init(sex::data::basic_config configuration) {
+    config = std::move(configuration);
 
-    const auto &props = configuration.camera;
+    const auto &props = config.camera;
     auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 

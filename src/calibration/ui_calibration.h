@@ -19,6 +19,7 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("ui_calibration");
 
+    sex::data::basic_config config;
     sex::xocv::StereoCamera camera;
     sex::util::DeltaLoop deltaLoop;
     sex::xgtk::GLImage glImage;
@@ -29,7 +30,7 @@ public:
     UiCalibration() = default;
     ~UiCalibration() override;
 
-    void init(const sex::data::basic_config& configuration) override;
+    void init(sex::data::basic_config configuration) override;
 
 protected:
     void onRefresh() override;
