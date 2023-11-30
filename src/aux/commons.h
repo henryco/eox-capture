@@ -29,6 +29,7 @@ namespace sex::data {
     } calibration_config;
 
     typedef struct {
+        std::string work_dir;
         std::vector<std::string> configs;
         std::vector<camera_properties> camera;
         std::string module;

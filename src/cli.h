@@ -170,10 +170,25 @@ namespace sex::cli {
                             });
         }
 
+        const auto configs = program.get<std::vector<std::string>>("--config");
+        std::vector<std::string> new_configs;
+        std::string work_dir;
+
+        for (const auto path: configs) {
+            if (!std::filesystem::exists(path))
+                continue;
+            if (std::filesystem::is_directory(path)) {
+                work_dir = path;
+                continue;
+            }
+            new_configs.push_back(path);
+        }
+
         if (program.is_subcommand_used("calibration")) {
             const auto &instance = program.at<argparse::ArgumentParser>("calibration");
             return {
-                    .configs = program.get<std::vector<std::string>>("--config"),
+                    .work_dir = work_dir,
+                    .configs = new_configs,
                     .camera = props,
                     .module = "calibration",
                     .calibration = {
@@ -187,9 +202,9 @@ namespace sex::cli {
         }
 
         return {
-                .configs = program.get<std::vector<std::string>>("--config"),
-                .camera = props,
-                .module = program.get<std::string>("module")
+                .work_dir = work_dir,
+                .configs = new_configs,
+                .camera = props
         };
     }
 

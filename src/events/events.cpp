@@ -15,6 +15,7 @@ namespace sex::events {
     void gtk_save_camera_settings_event(
             const std::vector<uint> &devices,
             Gtk::Window &window,
+            const std::string &work_dir,
             const std::shared_ptr<spdlog::logger> log
     ) {
         const auto name = std::accumulate(
@@ -29,6 +30,7 @@ namespace sex::events {
 
         Gtk::FileChooserDialog dialog("Please select a file to save", Gtk::FILE_CHOOSER_ACTION_SAVE);
         dialog.set_current_name("camera_" + name + ".xcam");
+        dialog.set_current_folder(work_dir);
         dialog.add_filter(filter_text);
         dialog.set_transient_for(window);
 

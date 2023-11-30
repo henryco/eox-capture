@@ -22,6 +22,11 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
     {
+        const auto &files = config.configs;
+
+    }
+
+    {
         // Init camera
         camera.setHomogeneous(props[0].homogeneous);
         camera.setFast(props[0].fast);
@@ -102,7 +107,7 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
 std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
     return [this, ids = std::move(devices)]() {
         log->debug("save camera configuration");
-        sex::events::gtk_save_camera_settings_event(ids, *this, log);
+        sex::events::gtk_save_camera_settings_event(ids, *this, config.work_dir, log);
         log->debug("camera configuration done");
     };
 }

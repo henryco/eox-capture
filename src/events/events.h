@@ -13,6 +13,7 @@ namespace sex::events {
     void gtk_save_camera_settings_event(
             const std::vector<uint> &devices,
             Gtk::Window &window,
+            const std::string &work_dir,
             const std::shared_ptr<spdlog::logger> log);
 
 } // events
