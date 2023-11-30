@@ -119,8 +119,7 @@ namespace sex::cli {
 
         program.add_argument("--fast")
                 .help("enable fast mode, faster frame grabbing with the cost of lack of synchronization between devices")
-                .default_value(false)
-                .implicit_value(true);
+                .flag();
 
         program.add_argument("--api")
                 .help("set the backend API for video capturing (see: cv::CAP_*)")
