@@ -35,11 +35,10 @@ namespace sex::cli {
         return devices_map;
     }
 
-    sex::data::basic_config parse(int argc, char **argv) {
+    sex::data::basic_config parse(int &argc, char **&argv) {
         argparse::ArgumentParser program(
                 "stereox",
-                "1.0.0",
-                argparse::default_arguments::all
+                "1.0.0"
         );
         program.add_description(R"desc(
                 StereoX - stereo vision modules.
@@ -53,7 +52,8 @@ namespace sex::cli {
 
         program.add_argument("module")
                 .help("chose the module to run (calibration, vision, config)")
-                .required();
+                .choices("calibration", "vision", "config")
+                .nargs(1);
 
         program.add_argument("-o", "--homogeneous")
                 .help("enable only if all the video capture devices are of the same model")
@@ -63,7 +63,6 @@ namespace sex::cli {
                 .help("set number of maximum concurrent jobs")
                 .default_value(4)
                 .scan<'i', int>();
-
 
         program.add_argument("-d", "--devices")
                 .help("list of devices coma separated (pairs id:index i.e.: '0:2,1:4' )")
@@ -105,15 +104,14 @@ namespace sex::cli {
 
         program.add_argument("--api")
                 .help("set the backend API for video capturing (see: cv::CAP_*)")
-                .default_value(cv::CAP_V4L2)
+                .default_value((int) cv::CAP_V4L2)
                 .scan<'i', int>();
-
 
         try {
             program.parse_args(argc, argv);
         } catch (const std::runtime_error &err) {
             std::cout << err.what() << std::endl;
-            std::cout << program << std::endl;
+            std::cout << program;
             std::exit(1);
         }
 
@@ -125,6 +123,7 @@ namespace sex::cli {
             spdlog::set_level(spdlog::level::info);
         }
 
+        const auto module = sex::data::enumerated_module.at(program.get<std::string>("module"));
         const auto codec = program.get<std::string>("--codec");
         const auto devices = parse_devices(
                 program.get<std::vector<std::string>>("--devices")
@@ -153,7 +152,7 @@ namespace sex::cli {
 
         return {
                 .camera = props,
-                .module = sex::data::enumerated_module.at(program.get<std::string>("module"))
+                .module = module
         };
     }
 
