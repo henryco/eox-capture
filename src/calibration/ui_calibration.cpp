@@ -2,6 +2,7 @@
 // Created by henryco on 8/20/23.
 //
 
+#include <gtkmm/filechooserdialog.h>
 #include "ui_calibration.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -12,7 +13,7 @@
 #include "../utils/mappers/cam_gtk_mapper.h"
 
 void UiCalibration::init(const sex::data::basic_config &configuration) {
-    const auto& props = configuration.camera;
+    const auto &props = configuration.camera;
 
     {
         // Init camera
@@ -60,7 +61,7 @@ void UiCalibration::init(const sex::data::basic_config &configuration) {
 }
 
 void UiCalibration::update(float delta, float latency, float _fps) {
-    log->debug("update: {}, late: {}, fps: {}", delta, latency, _fps);
+//    log->debug("update: {}, late: {}, fps: {}", delta, latency, _fps);
     this->FPS = _fps;
 
     auto captured = camera.capture();
@@ -81,7 +82,7 @@ void UiCalibration::onRefresh() {
 }
 
 std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devices) {
-    return [ids = std::move(devices), this](uint prop_id, int value) -> int {
+    return [ids = std::move(devices)](uint prop_id, int value) -> int {
         log->debug("update_property: {}, {}", prop_id, value);
         for (const auto &id: ids) {
             sex::v4l2::set_camera_prop(id, prop_id, value);
@@ -91,9 +92,27 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
 }
 
 std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
-    return [ids = std::move(devices)]() {
+    return [this, ids = std::move(devices)]() {
         log->debug("saveCamera");
         // TODO SERIALIZATION
+
+        Gtk::FileChooserDialog dialog("Please select a file to save", Gtk::FILE_CHOOSER_ACTION_SAVE);
+        dialog.set_transient_for(*this);
+
+        dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+        dialog.add_button("Save", Gtk::RESPONSE_OK);
+
+        const int result = dialog.run();
+        switch (result) {
+            case Gtk::RESPONSE_OK: {
+                auto const file_name = dialog.get_filename();
+                log->info("selected file: {}", file_name);
+                break;
+            }
+            default:
+                log->debug("nothing selected");
+                break;
+        }
     };
 }
 

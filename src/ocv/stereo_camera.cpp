@@ -135,7 +135,7 @@ namespace sex::xocv {
         results.reserve(captures.size());
         for (auto &capture: captures) {
             results.push_back(executor.execute<cv::Mat>([&capture]() mutable -> cv::Mat {
-                log->debug("retrieve frame");
+//                log->debug("retrieve frame");
                 cv::Mat frame;
                 capture->retrieve(frame);
                 return frame;
@@ -200,7 +200,7 @@ namespace sex::xocv {
 
         executor.start(properties.size());
 
-        log->debug("opened: {}", captures.size());
+        log->debug("opened devices total: {}", captures.size());
     }
 
     void StereoCamera::open(std::vector<sex::data::camera_properties> props) {
