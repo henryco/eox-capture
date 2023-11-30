@@ -29,7 +29,6 @@ namespace sex::xocv {
                               cv::CAP_PROP_BUFFERSIZE, prop.buffer
                       });
         capture.open((int) prop.index, api, params);
-        std::cout << "BUFF: " << capture.get(cv::CAP_PROP_BUFFERSIZE) << std::endl;
     }
 
     StereoCamera::StereoCamera(StereoCamera &&other) noexcept:
