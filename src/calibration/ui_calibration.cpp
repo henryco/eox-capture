@@ -11,9 +11,14 @@
 #include "../aux/v4l2/linux_video.h"
 #include "../aux/utils/mappers/cam_gtk_mapper.h"
 #include "../events/events.h"
+#include "../aux/gtk/gtk_config_stack.h"
+#include <gtkmm/box.h>
 
 void UiCalibration::init(const sex::data::basic_config &configuration) {
+
     const auto &props = configuration.camera;
+    auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+    auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
     {
         // Init camera
@@ -34,7 +39,7 @@ void UiCalibration::init(const sex::data::basic_config &configuration) {
             cam_params->onReset(resetCamera(indexes));
             cam_params->onSave(saveCamera(indexes));
 
-            configStack.add(*cam_params, " Camera " + std::to_string(control.id));
+            config_stack->add(*cam_params, " Camera " + std::to_string(control.id));
             keep(std::move(cam_params));
         }
     }
@@ -53,9 +58,11 @@ void UiCalibration::init(const sex::data::basic_config &configuration) {
 
     {
         // Init Window
-        add(layout_h);
-        layout_h.pack_start(glImage, Gtk::PACK_SHRINK);
-        layout_h.pack_start(configStack, Gtk::PACK_SHRINK);
+        layout_h->pack_start(glImage, Gtk::PACK_SHRINK);
+        layout_h->pack_start(*config_stack, Gtk::PACK_SHRINK);
+        add(*layout_h);
+        keep(std::move(layout_h));
+        keep(std::move(config_stack));
         show_all_children();
     }
 }

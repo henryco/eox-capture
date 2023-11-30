@@ -3,21 +3,12 @@
 //
 #pragma once
 
-#include <gtkmm/window.h>
-#include <gtkmm/glarea.h>
-#include <GL/gl.h>
-#include <gtkmm/box.h>
-#include <glibmm/dispatcher.h>
-
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "../aux/ocv/stereo_camera.h"
-#include "../aux/ogl/render/texture_1.h"
 #include "../aux/gtk/gl_image.h"
 #include "../aux/utils/loop/delta_loop.h"
-#include "../aux/gtk/gtk_cam_params.h"
-#include "../aux/gtk/gtk_config_stack.h"
 #include "../aux/gtk/gtk_sex_window.h"
 #include "../aux/commons.h"
 
@@ -28,11 +19,9 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("ui_calibration");
 
-    Gtk::Box layout_h = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
-    sex::xgtk::GtkConfigStack configStack;
-    sex::xgtk::GLImage glImage;
     sex::xocv::StereoCamera camera;
     sex::util::DeltaLoop deltaLoop;
+    sex::xgtk::GLImage glImage;
 
     float FPS = 0;
 
