@@ -140,7 +140,7 @@ namespace sex::cli {
 
         sex::globals::THREAD_POOL_CORES_MAX = program.get<int>("--jobs");
 
-        if (program["--verbose"] == true) {
+        if (program.get<bool>("--verbose")) {
             spdlog::set_level(spdlog::level::debug);
         }
 
