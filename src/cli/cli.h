@@ -53,19 +53,7 @@ namespace sex::cli {
 
         program.add_argument("module")
                 .help("chose the module to run (calibration, vision, config)")
-                .required()
-                .action([](const std::string &value) {
-                    static const std::vector<std::string> choices = {
-                            "calibration",
-                            "vision",
-                            "config"
-                    };
-
-                    if (std::find(choices.begin(), choices.end(), value) != choices.end()) {
-                        return value;
-                    }
-                    throw std::runtime_error("Invalid value for module");
-                });
+                .required();
 
         program.add_argument("-o", "--homogeneous")
                 .help("enable only if all the video capture devices are of the same model")
@@ -93,13 +81,7 @@ namespace sex::cli {
 
         program.add_argument("--codec")
                 .help("set the video capture codec (4 characters)")
-                .default_value(std::string("MJPG"))
-                .action([](const std::string &value) {
-                    if (value.size() != 4) {
-                        throw std::runtime_error("Code must be 4 characters long");
-                    }
-                    return value;
-                });
+                .default_value(std::string("MJPG"));
 
         program.add_argument("--width")
                 .help("set the width")
