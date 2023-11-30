@@ -95,7 +95,7 @@ std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
     return [this, ids = std::move(devices)]() {
         log->debug("save camera configuration");
         sex::events::gtk_save_camera_settings_event(ids, *this, log);
-        log->debug("camera configuration saved");
+        log->debug("camera configuration done");
     };
 }
 
