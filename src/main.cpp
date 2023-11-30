@@ -9,10 +9,9 @@ int main(int argc, char **argv) {
         const auto configuration = sex::cli::parse(argc, argv);
 
         int n_argc = 1;
-        char** n_argv = &argv[0];
         const auto app = Gtk::Application::create(
                 n_argc,
-                n_argv,
+                argv,
                 "dev.tindersamurai.stereox"
         );
 
