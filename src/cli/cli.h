@@ -53,6 +53,7 @@ namespace sex::cli {
         program.add_argument("module")
                 .help("chose the module to run (calibration, vision, config)")
                 .choices("calibration", "vision", "config")
+                .required()
                 .nargs(1);
 
         program.add_argument("-o", "--homogeneous")
@@ -123,7 +124,6 @@ namespace sex::cli {
             spdlog::set_level(spdlog::level::info);
         }
 
-        const auto module = sex::data::enumerated_module.at(program.get<std::string>("module"));
         const auto codec = program.get<std::string>("--codec");
         const auto devices = parse_devices(
                 program.get<std::vector<std::string>>("--devices")
@@ -152,7 +152,7 @@ namespace sex::cli {
 
         return {
                 .camera = props,
-                .module = module
+                .module = program.get<std::string>("module")
         };
     }
 
