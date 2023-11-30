@@ -39,25 +39,20 @@ namespace sex::cli {
         argparse::ArgumentParser program(
                 "stereox",
                 "1.0.0",
-                argparse::default_arguments::all,
-                R"desc(
+                argparse::default_arguments::all
+        );
+        program.add_description(R"desc(
                 StereoX - stereo vision modules.
 
-                To list available V4L2 devices you can use:
+                To list available capture devices on linux you can use:
                 [  $ v4l2-ctl --list-devices  ]
 
                 For proper configuration first check your camera allowed properties
                 [  $ v4l2-ctl -d \"/dev/video${ID}\" --list-formats-ext  ]
-                )desc"
-        );
-
-        program.add_argument("--verbose")
-                .help("increase output verbosity")
-                .default_value(false)
-                .implicit_value(true);
+                )desc");
 
         program.add_argument("module")
-                .help("chose the module to run")
+                .help("chose the module to run (calibration, vision, config)")
                 .required()
                 .action([](const std::string &value) {
                     static const std::vector<std::string> choices = {
@@ -72,6 +67,32 @@ namespace sex::cli {
                     throw std::runtime_error("Invalid value for module");
                 });
 
+        program.add_argument("-o", "--homogeneous")
+                .help("enable only if all the video capture devices are of the same model")
+                .default_value(false)
+                .implicit_value(true);
+
+        program.add_argument("-j", "--jobs")
+                .help("set number of maximum concurrent jobs")
+                .default_value(4)
+                .scan<'i', int>();
+
+
+        program.add_argument("-d", "--devices")
+                .help("list of devices coma separated (pairs id:index i.e.: '0:2,1:4' )")
+                .nargs(argparse::nargs_pattern::any)
+                .append();
+
+        program.add_argument("-b", "--buffer")
+                .help("set the buffer size")
+                .default_value(2)
+                .scan<'i', int>();
+
+        program.add_argument("--verbose")
+                .help("increase output verbosity")
+                .default_value(false)
+                .implicit_value(true);
+
         program.add_argument("--codec")
                 .help("set the video capture codec (4 characters)")
                 .default_value(std::string("MJPG"))
@@ -81,11 +102,6 @@ namespace sex::cli {
                     }
                     return value;
                 });
-
-        program.add_argument("-j", "--jobs")
-                .help("set number of maximum concurrent jobs")
-                .default_value(4)
-                .scan<'i', int>();
 
         program.add_argument("--width")
                 .help("set the width")
@@ -102,15 +118,6 @@ namespace sex::cli {
                 .default_value(30)
                 .scan<'i', int>();
 
-        program.add_argument("--buffer")
-                .help("set the buffer size")
-                .default_value(2)
-                .scan<'i', int>();
-
-        program.add_argument("--homogeneous")
-                .help("enable only if all the video capture devices are of the same model")
-                .default_value(true)
-                .implicit_value(true);
 
         program.add_argument("--fast")
                 .help("enable fast mode, faster frame grabbing with the cost of lack of synchronization between devices")
@@ -118,14 +125,9 @@ namespace sex::cli {
                 .implicit_value(true);
 
         program.add_argument("--api")
-                .help("set the backend API for video capturing")
+                .help("set the backend API for video capturing (see: cv::CAP_*)")
                 .default_value(cv::CAP_V4L2)
                 .scan<'i', int>();
-
-        program.add_argument("-d", "--devices")
-                .help("list of devices coma separated (pairs id:index i.e.: '0:2,1:4' )")
-                .nargs(argparse::nargs_pattern::any)
-                .append();
 
 
         try {
@@ -170,7 +172,7 @@ namespace sex::cli {
 
         return {
                 .camera = props,
-                .module = sex::data::enumerated_module[program.get<std::string>("module")]
+                .module = sex::data::enumerated_module.at(program.get<std::string>("module"))
         };
     }
 
