@@ -142,6 +142,8 @@ namespace sex::cli {
 
         if (program.get<bool>("--verbose")) {
             spdlog::set_level(spdlog::level::debug);
+        } else {
+            spdlog::set_level(spdlog::level::info);
         }
 
         const auto codec = program.get<std::string>("--codec");
