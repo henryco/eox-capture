@@ -20,10 +20,20 @@ namespace sex::data {
         int api;
     } camera_properties;
 
+    typedef struct {
+        int columns;
+        int rows;
+        float size;
+        int quality;
+        int number;
+    } calibration_config;
 
     typedef struct {
         std::vector<camera_properties> camera;
         std::string module;
+        union {
+            calibration_config calibration;
+        };
     } basic_config;
 }
 

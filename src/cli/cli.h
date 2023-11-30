@@ -50,63 +50,77 @@ namespace sex::cli {
                 [  $ v4l2-ctl -d \"/dev/video${ID}\" --list-formats-ext  ]
                 )desc");
 
-        program.add_argument("module")
-                .help("chose the module to run (calibration, vision, config)")
-                .choices("calibration", "vision", "config")
-                .required()
-                .nargs(1);
-
         program.add_argument("-o", "--homogeneous")
                 .help("enable only if all the video capture devices are of the same model")
                 .flag();
-
         program.add_argument("-j", "--jobs")
                 .help("set number of maximum concurrent jobs")
                 .default_value(4)
                 .scan<'i', int>();
-
         program.add_argument("-d", "--devices")
                 .help("list of devices coma separated (pairs id:index i.e.: '0:2,1:4' )")
                 .nargs(argparse::nargs_pattern::any)
                 .append();
-
         program.add_argument("-b", "--buffer")
                 .help("set the buffer size")
                 .default_value(2)
                 .scan<'i', int>();
-
         program.add_argument("--verbose")
                 .help("increase output verbosity")
                 .flag();
-
         program.add_argument("--codec")
                 .help("set the video capture codec (4 characters)")
                 .default_value(std::string("MJPG"));
-
         program.add_argument("--width")
                 .help("set the width")
                 .default_value(640)
                 .scan<'i', int>();
-
         program.add_argument("--height")
                 .help("set the height")
                 .default_value(480)
                 .scan<'i', int>();
-
         program.add_argument("--fps")
                 .help("set the camera maximum frames per second")
                 .default_value(30)
                 .scan<'i', int>();
-
-
         program.add_argument("--fast")
                 .help("enable fast mode, faster frame grabbing with the cost of lack of synchronization between devices")
                 .flag();
-
         program.add_argument("--api")
                 .help("set the backend API for video capturing (see: cv::CAP_*)")
                 .default_value((int) cv::CAP_V4L2)
                 .scan<'i', int>();
+
+
+        // Calibration config
+        argparse::ArgumentParser calibration("calibration", "");
+        calibration.add_description(R"desc(
+                Calibration module, used for stereo camera calibration.
+                Use calibration -h for help.
+        )desc");
+        calibration.add_argument("-r", "--rows")
+                .help("number of rows of checkerboard")
+                .default_value(7)
+                .scan<'i', int>();
+        calibration.add_argument("-c", "--columns")
+                .help("number of columns of checkerboard")
+                .default_value(10)
+                .scan<'i', int>();
+        calibration.add_argument("-s", "--size")
+                .help("square size in cm")
+                .default_value(1.0f)
+                .scan<'g', float>();
+        calibration.add_argument("-q", "--quality")
+                .help("quality [1 .. 4], lower == faster")
+                .default_value(3)
+                .choices("1", "2", "3", "4")
+                .scan<'i', int>();
+        calibration.add_argument("-n", "--number")
+                .help("number of images")
+                .default_value(4)
+                .scan<'i', int>();
+        program.add_subparser(calibration);
+
 
         try {
             program.parse_args(argc, argv);
@@ -148,6 +162,21 @@ namespace sex::cli {
                                     .homogeneous = program.get<bool>("--homogeneous"),
                                     .api = program.get<int>("--api")
                             });
+        }
+
+        if (program.is_subcommand_used("calibration")) {
+            const auto &instance = program.at<argparse::ArgumentParser>("calibration");
+            return {
+                    .camera = props,
+                    .module = "calibration",
+                    .calibration = {
+                            .columns = instance.get<int>("--columns"),
+                            .rows = instance.get<int>("--rows"),
+                            .size = instance.get<float>("--size"),
+                            .quality = instance.get<int>("--quality"),
+                            .number = instance.get<int>("--number"),
+                    }
+            };
         }
 
         return {
