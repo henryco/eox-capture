@@ -58,8 +58,11 @@ int main(int argc, char **argv) {
                 "dev.tindersamurai.stereox"
         );
 
-        sex::xgtk::GtkSexWindow* window = new UiCalibration();
-        window->init({ .camera = props });
+        sex::xgtk::GtkSexWindow *window = new UiCalibration();
+        window->init({
+                             .camera = props,
+                             .module = sex::data::module::calibration
+                     });
         window->show();
         return app->run(*window);
 

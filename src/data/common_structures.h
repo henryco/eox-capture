@@ -7,6 +7,16 @@
 
 namespace sex::data {
 
+    enum module {
+        calibration,
+        // todo more
+    };
+
+    const std::map<std::string, module> enumerated_module = {
+            {"calibration", module::calibration},
+            // todo more modules
+    };
+
     typedef struct {
         uint id;
         uint index;
@@ -23,7 +33,7 @@ namespace sex::data {
 
     typedef struct {
         std::vector<camera_properties> camera;
-
+        module module;
     } basic_config;
 }
 

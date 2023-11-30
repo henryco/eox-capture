@@ -60,6 +60,7 @@ add_executable(${PROJECT_NAME}
         src/utils/mappers/cam_gtk_mapper.h
         src/data/common_structures.h
         src/libs/argparse/argparse.h
+        src/cli/cli.h
 )
 
 # Include directories for the specific target
