@@ -9,9 +9,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "../libs/stb/stb_image.h"
-#include "../v4l2/linux_video.h"
-#include "../utils/mappers/cam_gtk_mapper.h"
+#include "../aux/v4l2/linux_video.h"
+#include "../aux/utils/mappers/cam_gtk_mapper.h"
 
 void UiCalibration::init(const sex::data::basic_config &configuration) {
     const auto &props = configuration.camera;

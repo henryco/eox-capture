@@ -7,9 +7,9 @@
 
 #include <opencv2/videoio.hpp>
 #include <spdlog/spdlog.h>
-#include "../libs/argparse/argparse.h"
-#include "../data/common_structures.h"
-#include "../utils/globals/sex_globals.h"
+#include "include/argparse/argparse.h"
+#include "aux/commons.h"
+#include "aux/utils/globals/sex_globals.h"
 
 namespace sex::cli {
 

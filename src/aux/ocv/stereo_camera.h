@@ -7,7 +7,7 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/core/mat.hpp>
 #include "../utils/tp/thread_pool.h"
-#include "../data/common_structures.h"
+#include "../commons.h"
 
 namespace sex::xocv {
 

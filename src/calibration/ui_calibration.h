@@ -12,14 +12,14 @@
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "../ocv/stereo_camera.h"
-#include "../ogl/render/texture_1.h"
-#include "../gtk/gl_image.h"
-#include "../utils/loop/delta_loop.h"
-#include "../gtk/gtk_cam_params.h"
-#include "../gtk/gtk_config_stack.h"
-#include "../gtk/gtk_sex_window.h"
-#include "../data/common_structures.h"
+#include "../aux/ocv/stereo_camera.h"
+#include "../aux/ogl/render/texture_1.h"
+#include "../aux/gtk/gl_image.h"
+#include "../aux/utils/loop/delta_loop.h"
+#include "../aux/gtk/gtk_cam_params.h"
+#include "../aux/gtk/gtk_config_stack.h"
+#include "../aux/gtk/gtk_sex_window.h"
+#include "../aux/commons.h"
 
 
 class UiCalibration final : public sex::xgtk::GtkSexWindow {

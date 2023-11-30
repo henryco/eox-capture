@@ -1,7 +1,7 @@
 #include <gtkmm.h>
 #include "calibration/ui_calibration.h"
-#include "utils/errors/error_reporter.h"
-#include "cli/cli.h"
+#include "aux/utils/errors/error_reporter.h"
+#include "cli.h"
 
 int main(int argc, char **argv) {
 

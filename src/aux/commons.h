@@ -2,8 +2,8 @@
 // Created by henryco on 11/29/23.
 //
 
-#ifndef STEREOX_COMMON_STRUCTURES_H
-#define STEREOX_COMMON_STRUCTURES_H
+#ifndef STEREOX_COMMONS_H
+#define STEREOX_COMMONS_H
 
 namespace sex::data {
 
@@ -37,4 +37,4 @@ namespace sex::data {
     } basic_config;
 }
 
-#endif //STEREOX_COMMON_STRUCTURES_H
+#endif //STEREOX_COMMONS_H

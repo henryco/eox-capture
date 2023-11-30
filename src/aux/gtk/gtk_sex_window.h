@@ -7,7 +7,7 @@
 
 #include <gtkmm/window.h>
 #include <glibmm/dispatcher.h>
-#include "../data/common_structures.h"
+#include "../commons.h"
 
 namespace sex::xgtk {
 

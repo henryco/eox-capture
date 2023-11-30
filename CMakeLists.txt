@@ -32,34 +32,34 @@ pkg_check_modules(V4L2 REQUIRED libv4l2)
 add_executable(${PROJECT_NAME}
         src/main.cpp
         src/calibration/ui_calibration.cpp
-        src/utils/errors/error_reporter.cpp
-        src/ocv/stereo_camera.cpp
-        src/ocv/stereo_camera.h
-        src/utils/tp/thread_pool.cpp
-        src/utils/tp/thread_pool.h
-        src/libs/stb/stb_image.h
-        src/ogl/render/texture_1.cpp
-        src/ogl/render/texture_1.h
-        src/ogl/shader/simple_shader.cpp
-        src/ogl/shader/simple_shader.h
-        src/gtk/gl_image.cpp
-        src/gtk/gl_image.h
-        src/utils/loop/delta_loop.cpp
-        src/utils/loop/delta_loop.h
-        src/v4l2/linux_video.cpp
-        src/v4l2/linux_video.h
-        src/gtk/gtk_cam_params.cpp
-        src/gtk/gtk_cam_params.h
-        src/gtk/gtk_utils.h
-        src/utils/globals/sex_globals.cpp
-        src/utils/globals/sex_globals.h
-        src/gtk/gtk_config_stack.cpp
-        src/gtk/gtk_config_stack.h
-        src/gtk/gtk_sex_window.h
-        src/utils/mappers/cam_gtk_mapper.h
-        src/data/common_structures.h
-        src/libs/argparse/argparse.h
-        src/cli/cli.h
+        src/aux/utils/errors/error_reporter.cpp
+        src/aux/ocv/stereo_camera.cpp
+        src/aux/ocv/stereo_camera.h
+        src/aux/utils/tp/thread_pool.cpp
+        src/aux/utils/tp/thread_pool.h
+        src/include/stb/stb_image.h
+        src/aux/ogl/render/texture_1.cpp
+        src/aux/ogl/render/texture_1.h
+        src/aux/ogl/shader/simple_shader.cpp
+        src/aux/ogl/shader/simple_shader.h
+        src/aux/gtk/gl_image.cpp
+        src/aux/gtk/gl_image.h
+        src/aux/utils/loop/delta_loop.cpp
+        src/aux/utils/loop/delta_loop.h
+        src/aux/v4l2/linux_video.cpp
+        src/aux/v4l2/linux_video.h
+        src/aux/gtk/gtk_cam_params.cpp
+        src/aux/gtk/gtk_cam_params.h
+        src/aux/gtk/gtk_utils.h
+        src/aux/utils/globals/sex_globals.cpp
+        src/aux/utils/globals/sex_globals.h
+        src/aux/gtk/gtk_config_stack.cpp
+        src/aux/gtk/gtk_config_stack.h
+        src/aux/gtk/gtk_sex_window.h
+        src/aux/utils/mappers/cam_gtk_mapper.h
+        src/aux/commons.h
+        src/include/argparse/argparse.h
+        src/cli.h
 )
 
 # Include directories for the specific target
