@@ -10,6 +10,7 @@
 #include <spdlog/spdlog.h>
 #include "aux/commons.h"
 #include "aux/utils/globals/sex_globals.h"
+#include <filesystem>
 
 namespace sex::cli {
 
@@ -65,6 +66,11 @@ namespace sex::cli {
                 .help("set the buffer size")
                 .default_value(2)
                 .scan<'i', int>();
+        program.add_argument("-f", "--config")
+                .default_value(std::vector<std::string>{std::filesystem::current_path().string()})
+                .help("stereo configuration files or directory")
+                .nargs(argparse::nargs_pattern::any)
+                .append();
         program.add_argument("--verbose")
                 .help("increase output verbosity")
                 .flag();
@@ -167,6 +173,7 @@ namespace sex::cli {
         if (program.is_subcommand_used("calibration")) {
             const auto &instance = program.at<argparse::ArgumentParser>("calibration");
             return {
+                    .configs = program.get<std::vector<std::string>>("--config"),
                     .camera = props,
                     .module = "calibration",
                     .calibration = {
@@ -180,6 +187,7 @@ namespace sex::cli {
         }
 
         return {
+                .configs = program.get<std::vector<std::string>>("--config"),
                 .camera = props,
                 .module = program.get<std::string>("module")
         };
