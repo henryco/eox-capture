@@ -69,8 +69,7 @@ namespace sex::cli {
 
         program.add_argument("-o", "--homogeneous")
                 .help("enable only if all the video capture devices are of the same model")
-                .default_value(false)
-                .implicit_value(true);
+                .flag();
 
         program.add_argument("-j", "--jobs")
                 .help("set number of maximum concurrent jobs")
@@ -90,8 +89,7 @@ namespace sex::cli {
 
         program.add_argument("--verbose")
                 .help("increase output verbosity")
-                .default_value(false)
-                .implicit_value(true);
+                .flag();
 
         program.add_argument("--codec")
                 .help("set the video capture codec (4 characters)")
