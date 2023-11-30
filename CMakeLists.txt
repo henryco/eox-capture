@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME}
         src/aux/ocv/stereo_camera.h
         src/aux/utils/tp/thread_pool.cpp
         src/aux/utils/tp/thread_pool.h
-        src/include/stb/stb_image.h
+        include/stb/stb_image.h
         src/aux/ogl/render/texture_1.cpp
         src/aux/ogl/render/texture_1.h
         src/aux/ogl/shader/simple_shader.cpp
@@ -58,7 +58,7 @@ add_executable(${PROJECT_NAME}
         src/aux/gtk/gtk_sex_window.h
         src/aux/utils/mappers/cam_gtk_mapper.h
         src/aux/commons.h
-        src/include/argparse/argparse.h
+        include/argparse/argparse.h
         src/cli.h
         src/events/events.cpp
         src/events/events.h
