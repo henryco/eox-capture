@@ -98,15 +98,15 @@ namespace sex::v4l2 {
     void write_control(std::ostream &out, const V4L2_Control &control);
 
     /**
-     * @brief Write V4L2 controls to an output stream
+     * @brief Writes V4L2 control information to an output stream.
      *
-     * This function writes the given V4L2 controls to the specified output stream.
+     * This function writes the device ID and the size of the control array to the output stream,
+     * followed by the control data. Each control's information is serialized and written
+     * to the stream. This is typically used for saving or transmitting the state of V4L2 controls.
      *
-     * @param os The output stream to write to
-     * @param device_id The ID of the V4L2 device
-     * @param controls The vector of V4L2 controls to write
-     *
-     * @note It DOES NOT close nor flush the stream
+     * @param os Reference to the output stream where control data will be written.
+     * @param device_id The unique identifier for the V4L2 device.
+     * @param controls A vector of V4L2_Control objects representing the controls to be written.
      */
     void write_control(std::ostream &os, uint device_id, const std::vector<V4L2_Control> &controls);
 
