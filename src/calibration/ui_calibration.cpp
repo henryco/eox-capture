@@ -29,17 +29,15 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 
         {
             std::vector<std::filesystem::path> paths;
-            for (const auto &entry: std::filesystem::directory_iterator(config.work_dir)) {
+            for (const auto &entry: std::filesystem::directory_iterator(config.work_dir))
                 paths.push_back(entry.path());
-            }
             sex::events::load_camera_from_paths(paths, config, log);
         }
 
         {
             std::vector<std::filesystem::path> paths;
-            for (const auto &entry: config.configs) {
+            for (const auto &entry: config.configs)
                 paths.push_back(std::filesystem::path(entry));
-            }
             sex::events::load_camera_from_paths(paths, config, log);
         }
 
