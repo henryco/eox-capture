@@ -97,7 +97,12 @@ namespace sex::events {
             const sex::data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger> log
     ) {
-        log->debug("load_camera_from_paths");
+        if (paths.empty()) {
+            log->debug("list of config path is empty");
+            return;
+        }
+
+        log->debug("load camera from paths");
 
         const auto &props = configuration.camera;
         for (const auto &path: paths) {
