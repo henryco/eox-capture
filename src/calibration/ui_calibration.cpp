@@ -22,7 +22,26 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
     {
-        const auto &files = config.configs;
+        // first check directory and load config from it
+        // then check the files and load config from it
+        // camera config -> [*.xcam]
+        // calibration config -> [*.xcb]
+
+        {
+            std::vector<std::filesystem::path> paths;
+            for (const auto &entry: std::filesystem::directory_iterator(config.work_dir)) {
+                paths.push_back(entry.path());
+            }
+            sex::events::load_camera_from_paths(paths, config, log);
+        }
+
+        {
+            std::vector<std::filesystem::path> paths;
+            for (const auto &entry: config.configs) {
+                paths.push_back(std::filesystem::path(entry));
+            }
+            sex::events::load_camera_from_paths(paths, config, log);
+        }
 
     }
 
@@ -107,7 +126,7 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
 std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
     return [this, ids = std::move(devices)]() {
         log->debug("save camera configuration");
-        sex::events::gtk_save_camera_settings_event(ids, *this, config.work_dir, log);
+        sex::events::gtk_save_camera_settings_event(ids, *this, config, log);
         log->debug("camera configuration done");
     };
 }
