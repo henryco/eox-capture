@@ -10,19 +10,22 @@
 #include <spdlog/logger.h>
 
 #include "../aux/commons.h"
+#include "../aux/ocv/stereo_camera.h"
 
 namespace sex::events {
 
     void gtk_save_camera_settings_event(
+            sex::xocv::StereoCamera &camera,
             const std::vector<uint> &devices,
             Gtk::Window &window,
             const sex::data::basic_config &configuration,
-            const std::shared_ptr<spdlog::logger> log);
+            const std::shared_ptr<spdlog::logger>& log
+            );
 
     void load_camera_from_paths(
+            sex::xocv::StereoCamera &camera,
             const std::vector<std::filesystem::path> &paths,
-            const sex::data::basic_config &configuration,
-            const std::shared_ptr<spdlog::logger> log);
+            const std::shared_ptr<spdlog::logger> &log);
 
 } // events
 

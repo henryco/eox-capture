@@ -40,7 +40,7 @@ namespace sex::xocv {
 
         std::vector<std::unique_ptr<cv::VideoCapture>> captures;
         std::vector<sex::data::camera_properties> properties;
-        sex::util::ThreadPool executor;
+        std::shared_ptr<sex::util::ThreadPool> executor;
 
         bool homogeneous = true;
         bool fast = false;
@@ -127,7 +127,26 @@ namespace sex::xocv {
 
         void setApi(int api);
 
-        void restore(const std::string& file);
+        /**
+         * Restore camera settings from data from input stream
+         * @param input_stream data stream with camera configuration
+         */
+        void restore(std::istream& input_stream);
+
+        /**
+         * Write camera configuration to output stream (for every devices)
+         *
+         * @param output_stream output stream to write to
+         */
+        void save(std::ostream &output_stream);
+
+        /**
+         * Write camera configuration to output stream
+         *
+         * @param output_stream output stream to write to
+         * @param devices vector of device identifiers
+         */
+        void save(std::ostream &output_stream, const std::vector<uint> &devices);
 
         std::vector<camera_controls> getControls();
 

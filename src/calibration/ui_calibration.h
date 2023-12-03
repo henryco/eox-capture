@@ -11,6 +11,7 @@
 #include "../aux/utils/loop/delta_loop.h"
 #include "../aux/gtk/gtk_sex_window.h"
 #include "../aux/commons.h"
+#include "../aux/utils/timer/timer.h"
 
 
 class UiCalibration final : public sex::xgtk::GtkSexWindow {
@@ -23,6 +24,7 @@ private:
     sex::xocv::StereoCamera camera;
     sex::util::DeltaLoop deltaLoop;
     sex::xgtk::GLImage glImage;
+    eox::utils::Timer timer;
 
     float FPS = 0;
 

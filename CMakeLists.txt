@@ -62,6 +62,8 @@ add_executable(${PROJECT_NAME}
         src/cli.h
         src/events/events.cpp
         src/events/events.h
+        src/aux/utils/timer/timer.cpp
+        src/aux/utils/timer/timer.h
 )
 
 # Include directories for the specific target

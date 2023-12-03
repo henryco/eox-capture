@@ -22,33 +22,30 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
     {
-        // first check directory and load config from it
-        // then check the files and load config from it
-        // camera config -> [*.xcam]
-        // calibration config -> [*.xcb]
-
-        {
-            std::vector<std::filesystem::path> paths;
-            for (const auto &entry: std::filesystem::directory_iterator(config.work_dir))
-                paths.push_back(entry.path());
-            sex::events::load_camera_from_paths(paths, config, log);
-        }
-
-        {
-            std::vector<std::filesystem::path> paths;
-            for (const auto &entry: config.configs)
-                paths.push_back(std::filesystem::path(entry));
-            sex::events::load_camera_from_paths(paths, config, log);
-        }
-
-    }
-
-    {
         // Init camera
+        camera.setProperties(props);
         camera.setHomogeneous(props[0].homogeneous);
         camera.setFast(props[0].fast);
         camera.setApi(props[0].api);
-        camera.open(props);
+
+        {
+            // loading camera parameters from files
+
+            {
+                std::vector<std::filesystem::path> paths;
+                for (const auto &entry: std::filesystem::directory_iterator(config.work_dir))
+                    paths.push_back(entry.path());
+                sex::events::load_camera_from_paths(camera, paths, log);
+            }
+
+            {
+                std::vector<std::filesystem::path> paths;
+                paths.reserve(config.configs.size());
+                for (const auto &entry: config.configs)
+                    paths.emplace_back(entry);
+                sex::events::load_camera_from_paths(camera, paths, log);
+            }
+        }
 
         const auto controls = camera.getControls();
         for (const auto &control: controls) {
@@ -65,6 +62,8 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             config_stack->add(*cam_params, " Camera " + std::to_string(control.id));
             keep(std::move(cam_params));
         }
+
+        camera.open();
     }
 
     {
@@ -77,6 +76,12 @@ void UiCalibration::init(sex::data::basic_config configuration) {
         deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
         deltaLoop.setFps(0);
         deltaLoop.start();
+    }
+
+    {
+        // Init timer
+        timer.set_delay(config.calibration.delay);
+        timer.start();
     }
 
     {
@@ -99,6 +104,8 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         log->debug("skip");
         return;
     }
+
+
 
     // LOGIC HERE
 
@@ -124,7 +131,7 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
 std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
     return [this, ids = std::move(devices)]() {
         log->debug("save camera configuration");
-        sex::events::gtk_save_camera_settings_event(ids, *this, config, log);
+        sex::events::gtk_save_camera_settings_event(camera, ids, *this, config, log);
         log->debug("camera configuration done");
     };
 }

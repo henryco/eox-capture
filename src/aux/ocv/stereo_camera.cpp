@@ -36,34 +36,6 @@ namespace sex::xocv {
             properties(std::move(other.properties)) {
     }
 
-    void StereoCamera::restore(const std::string &file) {
-        if (api == cv::CAP_V4L2) {
-
-            std::ifstream in(file);
-            if (!in)
-                throw std::runtime_error("Cannot open file file for read: " + file);
-
-            // read config from file
-            const auto controls = sex::v4l2::read_controls(in);
-
-            in.close();
-
-            if (controls.empty()) {
-                return;
-            }
-
-            // set properties via v4l2 api for corresponding device
-            for (const auto &prop: properties) {
-                if (!controls.contains(prop.id))
-                    continue;
-                sex::v4l2::set_camera_prop(prop.index, controls.at(prop.id));
-            }
-
-        } else {
-            // TODO windows support
-        }
-    }
-
     std::vector<camera_controls> StereoCamera::getControls() {
         if (api == cv::CAP_V4L2) {
             std::vector<camera_controls> vec;
@@ -134,7 +106,7 @@ namespace sex::xocv {
         std::vector<std::future<cv::Mat>> results;
         results.reserve(captures.size());
         for (auto &capture: captures) {
-            results.push_back(executor.execute<cv::Mat>([&capture]() mutable -> cv::Mat {
+            results.push_back(executor->execute<cv::Mat>([&capture]() mutable -> cv::Mat {
 //                log->debug("retrieve frame");
                 cv::Mat frame;
                 capture->retrieve(frame);
@@ -198,7 +170,11 @@ namespace sex::xocv {
             }
         }
 
-        executor.start(properties.size());
+        if (!executor) {
+            // there is no assigned executors
+            executor = std::make_shared<sex::util::ThreadPool>();
+            executor->start(properties.size());
+        }
 
         log->debug("opened devices total: {}", captures.size());
     }
@@ -220,8 +196,6 @@ namespace sex::xocv {
             log->debug("camera released [{}]", i++);
         }
         captures.clear();
-        executor.shutdown();
-
         log->debug("released");
     }
 
@@ -247,5 +221,103 @@ namespace sex::xocv {
 
     void StereoCamera::setProperties(std::vector<sex::data::camera_properties> props) {
         this->properties = std::move(props);
+    }
+
+    void StereoCamera::restore(std::istream &input_stream) {
+        if (input_stream.peek() == EOF)
+            return;
+
+        int32_t backend_header[1];
+        input_stream.read(reinterpret_cast<char *>(backend_header), sizeof(backend_header));
+
+        const int backend = backend_header[0];
+        if (backend != api) {
+            log->warn("mismatch backend for config file");
+            return;
+        }
+
+        if (backend == cv::CAP_V4L2) {
+
+            const auto controls = sex::v4l2::read_controls(input_stream);
+            for (const auto &[device_id, vec]: controls) {
+                log->debug("checking controls for device id: {}", device_id);
+
+                for (const auto &prop: properties) {
+                    if (device_id != prop.id)
+                        // no desired device under such id, skip
+                        continue;
+
+                    log->debug("setting configuration for device: {}, index: {}", device_id, prop.index);
+
+                    sex::v4l2::set_camera_prop(prop.index, vec);
+
+                    log->debug("configuration set: {}, {}", device_id, prop.index);
+                    break;
+                }
+            }
+
+        } else {
+            // TODO windows support
+        }
+    }
+
+    void StereoCamera::save(std::ostream &output_stream) {
+        std::vector<uint> devices;
+        devices.reserve(properties.size());
+        for (const auto &prop: properties) {
+            devices.push_back(prop.index);
+        }
+        save(output_stream, devices);
+    }
+
+    void StereoCamera::save(std::ostream &output_stream, const std::vector<uint> &devices) {
+        if (api == cv::CAP_V4L2) {
+
+            // iterative over devices
+            // map <device_id, controls>
+            std::map<uint, std::vector<sex::v4l2::V4L2_Control>> map;
+            for (const auto &index: devices) {
+
+                // iterating over controls for given device
+                const auto _properties = sex::v4l2::get_camera_props(index);
+                std::vector<sex::v4l2::V4L2_Control> controls;
+                for (const auto &prop: _properties) {
+                    // skipping non modifiable controls
+                    if (prop.type == 6)
+                        continue;
+                    // remapping control
+                    controls.push_back({.id = prop.id, .value = prop.value});
+                }
+
+                for (const auto &p: properties) {
+                    if (p.index != index)
+                        // this is definitely not our device
+                        continue;
+
+                    // id of device under corresponding index
+                    map.emplace(p.id, controls);
+                    break;
+                }
+            }
+
+            if (!output_stream) {
+                log->error("File stream opening error");
+                // maybe throw some exception or show some modal?
+                return;
+            }
+
+            // write backend type header first
+            int32_t backend_header[1] = {(int32_t) cv::CAP_V4L2};
+            output_stream.write(reinterpret_cast<const char *>(backend_header), sizeof(backend_header));
+
+            // write aggregated config data
+            for (const auto &[device_id, controls]: map) {
+                log->debug("writing camera [{}] configuration", device_id);
+                sex::v4l2::write_control(output_stream, device_id, controls);
+            }
+
+        } else {
+            // TODO WINDOWS support?
+        }
     }
 }

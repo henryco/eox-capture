@@ -125,6 +125,10 @@ namespace sex::cli {
                 .help("number of images")
                 .default_value(4)
                 .scan<'i', int>();
+        calibration.add_argument("-y", "--delay")
+                .help("delay between shots in ms")
+                .default_value(5000)
+                .scan<'i', int>();
         program.add_subparser(calibration);
 
 
@@ -174,7 +178,7 @@ namespace sex::cli {
         std::vector<std::string> new_configs;
         std::string work_dir;
 
-        for (const auto path: configs) {
+        for (const auto& path: configs) {
             if (!std::filesystem::exists(path))
                 continue;
             if (std::filesystem::is_directory(path)) {
@@ -197,6 +201,7 @@ namespace sex::cli {
                             .size = instance.get<float>("--size"),
                             .quality = instance.get<int>("--quality"),
                             .number = instance.get<int>("--number"),
+                            .delay = instance.get<int>("--delay"),
                     }
             };
         }
