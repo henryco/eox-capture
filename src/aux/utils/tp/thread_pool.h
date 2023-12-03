@@ -32,7 +32,7 @@ namespace sex::util {
             auto le_promise = std::make_shared<std::promise<T>>();
             auto le_future = le_promise->get_future();
 
-            auto lambda = [p = le_promise, func, this]() mutable {
+            auto lambda = [p = le_promise, func = std::move(func), this]() mutable {
                 try {
                     p->set_value(func());
                 } catch (...) {
@@ -43,12 +43,14 @@ namespace sex::util {
 
             {
                 std::lock_guard<std::mutex> lock(mutex);
-                tasks.push(std::move(lambda));
+                tasks.emplace(std::move(lambda));
                 flag.notify_all();
             }
 
             return le_future;
         }
+
+        std::future<void> execute(std::function<void()> func);
 
         void start(size_t size);
 

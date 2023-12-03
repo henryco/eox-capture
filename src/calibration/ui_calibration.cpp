@@ -116,7 +116,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         futures.push_back(executor->execute<cv::Mat>([frame]() {
 
             log->info("TODO");
-            // LOGIC HERE
+            // TODO LOGIC HERE
 
             return frame;
         }));

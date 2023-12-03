@@ -111,4 +111,28 @@ namespace sex::util {
         log->debug("started");
     }
 
+
+    std::future<void> ThreadPool::execute(std::function<void()> func) {
+        auto le_promise = std::make_shared<std::promise<void>>();
+        auto le_future = le_promise->get_future();
+
+        auto lambda = [p = le_promise, func = std::move(func), this]() mutable {
+            try {
+                func();
+                p->set_value();
+            } catch (...) {
+                p->set_exception(std::current_exception());
+            }
+            this->trigger();
+        };
+
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            tasks.emplace(std::move(lambda));
+            flag.notify_all();
+        }
+
+        return le_future;
+    }
+
 }
