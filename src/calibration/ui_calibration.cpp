@@ -7,10 +7,9 @@
 #include "ui_calibration.h"
 
 #include "../aux/v4l2/linux_video.h"
-#include "../aux/utils/mappers/cam_gtk_mapper.h"
 #include "../helpers/helpers.h"
+#include "../aux/utils/mappers/cam_gtk_mapper.h"
 #include "../aux/gtk/gtk_config_stack.h"
-#include "../aux/ocv/cv_utils.h"
 #include <gtkmm/box.h>
 
 void UiCalibration::init(sex::data::basic_config configuration) {
@@ -19,6 +18,11 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     const auto &props = config.camera;
     auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
+
+    {
+        // Init oGL canvas
+        glImage.init((int) props.size(), props[0].width, props[0].height, GL_BGR);
+    }
 
     {
         // init executor
@@ -68,13 +72,21 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             config_stack->add(*cam_params, " Camera " + std::to_string(control.id));
             keep(std::move(cam_params));
         }
-
-        camera.open();
     }
 
     {
-        // Init oGL canvas
-        glImage.init((int) props.size(), props[0].width, props[0].height, GL_BGR);
+        // Init Window
+        layout_h->pack_start(glImage, Gtk::PACK_SHRINK);
+        layout_h->pack_start(*config_stack, Gtk::PACK_SHRINK);
+        add(*layout_h);
+        keep(std::move(layout_h));
+        keep(std::move(config_stack));
+        show_all_children();
+    }
+
+    {
+        // start camera
+        camera.open();
     }
 
     {
@@ -89,49 +101,6 @@ void UiCalibration::init(sex::data::basic_config configuration) {
         timer.set_delay(config.calibration.delay);
         timer.start();
     }
-
-    {
-        // Init Window
-        layout_h->pack_start(glImage, Gtk::PACK_SHRINK);
-        layout_h->pack_start(*config_stack, Gtk::PACK_SHRINK);
-        add(*layout_h);
-        keep(std::move(layout_h));
-        keep(std::move(config_stack));
-        show_all_children();
-    }
-}
-
-void UiCalibration::update(float delta, float latency, float _fps) {
-//    log->debug("update: {}, late: {}, fps: {}", delta, latency, _fps);
-    this->FPS = _fps;
-
-    auto captured = camera.capture();
-    if (captured.empty()) {
-        log->debug("skip");
-        return;
-    }
-
-    std::vector<std::future<eox::ocv::Squares>> futures;
-    futures.reserve(captured.size());
-    for (const auto &frame: captured) {
-        futures.push_back(executor->execute<eox::ocv::Squares>([&frame, this]() {
-            return eox::ocv::find_squares(
-                    frame,
-                    config.calibration.columns,
-                    config.calibration.rows,
-                    config.calibration.quality);
-        }));
-    }
-
-    std::vector<cv::Mat> frames;
-    frames.reserve(futures.size());
-    for (auto &future: futures) {
-        const auto squares = future.get();
-        frames.push_back(squares.result);
-    }
-
-    glImage.setFrames(frames);
-    refresh();
 }
 
 void UiCalibration::onRefresh() {
