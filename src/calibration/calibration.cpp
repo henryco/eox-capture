@@ -45,9 +45,14 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         timer.reset();
         progress = 0;
     } else {
+
         const auto remains = timer.tick([]() {
             log->debug("TICKED");
+
+
             // TODO LOGIC
+
+
         });
         log->debug("REMAINS: {}", remains / 1000.);
 
