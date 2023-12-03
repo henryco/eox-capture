@@ -20,8 +20,15 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
     {
+        // init executor
+        executor = std::make_shared<sex::util::ThreadPool>();
+        executor->start(props.size());
+    }
+
+    {
         // Init camera
         camera.setProperties(props);
+        camera.setThreadPool(executor);
         camera.setHomogeneous(props[0].homogeneous);
         camera.setFast(props[0].fast);
         camera.setApi(props[0].api);
@@ -103,11 +110,25 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         return;
     }
 
+    std::vector<std::future<cv::Mat>> futures;
+    futures.reserve(captured.size());
+    for (const auto &frame: captured) {
+        futures.push_back(executor->execute<cv::Mat>([frame]() {
 
+            log->info("TODO");
+            // LOGIC HERE
 
-    // LOGIC HERE
+            return frame;
+        }));
+    }
 
-    glImage.setFrames(captured);
+    std::vector<cv::Mat> frames;
+    frames.reserve(futures.size());
+    for (auto &future: futures) {
+        frames.push_back(future.get());
+    }
+
+    glImage.setFrames(frames);
     refresh();
 }
 

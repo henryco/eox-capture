@@ -7,7 +7,6 @@
 
 #include <utility>
 #include <iostream>
-#include <fstream>
 
 namespace sex::xocv {
 
@@ -199,30 +198,6 @@ namespace sex::xocv {
         log->debug("released");
     }
 
-    StereoCamera::~StereoCamera() {
-        release();
-    }
-
-    const std::vector<sex::data::camera_properties>& StereoCamera::getProperties() const {
-        return properties;
-    }
-
-    void StereoCamera::setFast(bool _fast) {
-        this->fast = _fast;
-    }
-
-    void StereoCamera::setHomogeneous(bool _homogeneous) {
-        this->homogeneous = _homogeneous;
-    }
-
-    void StereoCamera::setApi(int _api) {
-        this->api = _api;
-    }
-
-    void StereoCamera::setProperties(std::vector<sex::data::camera_properties> props) {
-        this->properties = std::move(props);
-    }
-
     void StereoCamera::restore(std::istream &input_stream) {
         if (input_stream.peek() == EOF)
             return;
@@ -320,4 +295,33 @@ namespace sex::xocv {
             // TODO WINDOWS support?
         }
     }
+
+    StereoCamera::~StereoCamera() {
+        release();
+    }
+
+    const std::vector<sex::data::camera_properties>& StereoCamera::getProperties() const {
+        return properties;
+    }
+
+    void StereoCamera::setFast(bool _fast) {
+        this->fast = _fast;
+    }
+
+    void StereoCamera::setHomogeneous(bool _homogeneous) {
+        this->homogeneous = _homogeneous;
+    }
+
+    void StereoCamera::setApi(int _api) {
+        this->api = _api;
+    }
+
+    void StereoCamera::setProperties(std::vector<sex::data::camera_properties> props) {
+        this->properties = std::move(props);
+    }
+
+    void StereoCamera::setThreadPool(std::shared_ptr<sex::util::ThreadPool> _executor) {
+        this->executor = std::move(_executor);
+    }
+
 }

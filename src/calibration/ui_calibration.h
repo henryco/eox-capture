@@ -20,6 +20,7 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("ui_calibration");
 
+    std::shared_ptr<sex::util::ThreadPool> executor;
     sex::data::basic_config config;
     sex::xocv::StereoCamera camera;
     sex::util::DeltaLoop deltaLoop;

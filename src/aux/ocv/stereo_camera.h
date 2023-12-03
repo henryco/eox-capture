@@ -151,6 +151,8 @@ namespace sex::xocv {
         std::vector<camera_controls> getControls();
 
         void setProperties(std::vector<sex::data::camera_properties> props);
+
+        void setThreadPool(std::shared_ptr<sex::util::ThreadPool> executor);
     };
 
 }
