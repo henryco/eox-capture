@@ -117,9 +117,8 @@ namespace sex::cli {
                 .default_value(1.0f)
                 .scan<'g', float>();
         calibration.add_argument("-q", "--quality")
-                .help("quality [1 .. 4], lower == faster")
-                .default_value(3)
-                .choices("1", "2", "3", "4")
+                .help("quality flags (see cv::CALIB_CB_* enum)")
+                .default_value(0)
                 .scan<'i', int>();
         calibration.add_argument("-n", "--number")
                 .help("number of images")

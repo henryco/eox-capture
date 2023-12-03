@@ -64,6 +64,9 @@ add_executable(${PROJECT_NAME}
         src/helpers/helpers.h
         src/aux/utils/timer/timer.cpp
         src/aux/utils/timer/timer.h
+        src/calibration/calibration.cpp
+        src/aux/ocv/cv_utils.cpp
+        src/aux/ocv/cv_utils.h
 )
 
 # Include directories for the specific target

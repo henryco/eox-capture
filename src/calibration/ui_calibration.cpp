@@ -10,6 +10,7 @@
 #include "../aux/utils/mappers/cam_gtk_mapper.h"
 #include "../helpers/helpers.h"
 #include "../aux/gtk/gtk_config_stack.h"
+#include "../aux/ocv/cv_utils.h"
 #include <gtkmm/box.h>
 
 void UiCalibration::init(sex::data::basic_config configuration) {
@@ -110,22 +111,23 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         return;
     }
 
-    std::vector<std::future<cv::Mat>> futures;
+    std::vector<std::future<eox::ocv::Squares>> futures;
     futures.reserve(captured.size());
     for (const auto &frame: captured) {
-        futures.push_back(executor->execute<cv::Mat>([frame]() {
-
-            log->info("TODO");
-            // TODO LOGIC HERE
-
-            return frame;
+        futures.push_back(executor->execute<eox::ocv::Squares>([&frame, this]() {
+            return eox::ocv::find_squares(
+                    frame,
+                    config.calibration.columns,
+                    config.calibration.rows,
+                    config.calibration.quality);
         }));
     }
 
     std::vector<cv::Mat> frames;
     frames.reserve(futures.size());
     for (auto &future: futures) {
-        frames.push_back(future.get());
+        const auto squares = future.get();
+        frames.push_back(squares.result);
     }
 
     glImage.setFrames(frames);
