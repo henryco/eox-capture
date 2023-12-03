@@ -15,11 +15,11 @@ int main(int argc, char **argv) {
                 "dev.tindersamurai.stereox"
         );
 
-        sex::xgtk::GtkSexWindow *window = nullptr;
+        std::unique_ptr<sex::xgtk::GtkSexWindow> window;
         if (configuration.module == "calibration")
-            window = new UiCalibration();
+            window = std::make_unique<UiCalibration>();
 
-        if (window == nullptr)
+        if (!window)
             return 1;
 
         window->init(configuration);

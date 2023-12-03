@@ -60,8 +60,8 @@ add_executable(${PROJECT_NAME}
         src/aux/commons.h
         include/argparse/argparse.h
         src/cli.h
-        src/events/events.cpp
-        src/events/events.h
+        src/helpers/helpers.cpp
+        src/helpers/helpers.h
         src/aux/utils/timer/timer.cpp
         src/aux/utils/timer/timer.h
 )

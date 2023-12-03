@@ -6,11 +6,9 @@
 #include <fstream>
 #include "ui_calibration.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-
 #include "../aux/v4l2/linux_video.h"
 #include "../aux/utils/mappers/cam_gtk_mapper.h"
-#include "../events/events.h"
+#include "../helpers/helpers.h"
 #include "../aux/gtk/gtk_config_stack.h"
 #include <gtkmm/box.h>
 

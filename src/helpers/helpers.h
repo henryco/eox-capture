@@ -2,8 +2,8 @@
 // Created by henryco on 11/30/23.
 //
 
-#ifndef STEREOX_EVENTS_H
-#define STEREOX_EVENTS_H
+#ifndef STEREOX_HELPERS_H
+#define STEREOX_HELPERS_H
 
 #include <filesystem>
 #include <vector>
@@ -29,4 +29,4 @@ namespace sex::events {
 
 } // events
 
-#endif //STEREOX_EVENTS_H
+#endif //STEREOX_HELPERS_H
