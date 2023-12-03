@@ -19,10 +19,10 @@
 
 class UiCalibration final : public sex::xgtk::GtkSexWindow {
 
-private:
     static inline const auto log =
             spdlog::stdout_color_mt("ui_calibration");
 
+private:
     std::shared_ptr<sex::util::ThreadPool> executor;
     sex::data::basic_config config;
     sex::xocv::StereoCamera camera;
@@ -58,4 +58,5 @@ protected:
 
     std::function<void()> resetCamera(std::vector<uint> devices);
 
+    void update_ui(int remains, std::vector<cv::Mat>& _frames);
 };

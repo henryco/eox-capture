@@ -15,8 +15,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
     }
 
     if (!active) {
-        glImage.setFrames(captured);
-        refresh();
+        update_ui(0, captured);
         return;
     }
 
@@ -43,25 +42,18 @@ void UiCalibration::update(float delta, float latency, float _fps) {
 
     if (found != futures.size()) {
         timer.reset();
-        progress = 0;
-    } else {
-
-        const auto remains = timer.tick([]() {
-            log->debug("TICKED");
-
-
-            // TODO LOGIC
-
-
-        });
-        log->debug("REMAINS: {}", remains / 1000.);
-
-        const auto fraction = (double) remains / timer.get_delay();
-        if (std::isfinite(fraction))
-            progress = fraction;
-        else progress = 0;
+        update_ui(0, frames);
+        return;
     }
 
-    glImage.setFrames(frames);
-    refresh();
+    const auto remains = timer.tick([]() {
+        log->debug("TICKED");
+
+
+        // TODO LOGIC
+
+
+    });
+
+    update_ui(remains, frames);
 }

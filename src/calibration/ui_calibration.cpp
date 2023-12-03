@@ -202,3 +202,13 @@ UiCalibration::~UiCalibration() {
 
     log->debug("terminated");
 }
+
+void UiCalibration::update_ui(int remains, std::vector<cv::Mat>& _frames) {
+    const auto fraction = (double) remains / timer.get_delay();
+    if (std::isfinite(fraction))
+        progress = fraction;
+    else progress = 0;
+
+    glImage.setFrames(_frames);
+    refresh();
+}
