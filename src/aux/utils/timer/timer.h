@@ -29,6 +29,8 @@ namespace eox::utils {
         void stop();
 
         void set_delay(int delay);
+
+        int get_delay();
     };
 } // utils
 

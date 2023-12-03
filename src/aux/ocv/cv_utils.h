@@ -13,6 +13,7 @@ namespace eox::ocv {
 
     typedef struct {
         std::vector<cv::Point2f> corners;
+        cv::Mat original;
         cv::Mat result;
         bool found;
     } Squares;

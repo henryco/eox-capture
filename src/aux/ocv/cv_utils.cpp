@@ -44,6 +44,7 @@ namespace eox::ocv {
         cv::drawChessboardCorners(copy, size, corners, found);
         return {
                 .corners = std::move(corners),
+                .original = image,
                 .result = std::move(copy),
                 .found = found
         };

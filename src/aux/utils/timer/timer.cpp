@@ -12,6 +12,10 @@ namespace eox::utils {
     delay(std::chrono::milliseconds(delay)),
     active(false) {}
 
+    int Timer::get_delay() {
+        return (int) delay.count();
+    }
+
     int Timer::tick(const std::function<void()>& callback) {
         const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now().time_since_epoch());

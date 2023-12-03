@@ -5,12 +5,13 @@
 #include <numeric>
 #include <fstream>
 #include "ui_calibration.h"
+#include <gtkmm/box.h>
 
 #include "../aux/v4l2/linux_video.h"
 #include "../helpers/helpers.h"
 #include "../aux/utils/mappers/cam_gtk_mapper.h"
 #include "../aux/gtk/gtk_config_stack.h"
-#include <gtkmm/box.h>
+#include "../aux/gtk/gtk_utils.h"
 
 void UiCalibration::init(sex::data::basic_config configuration) {
     config = std::move(configuration);
@@ -75,6 +76,63 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     }
 
     {
+        // calibration config
+        auto _layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+
+        auto layout_calibration = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+        layout_calibration->pack_start(*_layout_h, Gtk::PACK_SHRINK);
+
+        progressBar.set_text("test");
+        progressBar.set_show_text(true);
+        layout_calibration->pack_start(progressBar, Gtk::PACK_SHRINK);
+
+        const std::string css = R"css(
+            .button-save {
+                 margin-right: 5px;
+                 margin-bottom: 5px;
+             }
+        )css";
+
+        start.set_halign(Gtk::ALIGN_CENTER);
+        start.set_label("Start");
+        start.get_style_context()->add_class("button-save");
+        sex::xgtk::add_style(start, css);
+        start.signal_clicked().connect([this]() {
+            active = !active;
+            if (active) {
+                log->debug("calibration start");
+                start.set_label("stop");
+                save.set_sensitive(false);
+                calibrationData.clear();
+                timer.reset();
+                progress = 1;
+            } else {
+                log->debug("calibration stop");
+                start.set_label("start");
+                timer.reset();
+                progress = 0;
+            }
+        });
+
+        save.set_label("Save");
+        save.set_sensitive(false);
+        save.get_style_context()->add_class("button-save");
+        sex::xgtk::add_style(save, css);
+        save.signal_clicked().connect([]() {
+            // TODO SAVE CALIBRATION DATA
+        });
+
+
+        _layout_h->pack_start(start, Gtk::PACK_SHRINK);
+        _layout_h->pack_start(save, Gtk::PACK_SHRINK);
+
+
+        config_stack->add(*layout_calibration, " Calibration ");
+        keep(std::move(layout_calibration));
+        keep(std::move(_layout_h));
+    }
+
+    {
         // Init Window
         layout_h->pack_start(glImage, Gtk::PACK_SHRINK);
         layout_h->pack_start(*config_stack, Gtk::PACK_SHRINK);
@@ -105,6 +163,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 
 void UiCalibration::onRefresh() {
     set_title("StereoX++ calibration [ " + std::to_string((int) FPS) + " FPS ]");
+    progressBar.set_fraction(progress);
     glImage.update();
 }
 

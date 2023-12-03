@@ -10,7 +10,7 @@
 
 namespace sex::xgtk {
 
-    void add_style(Gtk::Widget &widget, const std::basic_string<char> &style,
+    inline void add_style(Gtk::Widget &widget, const std::basic_string<char> &style,
                    guint priority = GTK_STYLE_PROVIDER_PRIORITY_USER) {
         auto css_provider = Gtk::CssProvider::create();
         css_provider->load_from_data(style);

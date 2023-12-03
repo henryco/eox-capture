@@ -5,6 +5,8 @@
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <gtkmm/button.h>
+#include <gtkmm/progressbar.h>
 
 #include "../aux/ocv/stereo_camera.h"
 #include "../aux/gtk/gl_image.h"
@@ -12,6 +14,7 @@
 #include "../aux/gtk/gtk_sex_window.h"
 #include "../aux/commons.h"
 #include "../aux/utils/timer/timer.h"
+#include "../aux/ocv/cv_utils.h"
 
 
 class UiCalibration final : public sex::xgtk::GtkSexWindow {
@@ -27,7 +30,16 @@ private:
     sex::xgtk::GLImage glImage;
     eox::utils::Timer timer;
 
+    double progress = 0;
+    bool active = false;
     float FPS = 0;
+
+    Gtk::ProgressBar progressBar;
+    Gtk::Button start;
+    Gtk::Button save;
+
+    std::vector<eox::ocv::Squares> calibrationData;
+
 
 public:
     UiCalibration() = default;
