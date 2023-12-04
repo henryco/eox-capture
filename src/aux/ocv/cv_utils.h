@@ -290,6 +290,35 @@ namespace eox::ocv {
             const std::string &file_name,
             bool b64 = false
     );
+
+
+    /**
+     * @brief Reads stereo camera calibration data from a file and returns a StereoPackage object.
+     *
+     * This function reads calibration data for a stereo camera setup from a specified file. The file should
+     * contain calibration data for both solo (single camera) and stereo configurations. The function
+     * constructs a StereoPackage object, which includes solo calibration for each device, stereo calibration
+     * parameters, and rectification data for each camera.
+     *
+     * The function uses OpenCV's FileStorage class for reading the data. The expected file format should
+     * include data for each solo camera (such as camera matrix, distortion coefficients, rotation and
+     * translation vectors, standard deviations for intrinsics and extrinsics, per-view errors, RMS error,
+     * image width and height, and a unique identifier for each camera). Stereo parameters include
+     * rotation matrix (R), translation vector (T), essential matrix (E), fundamental matrix (F), RMS error,
+     * and image dimensions. Rectification parameters include rotation matrices (R1, R2), projection matrices
+     * (P1, P2), disparity-to-depth mapping matrix (Q), and regions of interest for left and right cameras (ROI_L, ROI_R).
+     *
+     * @param file_name The name of the file from which to read the calibration data.
+     * @return A StereoPackage object containing the read calibration data.
+     *
+     * Example usage:
+     *
+     *     StereoPackage package = read_stereo_package("calibration_data.json");
+     *
+     * Note: This function assumes the file is correctly formatted and exists. It may throw exceptions
+     * if the file is not found or the data is improperly formatted.
+     */
+    StereoPackage read_stereo_package(const std::string &file_name);
 }
 
 

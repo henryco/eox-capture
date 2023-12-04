@@ -214,8 +214,9 @@ namespace eox::ocv {
         // SOLO
         {
             fs << "devices" << ((int) package.solo.size());
+            int i = 0;
             for (const auto &[k, solo]: package.solo) {
-                const std::string index = "s_" + std::to_string(k);
+                const std::string index = "s_" + std::to_string(i);
                 fs << index + "_cm" << solo.camera_matrix;
                 fs << index + "_dc" << solo.distortion_coefficients;
                 fs << index + "_rv" << solo.rotation_vecs;
@@ -227,6 +228,7 @@ namespace eox::ocv {
                 fs << index + "_wh" << (int) solo.width;
                 fs << index + "_hg" << (int) solo.height;
                 fs << index + "_id" << (int) solo.uid;
+                i++;
             }
         }
 
@@ -255,5 +257,125 @@ namespace eox::ocv {
         }
 
         fs.release();
+    }
+
+    StereoPackage read_stereo_package(const std::string &file_name) {
+        StereoPackage package;
+        cv::FileStorage fs(file_name, cv::FileStorage::READ);
+
+        // SOLO
+        {
+            std::map<uint, CalibrationSolo> solo;
+
+            int devices = 0;
+            fs["devices"] >> devices;
+
+            for (int i = 0; i < devices; i++) {
+                const std::string index = "s_" + std::to_string(i);
+
+                cv::Mat camera_matrix;
+                cv::Mat distortion_coefficients;
+                std::vector<cv::Mat> rotation_vecs;
+                std::vector<cv::Mat> translation_vecs;
+                std::vector<double> std_dev_intrinsics;
+                std::vector<double> std_dev_extrinsics;
+                std::vector<double> per_view_errors;
+                double rms;
+                int width;
+                int height;
+                int uid;
+
+                fs[index + "_cm"] >> camera_matrix;
+                fs[index + "_dc"] >> distortion_coefficients;
+                fs[index + "_rv"] >> rotation_vecs;
+                fs[index + "_tv"] >> translation_vecs;
+                fs[index + "_di"] >> std_dev_intrinsics;
+                fs[index + "_de"] >> std_dev_extrinsics;
+                fs[index + "_pe"] >> per_view_errors;
+                fs[index + "_er"] >> rms;
+                fs[index + "_wh"] >> width;
+                fs[index + "_hg"] >> height;
+                fs[index + "_id"] >> uid;
+
+                const CalibrationSolo instance = {
+                        .camera_matrix = camera_matrix,
+                        .distortion_coefficients = distortion_coefficients,
+                        .rotation_vecs = rotation_vecs,
+                        .translation_vecs = translation_vecs,
+                        .std_dev_intrinsics = std_dev_intrinsics,
+                        .std_dev_extrinsics = std_dev_extrinsics,
+                        .per_view_errors = per_view_errors,
+                        .rms = rms,
+                        .width = (uint) width,
+                        .height = (uint) height,
+                        .uid = (uint) uid
+                };
+
+                solo.emplace((uint) uid, instance);
+            }
+
+            package.solo = solo;
+        }
+
+        // STEREO
+        {
+            cv::Mat R;
+            cv::Mat T;
+            cv::Mat E;
+            cv::Mat F;
+            double rms;
+            int width;
+            int height;
+
+            fs["x_r"] >> R;
+            fs["x_t"] >> T;
+            fs["x_e"] >> E;
+            fs["x_f"] >> F;
+            fs["x_s"] >> rms;
+            fs["x_w"] >> width;
+            fs["x_h"] >> height;
+
+            package.stereo = {
+                    .R = R,
+                    .T = T,
+                    .E = E,
+                    .F = F,
+                    .rms = rms,
+                    .width = (uint) width,
+                    .height = (uint) height
+            };
+        }
+
+        // RECTIFICATION
+        {
+            cv::Mat R1;
+            cv::Mat R2;
+            cv::Mat P1;
+            cv::Mat P2;
+            cv::Mat Q;
+            cv::Rect2i ROI_L;
+            cv::Rect2i ROI_R;
+
+            fs["r_r1"] >> R1;
+            fs["r_r2"] >> R2;
+            fs["r_p1"] >> P1;
+            fs["r_p2"] >> P2;
+            fs["r_qq"] >> Q;
+            fs["r_i1"] >> ROI_L;
+            fs["r_i2"] >> ROI_R;
+
+            package.rectification = {
+                    .R1 = R1,
+                    .R2 = R2,
+                    .P1 = P1,
+                    .P2 = P2,
+                    .Q = Q,
+                    .ROI_L = ROI_L,
+                    .ROI_R = ROI_R
+            };
+        }
+
+        fs.release();
+        return package;
     }
 }

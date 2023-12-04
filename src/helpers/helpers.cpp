@@ -122,11 +122,11 @@ namespace sex::helpers {
         }
 
         const auto filter_text = Gtk::FileFilter::create();
-        filter_text->set_name("Camera calibration archives (*.json.gz)");
-        filter_text->add_pattern("*.json.gz");
+        filter_text->set_name("Camera calibration files (*.json)");
+        filter_text->add_pattern("*.json");
 
-        Gtk::FileChooserDialog dialog("Please select an archive to save", Gtk::FILE_CHOOSER_ACTION_SAVE);
-        dialog.set_current_name("camera_" + name + ".json.gz");
+        Gtk::FileChooserDialog dialog("Please select a file to save", Gtk::FILE_CHOOSER_ACTION_SAVE);
+        dialog.set_current_name("camera_" + name + ".json");
         dialog.set_current_folder(configuration.work_dir);
         dialog.add_filter(filter_text);
         dialog.set_transient_for(window);
