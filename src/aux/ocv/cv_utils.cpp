@@ -50,4 +50,52 @@ namespace eox::ocv {
         };
     }
 
+    CalibrationSolo
+    calibrate_solo(std::vector<std::vector<cv::Point2f>> &corners, int width, int height, int rows, int cols) {
+        // Prepare object points (0,0,0), (1,0,0), (2,0,0) ... (8,5,0)
+        std::vector<cv::Point3f> obj_p;
+        for(int i = 0; i < rows - 1; ++i) {
+            for(int j = 0; j < cols - 1; ++j) {
+                obj_p.emplace_back((float) j, (float) i, 0.0f);
+            }
+        }
+
+        // Replicate objP for each image
+        std::vector<std::vector<cv::Point3f>> object_points;
+        object_points.reserve(corners.size());
+        for (int i = 0; i < corners.size(); ++i) {
+            object_points.push_back(obj_p);
+        }
+
+        // output parameters
+        cv::Mat camera_matrix, distortion_coefficients;
+        std::vector<cv::Mat> r_vecs, t_vecs;
+        std::vector<double> std_intrinsics, std_extrinsics, per_view_errors;
+
+        // calibration
+        const auto rms = cv::calibrateCamera(
+                object_points,
+                corners,
+                cv::Size(width, height),
+                camera_matrix,
+                distortion_coefficients,
+                r_vecs,
+                t_vecs,
+                std_intrinsics,
+                std_extrinsics,
+                per_view_errors
+        );
+
+        return {
+                .camera_matrix = camera_matrix,
+                .distortion_coefficients = distortion_coefficients,
+                .rotation_vecs = r_vecs,
+                .translation_vecs = t_vecs,
+                .std_dev_intrinsics = std_intrinsics,
+                .std_dev_extrinsics = std_extrinsics,
+                .per_view_errors = per_view_errors,
+                .rms = rms
+        };
+    }
+
 }

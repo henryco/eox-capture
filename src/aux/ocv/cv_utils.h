@@ -18,6 +18,16 @@ namespace eox::ocv {
         bool found;
     } Squares;
 
+    typedef struct {
+        cv::Mat camera_matrix;
+        cv::Mat distortion_coefficients;
+        std::vector<cv::Mat> rotation_vecs;
+        std::vector<cv::Mat> translation_vecs;
+        std::vector<double> std_dev_intrinsics;
+        std::vector<double> std_dev_extrinsics;
+        std::vector<double> per_view_errors;
+        double rms;
+    } CalibrationSolo;
 
     /**
      * \brief Create a copy of the given image.
@@ -40,7 +50,7 @@ namespace eox::ocv {
      * \note The copy operation can consume a significant amount of memory if working with large images.
      */
 
-    cv::Mat img_copy(const cv::Mat& image);
+    cv::Mat img_copy(const cv::Mat &image);
 
 
     /**
@@ -57,7 +67,7 @@ namespace eox::ocv {
      * @return The copied image with color space conversion.
      */
 
-    cv::Mat img_copy(const cv::Mat& image, int color_space_conv_type);
+    cv::Mat img_copy(const cv::Mat &image, int color_space_conv_type);
 
     /**
      * @brief img_copy - Copies an image and converts the color space and matrix data type.
@@ -75,7 +85,7 @@ namespace eox::ocv {
      */
 
     cv::Mat img_copy(
-            const cv::Mat& image,
+            const cv::Mat &image,
             int color_space_conv_type,
             int matrix_data_type);
 
@@ -99,10 +109,44 @@ namespace eox::ocv {
      *         whether the corners were found successfully.
      */
     Squares find_squares(
-            const cv::Mat& image,
+            const cv::Mat &image,
             int columns,
             int rows,
             int flag);
+
+
+    /**
+     * @brief Performs camera calibration using a set of 2D-3D point correspondences.
+     *
+     * This function calibrates a camera using the provided image corners. It prepares object points
+     * in a grid pattern and replicates them for each image in the corners vector. Then, it uses
+     * OpenCV's calibrateCamera function to compute the camera matrix, distortion coefficients,
+     * rotation vectors, translation vectors, standard deviations for intrinsics, extrinsics,
+     * per view errors, and the root mean square (RMS) error of re-projection.
+     *
+     * @param corners A reference to a vector of vectors containing image corner points (cv::Point2f).
+     *                These are typically obtained from calibration patterns like checkerboards.
+     * @param width The width of the calibration image in pixels.
+     * @param height The height of the calibration image in pixels.
+     * @param rows The number of rows in the calibration pattern.
+     * @param columns The number of columns in the calibration pattern.
+     *
+     * @return A structure containing the calibration results:
+     *         - camera_matrix: The camera matrix.
+     *         - distortion_coefficients: Lens distortion coefficients.
+     *         - rotation_vecs: Rotation vectors for each calibration image.
+     *         - translation_vecs: Translation vectors for each calibration image.
+     *         - std_dev_intrinsics: Standard deviations of intrinsic parameters.
+     *         - std_dev_extrinsics: Standard deviations of extrinsic parameters.
+     *         - per_view_errors: Per-view re-projection errors.
+     *         - rms: The overall root mean square (RMS) re-projection error.
+     */
+    CalibrationSolo calibrate_solo(
+            std::vector<std::vector<cv::Point2f>> &corners,
+            int width,
+            int height,
+            int rows,
+            int columns);
 
 }
 

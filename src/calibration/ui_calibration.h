@@ -19,8 +19,7 @@
 namespace eox::calibration {
 
     typedef struct {
-        uint id;
-        uint index;
+
     } cb_data;
 }
 
@@ -45,7 +44,8 @@ private:
     Gtk::Button start;
     Gtk::Button save;
 
-    std::vector<eox::calibration::cb_data> calibrationData;
+    std::map<uint, std::vector<std::vector<cv::Point2f>>> image_points;
+    int cap = 0;
 
 public:
     UiCalibration() = default;

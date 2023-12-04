@@ -109,7 +109,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
                 log->debug("calibration start");
                 start.set_label("stop");
                 save.set_sensitive(false);
-                calibrationData.clear();
+                cap = 0;
                 timer.reset();
                 progress = 1;
             } else {
@@ -171,8 +171,8 @@ void UiCalibration::onRefresh() {
     set_title("StereoX++ calibration [ " + std::to_string((int) FPS) + " FPS ]");
     progressBar.set_fraction(progress);
     start.set_label(active ? "Stop" : "Start");
-    progressBar.set_text(std::to_string(calibrationData.size()) + " / " + std::to_string(config.calibration.number));
-    if (calibrationData.size() >= config.calibration.number) {
+    progressBar.set_text(std::to_string(cap) + " / " + std::to_string(config.calibration.number));
+    if (cap >= config.calibration.number) {
         save.set_sensitive(true);
     }
     glImage.update();
