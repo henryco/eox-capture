@@ -93,7 +93,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
                 config.calibration.rows,
                 config.calibration.columns
         );
-        log->debug("ERROR[{}]: {}", c_id, result.rms);
+        log->info("RMS[{}]: {}", c_id, result.rms);
         for (const auto &err: result.per_view_errors) {
             log->debug("-> {}", err);
         }
@@ -123,6 +123,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
             config.calibration.rows,
             config.calibration.columns
     );
+    log->info("RMS: {}", stereo_calibration.rms);
 
     // stereo rectification
     auto stereo_rectification = eox::ocv::rectify_stereo(
