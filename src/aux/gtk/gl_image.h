@@ -6,6 +6,7 @@
 #define STEREOX_GL_IMAGE_H
 
 #include <gtkmm/box.h>
+#include <gtkmm/label.h>
 #include <gtkmm/glarea.h>
 #include <opencv2/core/mat.hpp>
 #include "../ogl/render/texture_1.h"
@@ -22,6 +23,8 @@ private:
 
     Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
 
+    std::vector<std::unique_ptr<Gtk::Label>> labels;
+    std::vector<std::unique_ptr<Gtk::Box>> containers;
     std::vector<std::unique_ptr<xogl::Texture1>> textures;
     std::vector<std::unique_ptr<Gtk::GLArea>> glAreas;
     std::vector<cv::Mat> frames;
@@ -39,6 +42,7 @@ public:
     GLImage() = default;
     ~GLImage() override;
 
+    void init(size_t number, int width, int height, std::vector<std::string> ids, GLenum format = GL_RGB);
     void init(size_t number, int width, int height, GLenum format = GL_RGB);
     void setFrames(const std::vector<cv::Mat>& _frames);
     void update(const std::vector<cv::Mat>& _frames);

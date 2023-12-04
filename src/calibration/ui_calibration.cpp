@@ -20,9 +20,15 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
+    std::vector<std::string> c_ids;
+    c_ids.reserve(config.camera.size());
+    for (const auto &c_p: config.camera) {
+        c_ids.push_back(std::to_string(c_p.id));
+    }
+
     {
         // Init oGL canvas
-        glImage.init((int) props.size(), props[0].width, props[0].height, GL_BGR);
+        glImage.init((int) props.size(), props[0].width, props[0].height, c_ids,GL_BGR);
     }
 
     {
@@ -164,6 +170,11 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 void UiCalibration::onRefresh() {
     set_title("StereoX++ calibration [ " + std::to_string((int) FPS) + " FPS ]");
     progressBar.set_fraction(progress);
+    start.set_label(active ? "Stop" : "Start");
+    progressBar.set_text(std::to_string(calibrationData.size()) + " / " + std::to_string(config.calibration.number));
+    if (calibrationData.size() >= config.calibration.number) {
+        save.set_sensitive(true);
+    }
     glImage.update();
 }
 

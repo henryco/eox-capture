@@ -16,6 +16,13 @@
 #include "../aux/utils/timer/timer.h"
 #include "../aux/ocv/cv_utils.h"
 
+namespace eox::calibration {
+
+    typedef struct {
+        uint id;
+        uint index;
+    } cb_data;
+}
 
 class UiCalibration final : public sex::xgtk::GtkSexWindow {
 
@@ -38,8 +45,7 @@ private:
     Gtk::Button start;
     Gtk::Button save;
 
-    std::vector<eox::ocv::Squares> calibrationData;
-
+    std::vector<eox::calibration::cb_data> calibrationData;
 
 public:
     UiCalibration() = default;

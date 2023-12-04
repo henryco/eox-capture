@@ -49,34 +49,6 @@ namespace sex::xgtk {
         };
     }
 
-    void GLImage::init(size_t _number, int _width, int _height, GLenum _format) {
-        this->width = _width;
-        this->height = _height;
-        this->format = _format;
-
-        initialized.reserve(_number);
-        textures.reserve(_number);
-        glAreas.reserve(_number);
-        frames.reserve(_number);
-
-        for (int i = 0; i < _number; ++i) {
-            auto area = std::make_unique<Gtk::GLArea>();
-            area->signal_realize().connect(initFunc(i), false);
-            area->signal_render().connect(renderFunc(i), false);
-            area->set_size_request(_width, _height);
-            area->set_auto_render(true);
-
-            h_box.pack_end(*area, Gtk::PACK_SHRINK);
-            glAreas.push_back(std::move(area));
-            textures.push_back(std::make_unique<xogl::Texture1>());
-            initialized.push_back(false);
-        }
-
-        set_size_request((int) _number * _width, height);
-        set_orientation(Gtk::ORIENTATION_VERTICAL);
-        pack_end(h_box, Gtk::PACK_SHRINK);
-    }
-
     void GLImage::update() {
         for (auto &area: glAreas) {
             area->queue_render();
@@ -94,5 +66,53 @@ namespace sex::xgtk {
         setFrames(_frames);
         update();
     }
+
+    void GLImage::init(size_t _number, int _width, int _height, GLenum _format) {
+        std::vector<std::string> _ids;
+        _ids.reserve(_number);
+        for (int i = 0; i < _number; i++) {
+            _ids.push_back(std::to_string(i));
+        }
+        init(_number, _width, _height, _ids, _format);
+    }
+
+    void GLImage::init(size_t _number, int _width, int _height, std::vector<std::string> _ids, GLenum _format) {
+        this->width = _width;
+        this->height = _height;
+        this->format = _format;
+
+        initialized.reserve(_number);
+        textures.reserve(_number);
+        glAreas.reserve(_number);
+        frames.reserve(_number);
+
+        for (int i = 0; i < _number; ++i) {
+            auto area = std::make_unique<Gtk::GLArea>();
+            area->signal_realize().connect(initFunc(i), false);
+            area->signal_render().connect(renderFunc(i), false);
+            area->set_size_request(_width, _height);
+            area->set_auto_render(true);
+
+            auto v_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+            auto label = std::make_unique<Gtk::Label>();
+            const std::string id = _ids.at(i);
+            label->set_label(id);
+
+            v_box->pack_start(*label, Gtk::PACK_SHRINK);
+            v_box->pack_start(*area, Gtk::PACK_SHRINK);
+            h_box.pack_start(*v_box, Gtk::PACK_SHRINK);
+
+            labels.push_back(std::move(label));
+            containers.push_back(std::move(v_box));
+            glAreas.push_back(std::move(area));
+            textures.push_back(std::make_unique<xogl::Texture1>());
+            initialized.push_back(false);
+        }
+
+        set_size_request((int) _number * _width, height);
+        set_orientation(Gtk::ORIENTATION_VERTICAL);
+        pack_end(h_box, Gtk::PACK_SHRINK);
+    }
+
 
 } // xgtk

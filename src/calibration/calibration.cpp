@@ -46,14 +46,22 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         return;
     }
 
-    const auto remains = timer.tick([]() {
+    const auto remains = timer.tick([this]() {
         log->debug("TICKED");
-
-
         // TODO LOGIC
+        calibrationData.push_back({
 
-
+        });
     });
+
+    if (config.calibration.number <= calibrationData.size()) {
+        active = false;
+        timer.reset();
+
+
+        // TODO: Calibration stuff
+    }
+
 
     update_ui(remains, frames);
 }
