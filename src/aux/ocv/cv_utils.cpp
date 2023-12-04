@@ -26,11 +26,11 @@ namespace eox::ocv {
         return std::move(output);
     }
 
-    Squares find_squares(const cv::Mat &image, int columns, int rows, int flag) {
+    Squares find_squares(const cv::Mat &image, uint columns, uint rows, int flag) {
         cv::Mat gray = img_copy(image, cv::COLOR_BGR2GRAY);
         cv::Mat copy = img_copy(image);
 
-        const auto size = cv::Size(columns - 1, rows - 1);
+        const auto size = cv::Size((int) columns - 1, (int) rows - 1);
         const int flags = flag
                           | cv::CALIB_CB_FAST_CHECK
                           | cv::CALIB_CB_NORMALIZE_IMAGE
@@ -50,7 +50,8 @@ namespace eox::ocv {
     }
 
     CalibrationSolo
-    calibrate_solo(std::vector<std::vector<cv::Point2f>> &corners, int width, int height, int rows, int cols) {
+    calibrate_solo(std::vector<std::vector<cv::Point2f>> &corners, uint id, uint width, uint height, uint rows,
+                   uint cols) {
         // Prepare object points (0,0,0), (1,0,0), (2,0,0) ... (8,5,0)
         std::vector<cv::Point3f> obj_p;
         for (int i = 0; i < rows - 1; ++i) {
@@ -59,7 +60,7 @@ namespace eox::ocv {
             }
         }
 
-        // Replicate objP for each image
+        // Replicate obj_p for each image
         std::vector<std::vector<cv::Point3f>> object_points;
         object_points.reserve(corners.size());
         for (int i = 0; i < corners.size(); ++i) {
@@ -75,7 +76,7 @@ namespace eox::ocv {
         const auto rms = cv::calibrateCamera(
                 object_points,
                 corners,
-                cv::Size(width, height),
+                cv::Size((int) width, (int) height),
                 camera_matrix,
                 distortion_coefficients,
                 r_vecs,
@@ -96,14 +97,15 @@ namespace eox::ocv {
                 .per_view_errors = per_view_errors,
                 .rms = rms,
                 .width = width,
-                .height = height
+                .height = height,
+                .uid = id
         };
     }
 
     CalibrationStereo
     calibrate_stereo_pair(std::vector<std::vector<cv::Point2f>> &corners_l, CalibrationSolo &calibration_l,
                           std::vector<std::vector<cv::Point2f>> &corners_r, CalibrationSolo &calibration_r,
-                          int width, int height, int rows, int cols) {
+                          uint width, uint height, uint rows, uint cols) {
         // Prepare object points (0,0,0), (1,0,0), (2,0,0) ... (8,5,0)
         std::vector<cv::Point3f> obj_p;
         for (int i = 0; i < rows - 1; ++i) {
@@ -112,7 +114,7 @@ namespace eox::ocv {
             }
         }
 
-        // Replicate objP for each image
+        // Replicate obj_p for each image
         std::vector<std::vector<cv::Point3f>> object_points;
         object_points.reserve(corners_l.size());
         // L and R should be the same size anyway
@@ -132,7 +134,7 @@ namespace eox::ocv {
                 calibration_l.distortion_coefficients,
                 calibration_r.camera_matrix,
                 calibration_r.distortion_coefficients,
-                cv::Size(width, height),
+                cv::Size((int) width, (int) height),
                 R, T, E, F,
                 cv::CALIB_FIX_INTRINSIC
         );
@@ -152,7 +154,7 @@ namespace eox::ocv {
     CalibrationStereo
     calibrate_stereo_pair(std::vector<std::vector<cv::Point2f>> &corners_l, CalibrationSolo &calibration_l,
                           std::vector<std::vector<cv::Point2f>> &corners_r, CalibrationSolo &calibration_r,
-                          int rows, int cols) {
+                          uint rows, uint cols) {
         return calibrate_stereo_pair(
                 corners_l,
                 calibration_l,
@@ -182,7 +184,7 @@ namespace eox::ocv {
                 calibration_l.distortion_coefficients,
                 calibration_r.camera_matrix,
                 calibration_r.distortion_coefficients,
-                cv::Size(stereo.width, stereo.height),
+                cv::Size((int) stereo.width, (int) stereo.height),
                 stereo.R,
                 stereo.T,
                 R1, R2, P1, P2, Q,
@@ -203,5 +205,55 @@ namespace eox::ocv {
                 .ROI_L = cv::Rect2i(*roi_l),
                 .ROI_R = cv::Rect2i(*roi_r),
         };
+    }
+
+    void write_stereo_package(const StereoPackage &package, const std::string &file_name, bool b64) {
+        const auto flags = cv::FileStorage::WRITE | (b64 ? cv::FileStorage::BASE64 : 0);
+        cv::FileStorage fs(file_name, flags);
+
+        // SOLO
+        {
+            fs << "devices" << ((int) package.solo.size());
+            for (const auto &[k, solo]: package.solo) {
+                const std::string index = "s_" + std::to_string(k);
+                fs << index + "_cm" << solo.camera_matrix;
+                fs << index + "_dc" << solo.distortion_coefficients;
+                fs << index + "_rv" << solo.rotation_vecs;
+                fs << index + "_tv" << solo.translation_vecs;
+                fs << index + "_di" << solo.std_dev_intrinsics;
+                fs << index + "_de" << solo.std_dev_extrinsics;
+                fs << index + "_pe" << solo.per_view_errors;
+                fs << index + "_er" << solo.rms;
+                fs << index + "_wh" << (int) solo.width;
+                fs << index + "_hg" << (int) solo.height;
+                fs << index + "_id" << (int) solo.uid;
+            }
+        }
+
+        // STEREO
+        {
+            const std::string index = "x";
+            fs << index + "_r" << package.stereo.R;
+            fs << index + "_t" << package.stereo.T;
+            fs << index + "_e" << package.stereo.E;
+            fs << index + "_f" << package.stereo.F;
+            fs << index + "_s" << package.stereo.rms;
+            fs << index + "_w" << (int) package.stereo.width;
+            fs << index + "_h" << (int) package.stereo.height;
+        }
+
+        // RECTIFICATION
+        {
+            const std::string index = "r";
+            fs << index + "_r1" << package.rectification.R1;
+            fs << index + "_r2" << package.rectification.R2;
+            fs << index + "_p1" << package.rectification.P1;
+            fs << index + "_p2" << package.rectification.P2;
+            fs << index + "_qq" << package.rectification.Q;
+            fs << index + "_i1" << package.rectification.ROI_L;
+            fs << index + "_i2" << package.rectification.ROI_R;
+        }
+
+        fs.release();
     }
 }

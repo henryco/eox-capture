@@ -11,10 +11,11 @@
 
 #include "../aux/commons.h"
 #include "../aux/ocv/stereo_camera.h"
+#include "../aux/ocv/cv_utils.h"
 
-namespace sex::events {
+namespace sex::helpers {
 
-    void gtk_save_camera_settings_event(
+    void gtk_save_camera_settings(
             sex::xocv::StereoCamera &camera,
             const std::vector<uint> &devices,
             Gtk::Window &window,
@@ -26,6 +27,12 @@ namespace sex::events {
             sex::xocv::StereoCamera &camera,
             const std::vector<std::filesystem::path> &paths,
             const std::shared_ptr<spdlog::logger> &log);
+
+    void save_calibration_data(
+            eox::ocv::StereoPackage &stereoPackage,
+            Gtk::Window &window,
+            const sex::data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger>& log);
 
 } // events
 

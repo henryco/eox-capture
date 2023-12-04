@@ -10,14 +10,14 @@
 #include <filesystem>
 #include "helpers.h"
 
-namespace sex::events {
+namespace sex::helpers {
 
-    void gtk_save_camera_settings_event(
+    void gtk_save_camera_settings(
             sex::xocv::StereoCamera &camera,
             const std::vector<uint> &devices,
             Gtk::Window &window,
             const sex::data::basic_config &configuration,
-            const std::shared_ptr<spdlog::logger>& log
+            const std::shared_ptr<spdlog::logger> &log
     ) {
         std::vector<uint> ids;
         for (const auto &index: devices) {
@@ -52,7 +52,7 @@ namespace sex::events {
         if (result == Gtk::RESPONSE_OK) {
 
             auto const file_name = dialog.get_filename();
-            log->debug("selected file_stream: {}", file_name);
+            log->debug("selected file: {}", file_name);
 
             std::ofstream file_stream(file_name, std::ios::out);
             if (!file_stream) {
@@ -66,7 +66,6 @@ namespace sex::events {
 
             // closing the stream
             file_stream.close();
-
         } else {
             log->debug("nothing selected");
         }
@@ -75,7 +74,8 @@ namespace sex::events {
     void load_camera_from_paths(
             sex::xocv::StereoCamera &camera,
             const std::vector<std::filesystem::path> &paths,
-            const std::shared_ptr<spdlog::logger> &log) {
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
         if (paths.empty()) {
             log->debug("list of config path is empty");
             return;
@@ -107,6 +107,44 @@ namespace sex::events {
             }
 
             log->debug("file: {}, not a camera configuration", path.string());
+        }
+    }
+
+    void save_calibration_data(
+            eox::ocv::StereoPackage &package,
+            Gtk::Window &window,
+            const data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
+        std::string name;
+        for (const auto &[id, solo]: package.solo) {
+            name += "_" + std::to_string(solo.uid);
+        }
+
+        const auto filter_text = Gtk::FileFilter::create();
+        filter_text->set_name("Camera calibration archives (*.json.gz)");
+        filter_text->add_pattern("*.json.gz");
+
+        Gtk::FileChooserDialog dialog("Please select an archive to save", Gtk::FILE_CHOOSER_ACTION_SAVE);
+        dialog.set_current_name("camera_" + name + ".json.gz");
+        dialog.set_current_folder(configuration.work_dir);
+        dialog.add_filter(filter_text);
+        dialog.set_transient_for(window);
+
+        dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+        dialog.add_button("Save", Gtk::RESPONSE_OK);
+
+        const int result = dialog.run();
+        if (result == Gtk::RESPONSE_OK) {
+
+            auto const file_name = dialog.get_filename();
+            log->debug("selected file: {}", file_name);
+
+            eox::ocv::write_stereo_package(package, file_name);
+
+            log->debug("calibration data saved");
+        } else {
+            log->debug("nothing selected");
         }
     }
 

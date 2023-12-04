@@ -8,6 +8,7 @@
 #include <opencv2/core/mat.hpp>
 #include <opencv4/opencv2/calib3d.hpp>
 #include <opencv2/imgproc.hpp>
+#include <map>
 
 namespace eox::ocv {
 
@@ -28,8 +29,9 @@ namespace eox::ocv {
         std::vector<double> per_view_errors;
 
         double rms;
-        int width;
-        int height;
+        uint width;
+        uint height;
+        uint uid;
     } CalibrationSolo;
 
     typedef struct {
@@ -39,8 +41,8 @@ namespace eox::ocv {
         cv::Mat F;
 
         double rms;
-        int width;
-        int height;
+        uint width;
+        uint height;
     } CalibrationStereo;
 
     typedef struct {
@@ -55,7 +57,7 @@ namespace eox::ocv {
     } StereoRectification;
 
     typedef struct {
-        std::vector<CalibrationSolo> solo;
+        std::map<uint, CalibrationSolo> solo;
         CalibrationStereo stereo;
         StereoRectification rectification;
     } StereoPackage;
@@ -141,8 +143,8 @@ namespace eox::ocv {
      */
     Squares find_squares(
             const cv::Mat &image,
-            int columns,
-            int rows,
+            uint columns,
+            uint rows,
             int flag);
 
 
@@ -157,6 +159,7 @@ namespace eox::ocv {
      *
      * @param corners A reference to a vector of vectors containing image corner points (cv::Point2f).
      *                These are typically obtained from calibration patterns like checkerboards.
+     * @param uid Unique camera id
      * @param width The width of the calibration image in pixels.
      * @param height The height of the calibration image in pixels.
      * @param rows The number of rows in the calibration pattern.
@@ -174,10 +177,11 @@ namespace eox::ocv {
      */
     CalibrationSolo calibrate_solo(
             std::vector<std::vector<cv::Point2f>> &corners,
-            int width,
-            int height,
-            int rows,
-            int columns);
+            uint uid,
+            uint width,
+            uint height,
+            uint rows,
+            uint columns);
 
 
     /**
@@ -207,8 +211,8 @@ namespace eox::ocv {
             CalibrationSolo &calibration_left,
             std::vector<std::vector<cv::Point2f>> &corners_right,
             CalibrationSolo &calibration_right,
-            int rows,
-            int columns
+            uint rows,
+            uint columns
     );
 
 
@@ -220,10 +224,10 @@ namespace eox::ocv {
             CalibrationSolo &calibration_left,
             std::vector<std::vector<cv::Point2f>> &corners_right,
             CalibrationSolo &calibration_right,
-            int width,
-            int height,
-            int rows,
-            int columns
+            uint width,
+            uint height,
+            uint rows,
+            uint columns
     );
 
 
@@ -255,6 +259,37 @@ namespace eox::ocv {
             CalibrationSolo &calibration_right,
             CalibrationStereo &stereo,
             double alpha = 0);
+
+
+    /**
+     * @brief Writes stereo camera calibration and rectification data to a specified file.
+     *
+     * This function serializes the data contained in a StereoPackage object into a file. The file format and
+     * encoding can be specified. It supports Base64 encoding for the output file. The function writes various
+     * calibration parameters for solo (single camera) and stereo setups, as well as rectification parameters.
+     *
+     * @param package The StereoPackage object containing stereo camera calibration data.
+     * The package includes the following data structures:
+     *  - Solo: individual camera calibration data (camera matrix, distortion coefficients, rotation vectors,
+     *    translation vectors, standard deviation of intrinsics and extrinsics,
+     *    per view errors, RMS error, width, height, UID).
+     *  - Stereo: stereo camera pair calibration data (rotation matrix, translation vector, essential matrix,
+     *  fundamental matrix, RMS error, width, height).
+     *  - Rectification: rectification parameters for stereo camera pair (R1, R2, P1, P2, Q matrices,
+     *  ROI for left and right cameras).
+     *
+     * @param file_name The name of the file to which the data will be written.
+     * @param b64 A boolean flag indicating whether to encode the file in Base64.
+     * If true, the output is Base64 encoded; otherwise, it's plain text.
+     *
+     * Usage example:
+     *    write_stereo_package(package, "calibration_data.yml", false);
+     */
+    void write_stereo_package(
+            const StereoPackage &package,
+            const std::string &file_name,
+            bool b64 = false
+    );
 }
 
 

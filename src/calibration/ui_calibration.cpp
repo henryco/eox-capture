@@ -52,7 +52,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
                 std::vector<std::filesystem::path> paths;
                 for (const auto &entry: std::filesystem::directory_iterator(config.work_dir))
                     paths.push_back(entry.path());
-                sex::events::load_camera_from_paths(camera, paths, log);
+                sex::helpers::load_camera_from_paths(camera, paths, log);
             }
 
             {
@@ -60,7 +60,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
                 paths.reserve(config.configs.size());
                 for (const auto &entry: config.configs)
                     paths.emplace_back(entry);
-                sex::events::load_camera_from_paths(camera, paths, log);
+                sex::helpers::load_camera_from_paths(camera, paths, log);
             }
         }
 
@@ -126,14 +126,12 @@ void UiCalibration::init(sex::data::basic_config configuration) {
         save.set_sensitive(false);
         save.get_style_context()->add_class("button-save");
         sex::xgtk::add_style(save, css);
-        save.signal_clicked().connect([]() {
-            // TODO SAVE CALIBRATION DATA
+        save.signal_clicked().connect([this]() {
+            sex::helpers::save_calibration_data(stereoPackage, *this, config, log);
         });
-
 
         _layout_h->pack_start(start, Gtk::PACK_SHRINK);
         _layout_h->pack_start(save, Gtk::PACK_SHRINK);
-
 
         config_stack->add(*layout_calibration, " Calibration ");
         keep(std::move(layout_calibration));
@@ -193,7 +191,7 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
 std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
     return [this, ids = std::move(devices)]() {
         log->debug("save camera configuration");
-        sex::events::gtk_save_camera_settings_event(camera, ids, *this, config, log);
+        sex::helpers::gtk_save_camera_settings(camera, ids, *this, config, log);
         log->debug("camera configuration done");
     };
 }

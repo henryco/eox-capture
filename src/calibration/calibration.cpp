@@ -87,6 +87,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         const auto &c_id = prop.id;
         const auto result = eox::ocv::calibrate_solo(
                 image_points[c_id],
+                c_id,
                 config.camera[0].width,
                 config.camera[0].height,
                 config.calibration.rows,
@@ -130,8 +131,13 @@ void UiCalibration::update(float delta, float latency, float _fps) {
             stereo_calibration
     );
 
+    std::map<uint, eox::ocv::CalibrationSolo> solo_map;
+    for (const auto &solo: calibrated_solo) {
+        solo_map.emplace(solo.uid, solo);
+    }
+
     stereoPackage = {
-            .solo = std::move(calibrated_solo),
+            .solo = std::move(solo_map),
             .stereo = std::move(stereo_calibration),
             .rectification = std::move(stereo_rectification)
     };
