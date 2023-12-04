@@ -107,6 +107,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             active = !active;
             if (active) {
                 log->debug("calibration start");
+                stereoPackage = {};
                 start.set_label("stop");
                 save.set_sensitive(false);
                 cap = 0;
@@ -114,6 +115,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
                 progress = 1;
             } else {
                 log->debug("calibration stop");
+                stereoPackage = {};
                 start.set_label("start");
                 timer.reset();
                 progress = 0;
@@ -210,6 +212,7 @@ UiCalibration::~UiCalibration() {
 
     deltaLoop.stop();
     camera.release();
+    timer.stop();
 
     log->debug("terminated");
 }

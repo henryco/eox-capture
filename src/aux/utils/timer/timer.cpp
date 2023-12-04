@@ -17,6 +17,8 @@ namespace eox::utils {
     }
 
     int Timer::tick(const std::function<void()>& callback) {
+        if (!active)
+            return 0;
         const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::high_resolution_clock::now().time_since_epoch());
         const auto diff = now - point;

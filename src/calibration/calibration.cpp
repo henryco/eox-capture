@@ -130,7 +130,11 @@ void UiCalibration::update(float delta, float latency, float _fps) {
             stereo_calibration
     );
 
-    // TODO save results
+    stereoPackage = {
+            .solo = std::move(calibrated_solo),
+            .stereo = std::move(stereo_calibration),
+            .rectification = std::move(stereo_rectification)
+    };
 
     update_ui(remains, frames);
 }

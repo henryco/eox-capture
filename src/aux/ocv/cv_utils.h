@@ -54,6 +54,12 @@ namespace eox::ocv {
         cv::Rect2i ROI_R;
     } StereoRectification;
 
+    typedef struct {
+        std::vector<CalibrationSolo> solo;
+        CalibrationStereo stereo;
+        StereoRectification rectification;
+    } StereoPackage;
+
 
     /**
      * \brief Create a copy of the given image.
