@@ -26,8 +26,34 @@ namespace eox::ocv {
         std::vector<double> std_dev_intrinsics;
         std::vector<double> std_dev_extrinsics;
         std::vector<double> per_view_errors;
+
         double rms;
+        int width;
+        int height;
     } CalibrationSolo;
+
+    typedef struct {
+        cv::Mat R;
+        cv::Mat T;
+        cv::Mat E;
+        cv::Mat F;
+
+        double rms;
+        int width;
+        int height;
+    } CalibrationStereo;
+
+    typedef struct {
+        cv::Mat R1;
+        cv::Mat R2;
+        cv::Mat P1;
+        cv::Mat P2;
+        cv::Mat Q;
+
+        cv::Rect2i ROI_L;
+        cv::Rect2i ROI_R;
+    } StereoRectification;
+
 
     /**
      * \brief Create a copy of the given image.
@@ -49,7 +75,6 @@ namespace eox::ocv {
      * \note This function requires the OpenCV library to be installed and properly linked.
      * \note The copy operation can consume a significant amount of memory if working with large images.
      */
-
     cv::Mat img_copy(const cv::Mat &image);
 
 
@@ -66,8 +91,8 @@ namespace eox::ocv {
      *
      * @return The copied image with color space conversion.
      */
-
     cv::Mat img_copy(const cv::Mat &image, int color_space_conv_type);
+
 
     /**
      * @brief img_copy - Copies an image and converts the color space and matrix data type.
@@ -83,11 +108,11 @@ namespace eox::ocv {
      *
      * @return The copied image with the specified color space and matrix data type.
      */
-
     cv::Mat img_copy(
             const cv::Mat &image,
             int color_space_conv_type,
             int matrix_data_type);
+
 
     /**
      * @brief Finds and marks squares in a given image, typically used for chessboard corner detection.
@@ -148,6 +173,82 @@ namespace eox::ocv {
             int rows,
             int columns);
 
+
+    /**
+     * @brief Performs stereo camera calibration using the provided image corner points and individual camera calibrations.
+     *
+     * This function calibrates a stereo camera setup by using the corner points from a set of stereo images and the
+     * calibration data of each individual camera. It prepares object points in a 3D space for a standard chessboard-like pattern,
+     * then performs stereo calibration to find the rotation (R), translation (T), essential (E), and fundamental (F) matrices.
+     *
+     * @param corners_left A reference to a vector of vectors containing the 2D image points from the left camera.
+     * @param calibration_left A reference to the CalibrationSolo object for the left camera, containing its calibration data.
+     * @param corners_right A reference to a vector of vectors containing the 2D image points from the right camera.
+     * @param calibration_right A reference to the CalibrationSolo object for the right camera, containing its calibration data.
+     * @param width The width of the image used for calibration.
+     * @param height The height of the image used for calibration.
+     * @param rows The number of rows in the chessboard pattern used for calibration (actual number of corners is rows - 1).
+     * @param columns The number of columns in the chessboard pattern used for calibration (actual number of corners is cols - 1).
+     *
+     * @return A CalibrationStereo object containing the rotation matrix (R), translation vector (T), essential matrix (E),
+     *         and fundamental matrix (F) of the stereo calibration.
+     *
+     * @note It's assumed that the vector sizes of corners_l and corners_r are the same as they correspond to pairs of images
+     *       from the stereo setup. The chessboard pattern should have (rows - 1) x (cols - 1) corners.
+     */
+    CalibrationStereo calibrate_stereo_pair(
+            std::vector<std::vector<cv::Point2f>> &corners_left,
+            CalibrationSolo &calibration_left,
+            std::vector<std::vector<cv::Point2f>> &corners_right,
+            CalibrationSolo &calibration_right,
+            int rows,
+            int columns
+    );
+
+
+    /**
+     * @note Overloaded
+     */
+    CalibrationStereo calibrate_stereo_pair(
+            std::vector<std::vector<cv::Point2f>> &corners_left,
+            CalibrationSolo &calibration_left,
+            std::vector<std::vector<cv::Point2f>> &corners_right,
+            CalibrationSolo &calibration_right,
+            int width,
+            int height,
+            int rows,
+            int columns
+    );
+
+
+    /**
+     * @brief Performs stereo rectification on a pair of cameras.
+     *
+     * This function computes the rectification transformations and projection matrices
+     * necessary for stereo image alignment. It uses the calibration data of two cameras
+     * and their stereo configuration.
+     *
+     * @param calibration_left Reference to the calibration data of the left camera (CalibrationSolo).
+     * @param calibration_right Reference to the calibration data of the right camera (CalibrationSolo).
+     * @param stereo Reference to the stereo configuration data (CalibrationStereo).
+     * @param alpha Free scaling parameter. If it is -1 or absent, the function performs the default scaling. Otherwise,
+     * the parameter should be between 0 and 1. alpha=0 means that the rectified images are zoomed and shifted so that
+     * only valid pixels are visible (no black areas after rectification).
+     * alpha=1 means that the rectified image is decimated and shifted so that all the pixels from the original images
+     * from the cameras are retained in the rectified images (no source image pixels are lost).
+     *
+     * @return StereoRectification structure containing rectification matrices and projection matrices.
+     *
+     * The function relies on OpenCV's cv::stereoRectify function to calculate the rectification parameters.
+     * Output matrices R1, R2, P1, P2, and Q represent the rectification rotation matrices for each camera,
+     * the projection matrices in the new (rectified) coordinate systems for each camera, and the disparity-to-depth
+     * mapping matrix respectively.
+     */
+    StereoRectification rectify_stereo(
+            CalibrationSolo &calibration_left,
+            CalibrationSolo &calibration_right,
+            CalibrationStereo &stereo,
+            double alpha = 0);
 }
 
 

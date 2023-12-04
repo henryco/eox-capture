@@ -4,8 +4,10 @@
 
 #include "ui_calibration.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "UnusedParameter"
+
 void UiCalibration::update(float delta, float latency, float _fps) {
-//    log->debug("update: {}, late: {}, fps: {}", delta, latency, _fps);
     this->FPS = _fps;
 
     auto captured = camera.capture();
@@ -97,8 +99,40 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         calibrated_solo.push_back(result);
     }
 
+    // unpack map of corners to left and right
+    std::vector<std::vector<std::vector<cv::Point2f>>> points;
+    points.reserve(image_points.size());
+    for (const auto &[id, vec]: image_points) {
+        points.push_back(vec);
+    }
+
+    if (points.size() < 2) {
+        // not enough cameras to stereo calibrate
+        log->warn("Cannot stereo calibrate single camera");
+        update_ui(remains, frames);
+        return;
+    }
+
     // calibrate stereo
-    // TODO
+    auto stereo_calibration = eox::ocv::calibrate_stereo_pair(
+            points[0],
+            calibrated_solo[0],
+            points[1],
+            calibrated_solo[1],
+            config.calibration.rows,
+            config.calibration.columns
+    );
+
+    // stereo rectification
+    auto stereo_rectification = eox::ocv::rectify_stereo(
+            calibrated_solo[0],
+            calibrated_solo[1],
+            stereo_calibration
+    );
+
+    // TODO save results
 
     update_ui(remains, frames);
 }
+
+#pragma clang diagnostic pop
