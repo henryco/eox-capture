@@ -110,11 +110,13 @@ void UiCalibration::init(sex::data::basic_config configuration) {
                 stereoPackage = {};
                 start.set_label("stop");
                 save.set_sensitive(false);
+                image_points.clear();
                 cap = 0;
                 timer.reset();
                 progress = 1;
             } else {
                 log->debug("calibration stop");
+                image_points.clear();
                 stereoPackage = {};
                 start.set_label("start");
                 timer.reset();
