@@ -85,6 +85,10 @@ namespace sex::cli {
                 .help("set the height")
                 .default_value(480)
                 .scan<'i', int>();
+        program.add_argument("--scale")
+                .help("scale video output (for gui)")
+                .default_value(1.0f)
+                .scan<'g', float>();
         program.add_argument("--fps")
                 .help("set the camera maximum frames per second")
                 .default_value(30)
@@ -148,6 +152,7 @@ namespace sex::cli {
             spdlog::set_level(spdlog::level::info);
         }
 
+        const auto scale = program.get<float>("--scale");
         const auto codec = program.get<std::string>("--codec");
         const auto devices = parse_devices(
                 program.get<std::vector<std::string>>("--devices")
@@ -178,7 +183,7 @@ namespace sex::cli {
         std::vector<std::string> new_configs;
         std::string work_dir;
 
-        for (const auto& path: configs) {
+        for (const auto &path: configs) {
             if (!std::filesystem::exists(path))
                 continue;
             if (std::filesystem::is_directory(path)) {
@@ -197,6 +202,7 @@ namespace sex::cli {
             }
 
             return {
+                    .scale = scale,
                     .work_dir = work_dir,
                     .configs = new_configs,
                     .camera = props,
@@ -213,6 +219,7 @@ namespace sex::cli {
         }
 
         return {
+                .scale = scale,
                 .work_dir = work_dir,
                 .configs = new_configs,
                 .camera = props

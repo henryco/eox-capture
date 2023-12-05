@@ -30,6 +30,7 @@ namespace sex::data {
     } calibration_config;
 
     typedef struct {
+        float scale;
         std::string work_dir;
         std::vector<std::string> configs;
         std::vector<camera_properties> camera;

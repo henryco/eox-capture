@@ -149,6 +149,7 @@ namespace eox::ocv {
 
         // output parameters
         cv::Mat R, T, E, F;
+        cv::Mat per_view_errors;
 
         // calibration
         auto const rms = cv::stereoCalibrate(
@@ -161,6 +162,7 @@ namespace eox::ocv {
                 calibration_r.distortion_coefficients,
                 cv::Size((int) width, (int) height),
                 R, T, E, F,
+                per_view_errors,
                 cv::CALIB_FIX_INTRINSIC
         );
 
@@ -170,6 +172,7 @@ namespace eox::ocv {
                 .T = T,
                 .E = E,
                 .F = F,
+                .per_view_errors = per_view_errors,
                 .rms = rms,
                 .width = width,
                 .height = height
@@ -266,6 +269,7 @@ namespace eox::ocv {
             fs << index + "_t" << package.stereo.T;
             fs << index + "_e" << package.stereo.E;
             fs << index + "_f" << package.stereo.F;
+            fs << index + "_p" << package.stereo.per_view_errors;
             fs << index + "_s" << package.stereo.rms;
             fs << index + "_w" << (int) package.stereo.width;
             fs << index + "_h" << (int) package.stereo.height;
@@ -363,6 +367,7 @@ namespace eox::ocv {
             cv::Mat T;
             cv::Mat E;
             cv::Mat F;
+            cv::Mat per_view_errors;
             double rms;
             int width;
             int height;
@@ -371,6 +376,7 @@ namespace eox::ocv {
             fs["x_t"] >> T;
             fs["x_e"] >> E;
             fs["x_f"] >> F;
+            fs["x_p"] >> per_view_errors;
             fs["x_s"] >> rms;
             fs["x_w"] >> width;
             fs["x_h"] >> height;
@@ -380,6 +386,7 @@ namespace eox::ocv {
                     .T = T,
                     .E = E,
                     .F = F,
+                    .per_view_errors = per_view_errors,
                     .rms = rms,
                     .width = (uint) width,
                     .height = (uint) height

@@ -41,6 +41,8 @@ namespace eox::ocv {
         cv::Mat E;
         cv::Mat F;
 
+        cv::Mat per_view_errors;
+
         double rms;
         uint width;
         uint height;

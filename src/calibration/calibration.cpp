@@ -155,6 +155,13 @@ void UiCalibration::update(float delta, float latency, float _fps) {
             config.calibration.columns
     );
     log->info("RMS: {}", stereo_calibration.rms);
+    for (int row = 0; row < stereo_calibration.per_view_errors.rows; row++) {
+        std::string o;
+        for (int col = 0; col < stereo_calibration.per_view_errors.cols; col++) {
+            o += (std::to_string(stereo_calibration.per_view_errors.at<double>(row, col)) + "  ");
+        }
+        log->debug("-> {}", o);
+    }
 
     // stereo rectification
     auto stereo_rectification = eox::ocv::rectify_stereo(
