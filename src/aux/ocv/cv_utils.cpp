@@ -86,6 +86,30 @@ namespace eox::ocv {
                 per_view_errors
         );
 
+
+        // calculating mean re-projection error
+        double totalError = 0;
+        size_t totalPoints = 0;
+        std::vector<cv::Point2f> reprojectedPoints;
+        for (size_t i = 0; i < object_points.size(); ++i) {
+            projectPoints(
+                    object_points[i],
+                    r_vecs[i],
+                    t_vecs[i],
+                    camera_matrix,
+                    distortion_coefficients,
+                    reprojectedPoints
+            );
+            size_t n = object_points[i].size();
+            for (size_t j = 0; j < n; ++j) {
+                double err = norm(corners[i][j] - reprojectedPoints[j]);
+                totalError += err * err;
+            }
+            totalPoints += n;
+        }
+        double mre = sqrt(totalError / (double) totalPoints);
+
+
         // result
         return {
                 .camera_matrix = camera_matrix,
@@ -96,6 +120,7 @@ namespace eox::ocv {
                 .std_dev_extrinsics = std_extrinsics,
                 .per_view_errors = per_view_errors,
                 .rms = rms,
+                .mre = mre,
                 .width = width,
                 .height = height,
                 .uid = id
@@ -226,6 +251,7 @@ namespace eox::ocv {
                 fs << index + "_de" << solo.std_dev_extrinsics;
                 fs << index + "_pe" << solo.per_view_errors;
                 fs << index + "_er" << solo.rms;
+                fs << index + "_me" << solo.mre;
                 fs << index + "_wh" << (int) solo.width;
                 fs << index + "_hg" << (int) solo.height;
                 fs << index + "_id" << (int) solo.uid;
@@ -270,7 +296,7 @@ namespace eox::ocv {
         if ("eox::calibration" != type) {
             fs.release();
             return {
-                .ok = false
+                    .ok = false
             };
         }
 
@@ -292,6 +318,7 @@ namespace eox::ocv {
                 std::vector<double> std_dev_extrinsics;
                 std::vector<double> per_view_errors;
                 double rms;
+                double mre;
                 int width;
                 int height;
                 int uid;
@@ -304,6 +331,7 @@ namespace eox::ocv {
                 fs[index + "_de"] >> std_dev_extrinsics;
                 fs[index + "_pe"] >> per_view_errors;
                 fs[index + "_er"] >> rms;
+                fs[index + "_me"] >> mre;
                 fs[index + "_wh"] >> width;
                 fs[index + "_hg"] >> height;
                 fs[index + "_id"] >> uid;
@@ -317,6 +345,7 @@ namespace eox::ocv {
                         .std_dev_extrinsics = std_dev_extrinsics,
                         .per_view_errors = per_view_errors,
                         .rms = rms,
+                        .mre = mre,
                         .width = (uint) width,
                         .height = (uint) height,
                         .uid = (uint) uid

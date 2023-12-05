@@ -105,6 +105,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
                     config.calibration.columns
             );
             log->info("RMS[{}]: {}", c_id, result.rms);
+            log->info("MRE[{}]: {}", c_id, result.mre);
             for (const auto &err: result.per_view_errors) {
                 log->debug("-> {}", err);
             }

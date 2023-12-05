@@ -29,6 +29,7 @@ namespace eox::ocv {
         std::vector<double> per_view_errors;
 
         double rms;
+        double mre;
         uint width;
         uint height;
         uint uid;
