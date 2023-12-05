@@ -52,7 +52,24 @@ void UiCalibration::init(sex::data::basic_config configuration) {
                 std::vector<std::filesystem::path> paths;
                 for (const auto &entry: std::filesystem::directory_iterator(config.work_dir))
                     paths.push_back(entry.path());
+
                 sex::helpers::load_camera_from_paths(camera, paths, log);
+
+                auto data = sex::helpers::load_calibration_data(paths, log);
+                for (const auto &package: data) {
+                    auto solo = package.solo;
+
+                    for (const auto &p: props) {
+                        if (!solo.contains(p.id))
+                            continue;
+
+                        const auto cpy = solo[p.id];
+                        preCalibrated[p.id] = cpy;
+
+                        log->debug("set calibration data: {}", p.id);
+                        break;
+                    }
+                }
             }
 
             {
@@ -60,7 +77,29 @@ void UiCalibration::init(sex::data::basic_config configuration) {
                 paths.reserve(config.configs.size());
                 for (const auto &entry: config.configs)
                     paths.emplace_back(entry);
+
                 sex::helpers::load_camera_from_paths(camera, paths, log);
+
+                auto data = sex::helpers::load_calibration_data(paths, log);
+                for (const auto &package: data) {
+                    auto solo = package.solo;
+
+                    for (const auto &p: props) {
+                        if (!solo.contains(p.id))
+                            continue;
+
+                        const auto cpy = solo[p.id];
+                        preCalibrated[p.id] = cpy;
+
+                        log->debug("set calibration data: {}", p.id);
+                        break;
+                    }
+                }
+            }
+
+            if (!preCalibrated.empty() && preCalibrated.size() != props.size()) {
+                log->warn("missing calibration data for some devices");
+                preCalibrated.clear();
             }
         }
 

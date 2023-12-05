@@ -34,6 +34,10 @@ namespace sex::helpers {
             const sex::data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger>& log);
 
+    std::vector<eox::ocv::StereoPackage> load_calibration_data(
+            const std::vector<std::filesystem::path> &paths,
+            const std::shared_ptr<spdlog::logger> &log);
+
 } // events
 
 #endif //STEREOX_HELPERS_H

@@ -60,6 +60,7 @@ namespace eox::ocv {
         std::map<uint, CalibrationSolo> solo;
         CalibrationStereo stereo;
         StereoRectification rectification;
+        bool ok;
     } StereoPackage;
 
 

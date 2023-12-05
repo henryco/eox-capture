@@ -45,6 +45,7 @@ private:
     Gtk::Button save;
 
     eox::ocv::StereoPackage stereoPackage;
+    std::map<uint, eox::ocv::CalibrationSolo> preCalibrated;
     std::map<uint, std::vector<std::vector<cv::Point2f>>> image_points;
     int cap = 0;
 

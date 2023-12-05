@@ -213,6 +213,7 @@ namespace eox::ocv {
 
         // SOLO
         {
+            fs << "type" << "eox::calibration";
             fs << "devices" << ((int) package.solo.size());
             int i = 0;
             for (const auto &[k, solo]: package.solo) {
@@ -262,6 +263,16 @@ namespace eox::ocv {
     StereoPackage read_stereo_package(const std::string &file_name) {
         StereoPackage package;
         cv::FileStorage fs(file_name, cv::FileStorage::READ);
+
+        std::string type;
+        fs["type"] >> type;
+
+        if ("eox::calibration" != type) {
+            fs.release();
+            return {
+                .ok = false
+            };
+        }
 
         // SOLO
         {
@@ -376,6 +387,8 @@ namespace eox::ocv {
         }
 
         fs.release();
+
+        package.ok = true;
         return package;
     }
 }

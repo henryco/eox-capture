@@ -226,7 +226,7 @@ namespace sex::xocv {
 
                     sex::v4l2::set_camera_prop(prop.index, vec);
 
-                    log->debug("configuration set: {}, {}", device_id, prop.index);
+                    log->debug("configuration set: {}[{}]", device_id, prop.index);
                     break;
                 }
             }

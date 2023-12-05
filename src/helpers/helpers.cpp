@@ -148,5 +148,38 @@ namespace sex::helpers {
         }
     }
 
+    std::vector<eox::ocv::StereoPackage> load_calibration_data(
+            const std::vector<std::filesystem::path> &paths,
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
+        if (paths.empty()) {
+            log->debug("list of config path is empty");
+            return {};
+        }
+
+        std::vector<eox::ocv::StereoPackage> packages;
+        log->debug("load calibration from paths");
+        for (const auto &path: paths) {
+            const auto ext = path.extension().string();
+
+            log->debug("checking path: {}", path.string());
+            if (!std::filesystem::is_regular_file(path))
+                continue;
+
+            if (ext == ".json") {
+                log->debug("loading configuration: {}", path.string());
+
+                const auto result = eox::ocv::read_stereo_package(path.string());
+                if (result.ok) {
+                    packages.push_back(result);
+                    continue;
+                }
+            }
+
+            log->debug("file: {}, not a calibration configuration", path.string());
+        }
+
+        return packages;
+    }
 
 } // events
