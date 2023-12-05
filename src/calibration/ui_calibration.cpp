@@ -29,6 +29,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     {
         // Init oGL canvas
         glImage.init((int) props.size(), props[0].width, props[0].height, c_ids,GL_BGR);
+        glImage.scale(0.5f);
     }
 
     {

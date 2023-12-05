@@ -86,11 +86,14 @@ namespace sex::xgtk {
         glAreas.reserve(_number);
         frames.reserve(_number);
 
+        this->v_w = (int) _number * _width;
+        this->v_h = _height;
+
         for (int i = 0; i < _number; ++i) {
             auto area = std::make_unique<Gtk::GLArea>();
             area->signal_realize().connect(initFunc(i), false);
             area->signal_render().connect(renderFunc(i), false);
-            area->set_size_request(_width, _height);
+            area->set_size_request((int) (v_w / _number), v_h);
             area->set_auto_render(true);
 
             auto v_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
@@ -109,10 +112,54 @@ namespace sex::xgtk {
             initialized.push_back(false);
         }
 
-        set_size_request((int) _number * _width, height);
+        set_size_request(v_w, v_h);
         set_orientation(Gtk::ORIENTATION_VERTICAL);
         pack_end(h_box, Gtk::PACK_SHRINK);
     }
 
+    void GLImage::scale(float _scale) {
+        resize((int) ((float) v_w * _scale), (int) ((float) v_h * _scale));
+    }
+
+    void GLImage::resize(int _width, int _height) {
+        const auto _number = glAreas.size();
+
+        if (_width == -1 && _height == -1) {
+            v_w = (int) _number * width;
+            v_h = height;
+        }
+
+        else if (_width != -1 && _height == -1) {
+            v_w = _width;
+
+            const auto ratio = (float) (width * _number) / (float) height;
+            v_h = (int) ((float) v_w / ratio);
+        }
+
+        else if (_width == -1) {
+            v_h = _height;
+
+            const auto ratio = (float) (width * _number) / (float) height;
+            v_w = (int) ((float) v_h * ratio);
+        }
+
+        else {
+            v_w = _width;
+            v_h = _height;
+        }
+
+        for (const auto &area: glAreas) {
+            area->set_size_request((int) (v_w / _number), v_h);
+        }
+        set_size_request(v_w, v_h);
+    }
+
+    int GLImage::getViewWidth() const {
+        return v_w;
+    }
+
+    int GLImage::getViewHeight() const {
+        return v_h;
+    }
 
 } // xgtk

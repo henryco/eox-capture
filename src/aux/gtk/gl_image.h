@@ -34,6 +34,9 @@ private:
     int width = 0;
     int height = 0;
 
+    int v_w = 0;
+    int v_h = 0;
+
 protected:
     std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> renderFunc(int num);
     std::function<void()> initFunc(size_t num);
@@ -47,6 +50,11 @@ public:
     void setFrames(const std::vector<cv::Mat>& _frames);
     void update(const std::vector<cv::Mat>& _frames);
     void update();
+
+    void scale(float _scale);
+    void resize(int width = -1, int height = -1);
+    int getViewWidth() const;
+    int getViewHeight() const;
 
 };
 
