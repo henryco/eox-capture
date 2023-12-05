@@ -118,8 +118,9 @@ namespace sex::cli {
                 .scan<'g', float>();
         calibration.add_argument("-q", "--quality")
                 .help("quality flags (see cv::CALIB_CB_* enum)")
-                .default_value(0)
-                .scan<'i', int>();
+                .default_value(std::vector<std::string>{"0"})
+                .nargs(argparse::nargs_pattern::any)
+                .append();
         calibration.add_argument("-n", "--number")
                 .help("number of images")
                 .default_value(4)
@@ -189,6 +190,12 @@ namespace sex::cli {
 
         if (program.is_subcommand_used("calibration")) {
             const auto &instance = program.at<argparse::ArgumentParser>("calibration");
+
+            int quality = 0;
+            for (const auto &v: instance.get<std::vector<std::string>>("--quality")) {
+                quality |= std::stoi(v);
+            }
+
             return {
                     .work_dir = work_dir,
                     .configs = new_configs,
@@ -198,7 +205,7 @@ namespace sex::cli {
                             .columns = instance.get<int>("--columns"),
                             .rows = instance.get<int>("--rows"),
                             .size = instance.get<float>("--size"),
-                            .quality = instance.get<int>("--quality"),
+                            .quality = quality,
                             .number = instance.get<int>("--number"),
                             .delay = instance.get<int>("--delay"),
                     }
