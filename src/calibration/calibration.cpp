@@ -87,10 +87,11 @@ void UiCalibration::update(float delta, float latency, float _fps) {
 
     // first calibrate each camera solo
     std::vector<eox::ocv::CalibrationSolo> calibrated_solo;
-    if (preCalibrated.empty() || image_points.size() < 2) {
+    if (preCalibrated.empty() || image_points.size() < 2 || preCalibrated.size() != image_points.size()) {
 
         // there is no pre-calibrated matrices from configuration,
-        // or there is only one camera. In any case we need to calibrate each camera first
+        // or there is only one camera, OR not every camera is pre-calibrated.
+        // In any case we need to calibrate each camera first
 
         calibrated_solo.reserve(props.size());
         for (const auto &prop: props) {

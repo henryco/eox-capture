@@ -49,9 +49,23 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             // loading camera parameters from files
 
             {
+                log->debug("initializing from dir implicitly");
+
                 std::vector<std::filesystem::path> paths;
-                for (const auto &entry: std::filesystem::directory_iterator(config.work_dir))
-                    paths.push_back(entry.path());
+                for (const auto &entry: std::filesystem::directory_iterator(config.work_dir)) {
+                    const auto path = entry.path().string();
+
+                    bool contains = false;
+                    for (const auto &c_path: config.configs) {
+                        if (c_path == path) {
+                            contains += 1;
+                            break;
+                        }
+                    }
+
+                    if (!contains)
+                        paths.push_back(entry.path());
+                }
 
                 sex::helpers::load_camera_from_paths(camera, paths, log);
 
@@ -73,6 +87,8 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             }
 
             {
+                log->debug("initializing from files explicitly");
+
                 std::vector<std::filesystem::path> paths;
                 paths.reserve(config.configs.size());
                 for (const auto &entry: config.configs)
@@ -103,20 +119,22 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             }
         }
 
-        const auto controls = camera.getControls();
-        for (const auto &control: controls) {
+        {
+            const auto controls = camera.getControls();
+            for (const auto &control: controls) {
 
-            const auto indexes = sex::mappers::cam_gtk::index(
-                    props, control.id, props[0].homogeneous);
+                const auto indexes = sex::mappers::cam_gtk::index(
+                        props, control.id, props[0].homogeneous);
 
-            auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-            cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
-            cam_params->onUpdate(updateCamera(indexes));
-            cam_params->onReset(resetCamera(indexes));
-            cam_params->onSave(saveCamera(indexes));
+                auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
+                cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
+                cam_params->onUpdate(updateCamera(indexes));
+                cam_params->onReset(resetCamera(indexes));
+                cam_params->onSave(saveCamera(indexes));
 
-            config_stack->add(*cam_params, " Camera " + std::to_string(control.id));
-            keep(std::move(cam_params));
+                config_stack->add(*cam_params, " Camera " + std::to_string(control.id));
+                keep(std::move(cam_params));
+            }
         }
     }
 
