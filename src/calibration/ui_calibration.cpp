@@ -50,7 +50,15 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             // loading camera parameters from files
 
             {
-                log->debug("initializing from dir implicitly");
+                log->debug("using camera hardware defaults");
+
+                for (const auto &prop: props) {
+                    sex::v4l2::reset_defaults(prop.index);
+                }
+            }
+
+            {
+                log->debug("initializing from work directory implicitly");
 
                 std::vector<std::filesystem::path> paths;
                 for (const auto &entry: std::filesystem::directory_iterator(config.work_dir)) {
@@ -88,7 +96,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             }
 
             {
-                log->debug("initializing from files explicitly");
+                log->debug("initializing from configuration files explicitly");
 
                 std::vector<std::filesystem::path> paths;
                 paths.reserve(config.configs.size());

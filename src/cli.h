@@ -134,7 +134,7 @@ namespace sex::cli {
                 .default_value(5000)
                 .scan<'i', int>();
         calibration.add_argument("-t", "--correction")
-                .help("correct camera intrinsic/extrinsic matrices")
+                .help("optimize some of all of the camera intrinsic parameters during stereo calibration")
                 .flag();
         program.add_subparser(calibration);
 
@@ -142,7 +142,7 @@ namespace sex::cli {
         try {
             program.parse_args(argc, argv);
         } catch (const std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
+            std::cout << err.what() << '\n';
             std::cout << program;
             std::exit(1);
         }

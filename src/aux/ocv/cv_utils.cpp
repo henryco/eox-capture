@@ -4,8 +4,12 @@
 
 #include "cv_utils.h"
 
+#include <cmath>
+
 #include <opencv2/imgproc.hpp>
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 namespace eox::ocv {
 
     cv::Mat img_copy(const cv::Mat &image, int color_space_conv_type, int matrix_data_type) {
@@ -130,7 +134,7 @@ namespace eox::ocv {
     CalibrationStereo
     calibrate_stereo_pair(std::vector<std::vector<cv::Point2f>> &corners_l, CalibrationSolo &calibration_l,
                           std::vector<std::vector<cv::Point2f>> &corners_r, CalibrationSolo &calibration_r,
-                          uint width, uint height, uint rows, uint cols) {
+                          uint width, uint height, uint rows, uint cols, bool correction) {
         // Prepare object points (0,0,0), (1,0,0), (2,0,0) ... (8,5,0)
         std::vector<cv::Point3f> obj_p;
         for (int i = 0; i < rows - 1; ++i) {
@@ -163,7 +167,7 @@ namespace eox::ocv {
                 cv::Size((int) width, (int) height),
                 R, T, E, F,
                 per_view_errors,
-                cv::CALIB_FIX_INTRINSIC
+                correction ? cv::CALIB_USE_INTRINSIC_GUESS : cv::CALIB_FIX_INTRINSIC
         );
 
         // result
@@ -182,7 +186,7 @@ namespace eox::ocv {
     CalibrationStereo
     calibrate_stereo_pair(std::vector<std::vector<cv::Point2f>> &corners_l, CalibrationSolo &calibration_l,
                           std::vector<std::vector<cv::Point2f>> &corners_r, CalibrationSolo &calibration_r,
-                          uint rows, uint cols) {
+                          uint rows, uint cols, bool correction) {
         return calibrate_stereo_pair(
                 corners_l,
                 calibration_l,
@@ -191,7 +195,8 @@ namespace eox::ocv {
                 calibration_l.width,
                 calibration_l.height,
                 rows,
-                cols);
+                cols,
+                correction);
     }
 
     StereoRectification rectify_stereo(
@@ -321,11 +326,11 @@ namespace eox::ocv {
                 std::vector<double> std_dev_intrinsics;
                 std::vector<double> std_dev_extrinsics;
                 std::vector<double> per_view_errors;
-                double rms;
-                double mre;
-                int width;
-                int height;
-                int uid;
+                double rms = NAN;
+                double mre = NAN;
+                int width = 0;
+                int height = 0;
+                int uid = 0;
 
                 fs[index + "_cm"] >> camera_matrix;
                 fs[index + "_dc"] >> distortion_coefficients;
@@ -368,9 +373,9 @@ namespace eox::ocv {
             cv::Mat E;
             cv::Mat F;
             cv::Mat per_view_errors;
-            double rms;
-            int width;
-            int height;
+            double rms = NAN;
+            int width = 0;
+            int height = 0;
 
             fs["x_r"] >> R;
             fs["x_t"] >> T;
@@ -427,4 +432,6 @@ namespace eox::ocv {
         package.ok = true;
         return package;
     }
+
 }
+#pragma clang diagnostic pop

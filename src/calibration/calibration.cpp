@@ -152,7 +152,8 @@ void UiCalibration::update(float delta, float latency, float _fps) {
             points[1],
             calibrated_solo[1],
             config.calibration.rows,
-            config.calibration.columns
+            config.calibration.columns,
+            config.calibration.correction
     );
     log->info("RMS: {}", stereo_calibration.rms);
     for (int row = 0; row < stereo_calibration.per_view_errors.rows; row++) {

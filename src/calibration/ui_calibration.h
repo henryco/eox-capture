@@ -16,13 +16,6 @@
 #include "../aux/utils/timer/timer.h"
 #include "../aux/ocv/cv_utils.h"
 
-namespace eox::calibration {
-
-    typedef struct {
-
-    } cb_data;
-}
-
 class UiCalibration final : public sex::xgtk::GtkSexWindow {
 
     static inline const auto log =

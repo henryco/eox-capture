@@ -12,14 +12,14 @@
 
 namespace eox::ocv {
 
-    typedef struct {
+    using Squares = struct {
         std::vector<cv::Point2f> corners;
         cv::Mat original;
         cv::Mat result;
         bool found;
-    } Squares;
+    };
 
-    typedef struct {
+    using CalibrationSolo = struct {
         cv::Mat camera_matrix;
         cv::Mat distortion_coefficients;
         std::vector<cv::Mat> rotation_vecs;
@@ -33,9 +33,9 @@ namespace eox::ocv {
         uint width;
         uint height;
         uint uid;
-    } CalibrationSolo;
+    };
 
-    typedef struct {
+    using CalibrationStereo = struct {
         cv::Mat R;
         cv::Mat T;
         cv::Mat E;
@@ -46,9 +46,9 @@ namespace eox::ocv {
         double rms;
         uint width;
         uint height;
-    } CalibrationStereo;
+    };
 
-    typedef struct {
+    using StereoRectification = struct {
         cv::Mat R1;
         cv::Mat R2;
         cv::Mat P1;
@@ -57,14 +57,14 @@ namespace eox::ocv {
 
         cv::Rect2i ROI_L;
         cv::Rect2i ROI_R;
-    } StereoRectification;
+    };
 
-    typedef struct {
+    using StereoPackage = struct {
         std::map<uint, CalibrationSolo> solo;
         CalibrationStereo stereo;
         StereoRectification rectification;
         bool ok;
-    } StereoPackage;
+    };
 
 
     /**
@@ -203,6 +203,7 @@ namespace eox::ocv {
      * @param height The height of the image used for calibration.
      * @param rows The number of rows in the chessboard pattern used for calibration (actual number of corners is rows - 1).
      * @param columns The number of columns in the chessboard pattern used for calibration (actual number of corners is cols - 1).
+     * @param correction Optimize some of all of the camera intrinsic parameters.
      *
      * @return A CalibrationStereo object containing the rotation matrix (R), translation vector (T), essential matrix (E),
      *         and fundamental matrix (F) of the stereo calibration.
@@ -216,7 +217,8 @@ namespace eox::ocv {
             std::vector<std::vector<cv::Point2f>> &corners_right,
             CalibrationSolo &calibration_right,
             uint rows,
-            uint columns
+            uint columns,
+            bool correction = false
     );
 
 
@@ -231,7 +233,8 @@ namespace eox::ocv {
             uint width,
             uint height,
             uint rows,
-            uint columns
+            uint columns,
+            bool correction = false
     );
 
 
