@@ -27,6 +27,7 @@ namespace sex::data {
         int quality;
         int number;
         int delay;
+        bool correction;
     } calibration_config;
 
     typedef struct {

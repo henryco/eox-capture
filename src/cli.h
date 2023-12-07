@@ -133,6 +133,9 @@ namespace sex::cli {
                 .help("delay between shots in ms")
                 .default_value(5000)
                 .scan<'i', int>();
+        calibration.add_argument("-t", "--correction")
+                .help("correct camera intrinsic/extrinsic matrices")
+                .flag();
         program.add_subparser(calibration);
 
 
@@ -214,6 +217,7 @@ namespace sex::cli {
                             .quality = quality,
                             .number = instance.get<int>("--number"),
                             .delay = instance.get<int>("--delay"),
+                            .correction = instance.get<bool>("--correction")
                     }
             };
         }
