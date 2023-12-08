@@ -67,6 +67,8 @@ add_executable(${PROJECT_NAME}
         src/calibration/calibration.cpp
         src/aux/ocv/cv_utils.cpp
         src/aux/ocv/cv_utils.h
+        src/cloud/ui_points_cloud.cpp
+        src/cloud/ui_points_cloud.h
 )
 
 # Include directories for the specific target

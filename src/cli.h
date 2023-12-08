@@ -36,6 +36,31 @@ namespace sex::cli {
         return devices_map;
     }
 
+    std::map<uint, std::vector<uint>> parse_groups(const std::vector<std::string> &groups_str_vec) {
+        // input: 1:4,6 2:0,2 aka ["1:4,6", "2:0,2"]
+
+        std::map<uint, std::vector<uint>> map;
+        for (const auto &group_str: groups_str_vec) {
+
+            std::istringstream stream(group_str);
+            std::string key, pair;
+
+            while (std::getline(stream, key, ':') && std::getline(stream, pair)) {
+                std::istringstream pair_stream(pair);
+                std::string value;
+
+                std::vector<uint> values;
+                while (std::getline(pair_stream, value, ',')) {
+                    values.push_back(std::stoul(value));
+                }
+
+                map.emplace(std::stoul(key), std::move(values));
+            }
+        }
+
+        return map;
+    }
+
     sex::data::basic_config parse(int &argc, char **&argv) {
         argparse::ArgumentParser program(
                 "stereox",
@@ -58,7 +83,7 @@ namespace sex::cli {
                 .help("set number of maximum concurrent jobs")
                 .default_value(4)
                 .scan<'i', int>();
-        program.add_argument("-d", "--devices")
+        program.add_argument("-d", "--device")
                 .help("list of devices coma separated (pairs id:index i.e.: '0:2,1:4' )")
                 .nargs(argparse::nargs_pattern::any)
                 .append();
@@ -103,7 +128,7 @@ namespace sex::cli {
 
 
         // Calibration config
-        argparse::ArgumentParser calibration("calibration", "");
+        argparse::ArgumentParser calibration("calibration");
         calibration.add_description(R"desc(
                 Calibration module, used for stereo camera calibration.
                 Use calibration -h for help.
@@ -139,6 +164,19 @@ namespace sex::cli {
         program.add_subparser(calibration);
 
 
+        // Stereo config
+        argparse::ArgumentParser stereo("stereo");
+        stereo.add_description(R"desc(
+                Stereo points cloud module.
+                Use calibration -h for help.
+        )desc");
+        program.add_argument("-g", "--group")
+                .help("list of device groups (pairs id:d1,...,dn i.e.: '1:4,6 2:0,2' )")
+                .nargs(argparse::nargs_pattern::any)
+                .append();
+        program.add_subparser(stereo);
+
+
         try {
             program.parse_args(argc, argv);
         } catch (const std::runtime_error &err) {
@@ -158,7 +196,7 @@ namespace sex::cli {
         const auto scale = program.get<float>("--scale");
         const auto codec = program.get<std::string>("--codec");
         const auto devices = parse_devices(
-                program.get<std::vector<std::string>>("--devices")
+                program.get<std::vector<std::string>>("--device")
         );
 
         std::vector<sex::data::camera_properties> props;
@@ -218,6 +256,27 @@ namespace sex::cli {
                             .number = instance.get<int>("--number"),
                             .delay = instance.get<int>("--delay"),
                             .correction = instance.get<bool>("--correction")
+                    }
+            };
+        }
+
+        if (program.is_subcommand_used("stereo")) {
+            const auto &instance = program.at<argparse::ArgumentParser>("stereo");
+
+            const auto groups = parse_groups(
+                    instance.get<std::vector<std::string>>("--group")
+            );
+            // TODO
+
+            return {
+                    .scale = scale,
+                    .work_dir = work_dir,
+                    .configs = new_configs,
+                    .camera = props,
+                    .groups = groups,
+                    .module = "stereo",
+                    .stereo = {
+                            // TODO
                     }
             };
         }

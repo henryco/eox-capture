@@ -31,13 +31,21 @@ namespace sex::data {
     } calibration_config;
 
     typedef struct {
+        // TODO
+
+    } stereo_config;
+
+    typedef struct {
         float scale;
         std::string work_dir;
         std::vector<std::string> configs;
         std::vector<camera_properties> camera;
+        std::map<uint, std::vector<uint>> groups;
         std::string module;
         union {
             calibration_config calibration;
+            stereo_config stereo;
+
         };
     } basic_config;
 }

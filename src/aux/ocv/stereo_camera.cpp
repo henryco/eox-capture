@@ -10,7 +10,7 @@
 
 namespace sex::xocv {
 
-    int fourCC(const char* name) {
+    int fourCC(const char *name) {
         return cv::VideoWriter::fourcc(
                 name[0],
                 name[1],
@@ -74,6 +74,18 @@ namespace sex::xocv {
         }
     }
 
+    std::map<uint, cv::Mat> StereoCamera::captureWithId() {
+        std::map<uint, cv::Mat> map;
+        auto captured = capture();
+        for (int i = 0; i < properties.size(); i++) {
+            map.emplace(
+                    properties.at(i).id,
+                    captured.at(i)
+            );
+        }
+        return map;
+    }
+
     std::vector<cv::Mat> StereoCamera::capture() {
         std::vector<cv::Mat> frames;
 
@@ -106,7 +118,6 @@ namespace sex::xocv {
         results.reserve(captures.size());
         for (auto &capture: captures) {
             results.push_back(executor->execute<cv::Mat>([&capture]() mutable -> cv::Mat {
-//                log->debug("retrieve frame");
                 cv::Mat frame;
                 capture->retrieve(frame);
                 return frame;
@@ -162,9 +173,7 @@ namespace sex::xocv {
                 for (int i = 1; i < properties.size(); i++) {
                     sex::v4l2::set_camera_prop(properties[i].index, v4_controls);
                 }
-            }
-
-            else {
+            } else {
                 // TODO: windows support
             }
         }
@@ -300,7 +309,7 @@ namespace sex::xocv {
         release();
     }
 
-    const std::vector<sex::data::camera_properties>& StereoCamera::getProperties() const {
+    const std::vector<sex::data::camera_properties> &StereoCamera::getProperties() const {
         return properties;
     }
 

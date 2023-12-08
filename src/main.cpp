@@ -1,9 +1,22 @@
 #include <gtkmm.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/ocl.hpp>
 #include "calibration/ui_calibration.h"
 #include "aux/utils/errors/error_reporter.h"
 #include "cli.h"
+#include "cloud/ui_points_cloud.h"
 
 int main(int argc, char **argv) {
+
+    {
+        // init opencl
+        cv::ocl::setUseOpenCL(true);
+
+        if (!cv::ocl::useOpenCL()) {
+            std::cerr << "OpenCL is not available..." << '\n';
+            return -1;
+        }
+    }
 
     try {
         const auto configuration = sex::cli::parse(argc, argv);
@@ -16,11 +29,16 @@ int main(int argc, char **argv) {
         );
 
         std::unique_ptr<sex::xgtk::GtkSexWindow> window;
+
         if (configuration.module == "calibration")
             window = std::make_unique<UiCalibration>();
 
-        if (!window)
-            return 1;
+        else if (configuration.module == "stereo")
+            window = std::make_unique<eox::UiPointsCloud>();
+
+
+
+        else return 1;
 
         window->init(configuration);
         window->show();

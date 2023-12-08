@@ -74,6 +74,8 @@ namespace sex::xocv {
 
         std::vector<cv::Mat> capture();
 
+        std::map<uint, cv::Mat> captureWithId();
+
         /**
          * This function releases any resources held by the current instance.
          */

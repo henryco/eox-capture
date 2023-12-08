@@ -33,10 +33,6 @@ namespace sex::mappers {
 
     }
 
-    namespace cam_ocv {
-        // todo
-    }
-
 }
 
 #endif //STEREOX_CAM_GTK_MAPPER_H
