@@ -12,6 +12,33 @@
 
 namespace sex::helpers {
 
+    std::vector<std::filesystem::path> config_paths(const sex::data::basic_config &configuration) {
+        std::vector<std::filesystem::path> paths;
+        paths.reserve(configuration.configs.size());
+        for (const auto &entry: configuration.configs)
+            paths.emplace_back(entry);
+        return paths;
+    }
+
+    std::vector<std::filesystem::path> work_paths(const sex::data::basic_config &configuration) {
+        std::vector<std::filesystem::path> paths;
+        for (const auto &entry: std::filesystem::directory_iterator(configuration.work_dir)) {
+            const auto path = entry.path().string();
+
+            bool contains = false;
+            for (const auto &c_path: configuration.configs) {
+                if (c_path == path) {
+                    contains += 1;
+                    break;
+                }
+            }
+
+            if (!contains)
+                paths.push_back(entry.path());
+        }
+        return paths;
+    }
+
     void gtk_save_camera_settings(
             sex::xocv::StereoCamera &camera,
             const std::vector<uint> &devices,
@@ -180,6 +207,68 @@ namespace sex::helpers {
         }
 
         return packages;
+    }
+
+    void init_pre_calibrated_data(
+            std::map<uint, eox::ocv::CalibrationSolo> &preCalibrated,
+            const std::vector<std::filesystem::path> &paths,
+            const sex::data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
+        const auto props = configuration.camera;
+        auto data = load_calibration_data(paths, log);
+        for (const auto &package: data) {
+            auto solo = package.solo;
+
+            for (const auto &p: props) {
+                if (!solo.contains(p.id))
+                    continue;
+
+                const auto cpy = solo[p.id];
+                preCalibrated[p.id] = cpy;
+
+                log->debug("set calibration data: {}", p.id);
+                break;
+            }
+        }
+    }
+
+    void init_package_group(
+            std::map<uint, eox::ocv::StereoPackage> &packages,
+            const std::vector<std::filesystem::path> &paths,
+            const sex::data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
+        log->debug("initializing package groups");
+        const auto &groups = configuration.groups;
+        auto stereo_data = load_calibration_data(paths, log);
+        for (const auto &data: stereo_data) {
+            const auto &solo = data.solo;
+
+            // iterate over groups, ie: {1: [4,6,...], 2: [0,2,...]}
+            for (const auto &group: groups) {
+
+                // got devices for group, ie: [4,6,...]
+                const auto &ids = group.second;
+                int matches = 0;
+
+                // iterate over ids, ie: [4,6,...]
+                for (const auto &id: ids) {
+                    if (solo.contains(id)) {
+                        matches++;
+                        continue;
+                    }
+                    break;
+                }
+
+                // yep, we found our group
+                if (matches == ids.size()) {
+                    log->debug("found matching group in stereo config: {}", group.first);
+                    packages.emplace(group.first, data);
+                    break;
+                }
+            }
+        }
     }
 
 } // events

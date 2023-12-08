@@ -37,7 +37,8 @@ namespace sex::cli {
     }
 
     std::map<uint, std::vector<uint>> parse_groups(const std::vector<std::string> &groups_str_vec) {
-        // input: 1:4,6 2:0,2 aka ["1:4,6", "2:0,2"]
+        // input:  1:4,6 2:0,2 aka ["1:4,6", "2:0,2"]
+        // output: {1: [4,6], 2: [0,2]}
 
         std::map<uint, std::vector<uint>> map;
         for (const auto &group_str: groups_str_vec) {

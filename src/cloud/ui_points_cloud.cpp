@@ -2,8 +2,11 @@
 // Created by henryco on 12/7/23.
 //
 
+#include <filesystem>
 #include "ui_points_cloud.h"
 #include "../aux/gtk/gtk_config_stack.h"
+#include "../aux/v4l2/linux_video.h"
+#include "../helpers/helpers.h"
 
 namespace eox {
 
@@ -35,11 +38,36 @@ namespace eox {
             camera.setHomogeneous(props[0].homogeneous);
             camera.setFast(props[0].fast);
             camera.setApi(props[0].api);
+
+            {
+                log->debug("using camera hardware defaults");
+                for (const auto &prop: props) {
+                    sex::v4l2::reset_defaults(prop.index);
+                }
+            }
+
+            {
+                log->debug("initializing from work directory implicitly");
+                const auto paths = sex::helpers::work_paths(config);
+                sex::helpers::load_camera_from_paths(camera, paths, log);
+                sex::helpers::init_package_group(packages, paths, config, log);
+            }
+
+            {
+                log->debug("initializing from configuration files explicitly");
+                const auto paths = sex::helpers::config_paths(config);
+                sex::helpers::load_camera_from_paths(camera, paths, log);
+                sex::helpers::init_package_group(packages, paths, config, log);
+            }
+
+            if (packages.size() < config.groups.size()) {
+                throw std::runtime_error("stereo group number mismatch");
+            }
         }
 
         {
 
-            // TODO
+            // TODO stereo block matcher configuration here
 
         }
 
@@ -63,10 +91,6 @@ namespace eox {
             deltaLoop.setFps(0);
             deltaLoop.start();
         }
-    }
-
-    void UiPointsCloud::update(float delta, float late, float fps) {
-        FPS = fps;
     }
 
     void UiPointsCloud::onRefresh() {

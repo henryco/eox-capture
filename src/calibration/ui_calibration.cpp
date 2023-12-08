@@ -51,7 +51,6 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 
             {
                 log->debug("using camera hardware defaults");
-
                 for (const auto &prop: props) {
                     sex::v4l2::reset_defaults(prop.index);
                 }
@@ -59,67 +58,16 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 
             {
                 log->debug("initializing from work directory implicitly");
-
-                std::vector<std::filesystem::path> paths;
-                for (const auto &entry: std::filesystem::directory_iterator(config.work_dir)) {
-                    const auto path = entry.path().string();
-
-                    bool contains = false;
-                    for (const auto &c_path: config.configs) {
-                        if (c_path == path) {
-                            contains += 1;
-                            break;
-                        }
-                    }
-
-                    if (!contains)
-                        paths.push_back(entry.path());
-                }
-
+                const auto paths = sex::helpers::work_paths(config);
                 sex::helpers::load_camera_from_paths(camera, paths, log);
-
-                auto data = sex::helpers::load_calibration_data(paths, log);
-                for (const auto &package: data) {
-                    auto solo = package.solo;
-
-                    for (const auto &p: props) {
-                        if (!solo.contains(p.id))
-                            continue;
-
-                        const auto cpy = solo[p.id];
-                        preCalibrated[p.id] = cpy;
-
-                        log->debug("set calibration data: {}", p.id);
-                        break;
-                    }
-                }
+                sex::helpers::init_pre_calibrated_data(preCalibrated, paths, config, log);
             }
 
             {
                 log->debug("initializing from configuration files explicitly");
-
-                std::vector<std::filesystem::path> paths;
-                paths.reserve(config.configs.size());
-                for (const auto &entry: config.configs)
-                    paths.emplace_back(entry);
-
+                const auto paths = sex::helpers::config_paths(config);
                 sex::helpers::load_camera_from_paths(camera, paths, log);
-
-                auto data = sex::helpers::load_calibration_data(paths, log);
-                for (const auto &package: data) {
-                    auto solo = package.solo;
-
-                    for (const auto &p: props) {
-                        if (!solo.contains(p.id))
-                            continue;
-
-                        const auto cpy = solo[p.id];
-                        preCalibrated[p.id] = cpy;
-
-                        log->debug("set calibration data: {}", p.id);
-                        break;
-                    }
-                }
+                sex::helpers::init_pre_calibrated_data(preCalibrated, paths, config, log);
             }
 
             if (!preCalibrated.empty() && preCalibrated.size() != props.size()) {
