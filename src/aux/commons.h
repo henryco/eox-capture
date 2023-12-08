@@ -7,6 +7,11 @@
 
 namespace sex::data {
 
+    typedef enum  {
+        SGBM,
+        BM
+    } Algorithm;
+
     typedef struct {
         uint id;
         uint index;
@@ -31,8 +36,7 @@ namespace sex::data {
     } calibration_config;
 
     typedef struct {
-        // TODO
-
+        Algorithm algorithm;
     } stereo_config;
 
     typedef struct {
@@ -45,7 +49,6 @@ namespace sex::data {
         union {
             calibration_config calibration;
             stereo_config stereo;
-
         };
     } basic_config;
 }

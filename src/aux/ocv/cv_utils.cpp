@@ -207,7 +207,7 @@ namespace eox::ocv {
     ) {
 
         // output parameters
-        cv::Mat R1, R2, P1, P2, Q;
+        cv::Mat R1, R2, P1, P2, Q, L_MAP1, L_MAP2, R_MAP1, R_MAP2;
         auto roi_l = std::make_unique<cv::Rect2i>();
         auto roi_r = std::make_unique<cv::Rect2i>();
 
@@ -228,6 +228,28 @@ namespace eox::ocv {
                 roi_r.get()
         );
 
+        cv::initUndistortRectifyMap(
+                calibration_l.camera_matrix,
+                calibration_l.distortion_coefficients,
+                R1,
+                P1,
+                cv::Size((int) stereo.width, (int) stereo.height),
+                CV_16SC2, // CV_32FC2 for high accuracy
+                L_MAP1,
+                L_MAP2
+        );
+
+        cv::initUndistortRectifyMap(
+                calibration_r.camera_matrix,
+                calibration_r.distortion_coefficients,
+                R2,
+                P2,
+                cv::Size((int) stereo.width, (int) stereo.height),
+                CV_16SC2, // CV_32FC2 for high accuracy
+                R_MAP1,
+                R_MAP2
+        );
+
         // result
         return {
                 .R1 = R1,
@@ -237,6 +259,10 @@ namespace eox::ocv {
                 .Q = Q,
                 .ROI_L = cv::Rect2i(*roi_l),
                 .ROI_R = cv::Rect2i(*roi_r),
+                .L_MAP1 = L_MAP1,
+                .L_MAP2 = L_MAP2,
+                .R_MAP1 = R_MAP1,
+                .R_MAP2 = R_MAP2
         };
     }
 
@@ -290,6 +316,10 @@ namespace eox::ocv {
             fs << index + "_qq" << package.rectification.Q;
             fs << index + "_i1" << package.rectification.ROI_L;
             fs << index + "_i2" << package.rectification.ROI_R;
+            fs << index + "_1l" << package.rectification.L_MAP1;
+            fs << index + "_2l" << package.rectification.L_MAP2;
+            fs << index + "_1r" << package.rectification.R_MAP1;
+            fs << index + "_2r" << package.rectification.R_MAP2;
         }
 
         fs.release();
@@ -407,6 +437,12 @@ namespace eox::ocv {
             cv::Mat Q;
             cv::Rect2i ROI_L;
             cv::Rect2i ROI_R;
+            cv::Mat L_MAP1;
+            cv::Mat L_MAP2;
+            cv::Mat R_MAP1;
+            cv::Mat R_MAP2;
+            cv::Mat NL;
+            cv::Mat NR;
 
             fs["r_r1"] >> R1;
             fs["r_r2"] >> R2;
@@ -415,6 +451,10 @@ namespace eox::ocv {
             fs["r_qq"] >> Q;
             fs["r_i1"] >> ROI_L;
             fs["r_i2"] >> ROI_R;
+            fs["r_1l"] >> L_MAP1;
+            fs["r_2l"] >> L_MAP2;
+            fs["r_1r"] >> R_MAP1;
+            fs["r_2r"] >> R_MAP2;
 
             package.rectification = {
                     .R1 = R1,
@@ -423,7 +463,11 @@ namespace eox::ocv {
                     .P2 = P2,
                     .Q = Q,
                     .ROI_L = ROI_L,
-                    .ROI_R = ROI_R
+                    .ROI_R = ROI_R,
+                    .L_MAP1 = L_MAP1,
+                    .L_MAP2 = L_MAP2,
+                    .R_MAP1 = R_MAP1,
+                    .R_MAP2 = R_MAP2
             };
         }
 

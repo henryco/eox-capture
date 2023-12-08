@@ -57,6 +57,11 @@ namespace eox::ocv {
 
         cv::Rect2i ROI_L;
         cv::Rect2i ROI_R;
+
+        cv::Mat L_MAP1;
+        cv::Mat L_MAP2;
+        cv::Mat R_MAP1;
+        cv::Mat R_MAP2;
     };
 
     using StereoPackage = struct {

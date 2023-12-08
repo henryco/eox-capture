@@ -15,6 +15,7 @@ namespace eox {
             return;
         }
 
+//        cv::initUndistortRectifyMap()
 
 
         refresh();

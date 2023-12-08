@@ -20,13 +20,16 @@ namespace eox {
 
         {
             std::vector<std::string> group_ids;
-            group_ids.reserve(config.groups.size());
+            group_ids.reserve((int) groups.size() + (groups.size() * 2));
             for (const auto &group: config.groups) {
-                group_ids.push_back(std::to_string(group.first));
+                group_ids.push_back(std::to_string(group.first) + "_A");
+                group_ids.push_back(std::to_string(group.first) + "_B");
+                group_ids.push_back(std::to_string(group.first) + "_S");
             }
 
             // Init oGL canvas
-            glImage.init((int) groups.size(), props[0].width, props[0].height, group_ids, GL_BGR);
+            glImage.init((int) group_ids.size(), props[0].width, props[0].height, group_ids, GL_BGR);
+//            glImage.init((int) groups.size(), props[0].width, props[0].height, GL_BGR);
             glImage.scale(config.scale);
         }
 
@@ -71,9 +74,16 @@ namespace eox {
         }
 
         {
+            // init block matcher
 
             // TODO stereo block matcher configuration here
+            if (config.stereo.algorithm == sex::data::Algorithm::BM)
+                blockMatcher = cv::StereoBM::create(1, 21);
 
+            else if (config.stereo.algorithm == sex::data::Algorithm::SGBM)
+                blockMatcher = cv::StereoSGBM::create();
+
+            else throw std::runtime_error("Unknown block matcher algorithm");
         }
 
         {

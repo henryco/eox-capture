@@ -14,6 +14,14 @@
 
 namespace sex::cli {
 
+    // lower casing strings
+    std::string to_lower_case(const std::string& str) {
+        std::string result = str;
+        std::transform(str.begin(), str.end(), result.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+        return result;
+    }
+
     // Function to parse the devices string into a map
     std::map<unsigned int, unsigned int> parse_devices(const std::vector<std::string> &devices_str_vec) {
         std::map<unsigned int, unsigned int> devices_map;
@@ -175,6 +183,10 @@ namespace sex::cli {
                 .help("list of device groups (pairs id:d1,...,dn i.e.: '1:4,6 2:0,2' )")
                 .nargs(argparse::nargs_pattern::any)
                 .append();
+        stereo.add_argument("-a", "--algorithm")
+                .help("pattern matching algorithm [bm, sgbm]")
+                .choices("bm", "sgbm")
+                .default_value("bm");
         program.add_subparser(stereo);
 
 
@@ -267,7 +279,8 @@ namespace sex::cli {
             const auto groups = parse_groups(
                     instance.get<std::vector<std::string>>("--group")
             );
-            // TODO
+
+            const auto algo = instance.get<std::string>("--algorithm");
 
             return {
                     .scale = scale,
@@ -277,7 +290,9 @@ namespace sex::cli {
                     .groups = groups,
                     .module = "stereo",
                     .stereo = {
-                            // TODO
+                            .algorithm = to_lower_case(algo) == "sgbm"
+                                    ? sex::data::Algorithm::SGBM
+                                    : sex::data::Algorithm::BM
                     }
             };
         }

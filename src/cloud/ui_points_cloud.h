@@ -28,6 +28,8 @@ namespace eox {
 
         std::map<uint, eox::ocv::StereoPackage> packages;
 
+        cv::Ptr<cv::StereoMatcher> blockMatcher;
+
         float FPS = 0;
 
     public:
