@@ -9,7 +9,13 @@ namespace eox {
     void UiPointsCloud::update(float delta, float late, float fps) {
         FPS = fps;
 
-        // TODO
+        auto captured = camera.captureWithId();
+        if (captured.empty()) {
+            log->debug("nothing captured, skip");
+            return;
+        }
+
+
 
         refresh();
     }

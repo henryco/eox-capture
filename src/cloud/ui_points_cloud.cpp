@@ -18,10 +18,15 @@ namespace eox {
         auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
         auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
-
         {
+            std::vector<std::string> group_ids;
+            group_ids.reserve(config.groups.size());
+            for (const auto &group: config.groups) {
+                group_ids.push_back(std::to_string(group.first));
+            }
+
             // Init oGL canvas
-            glImage.init((int) groups.size(), props[0].width, props[0].height, GL_BGR);
+            glImage.init((int) groups.size(), props[0].width, props[0].height, group_ids, GL_BGR);
             glImage.scale(config.scale);
         }
 

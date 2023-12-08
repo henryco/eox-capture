@@ -171,7 +171,7 @@ namespace sex::cli {
                 Stereo points cloud module.
                 Use calibration -h for help.
         )desc");
-        program.add_argument("-g", "--group")
+        stereo.add_argument("-g", "--group")
                 .help("list of device groups (pairs id:d1,...,dn i.e.: '1:4,6 2:0,2' )")
                 .nargs(argparse::nargs_pattern::any)
                 .append();

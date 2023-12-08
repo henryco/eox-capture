@@ -20,13 +20,13 @@ void UiCalibration::init(sex::data::basic_config configuration) {
     auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
     auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
 
-    std::vector<std::string> c_ids;
-    c_ids.reserve(config.camera.size());
-    for (const auto &c_p: config.camera) {
-        c_ids.push_back(std::to_string(c_p.id));
-    }
-
     {
+        std::vector<std::string> c_ids;
+        c_ids.reserve(config.camera.size());
+        for (const auto &c_p: config.camera) {
+            c_ids.push_back(std::to_string(c_p.id));
+        }
+
         // Init oGL canvas
         glImage.init((int) props.size(), props[0].width, props[0].height, c_ids, GL_BGR);
         glImage.scale(config.scale);
