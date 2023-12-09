@@ -27,6 +27,7 @@ namespace eox {
         sex::xgtk::GLImage glImage;
 
         std::map<uint, eox::ocv::StereoPackage> packages;
+        std::map<uint, uint> deviceGroupMap;
 
         cv::Ptr<cv::StereoMatcher> blockMatcher;
 

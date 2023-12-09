@@ -22,8 +22,8 @@ namespace eox {
             std::vector<std::string> group_ids;
             group_ids.reserve((int) groups.size() + (groups.size() * 2));
             for (const auto &group: config.groups) {
-                group_ids.push_back(std::to_string(group.first) + "_A");
-                group_ids.push_back(std::to_string(group.first) + "_B");
+                group_ids.push_back(std::to_string(group.first) + "_1");
+                group_ids.push_back(std::to_string(group.first) + "_2");
                 group_ids.push_back(std::to_string(group.first) + "_S");
             }
 
@@ -69,7 +69,13 @@ namespace eox {
             }
 
             if (packages.size() < config.groups.size()) {
+                log->error("stereo group number mismatch, probably devices in group lacks of stereo-config file");
                 throw std::runtime_error("stereo group number mismatch");
+            }
+
+            for (const auto &[id, package]: packages) {
+                for (const auto &[_, solo]: package.solo)
+                    deviceGroupMap.emplace(solo.uid, id);
             }
         }
 
