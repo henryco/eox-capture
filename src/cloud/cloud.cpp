@@ -38,10 +38,25 @@ namespace eox {
         for (const auto &[g_id, container]: frames) {
 
             // unpacking frames container
-            std::vector<cv::Mat> frames_pair;
+            std::vector<cv::UMat> frames_pair;
             frames_pair.reserve(container.frames.size());
             for (const auto &[d_id, frame]: container.frames) {
-                frames_pair.push_back(frame);
+                cv::UMat dst;
+                frame.copyTo(dst);
+                frames_pair.push_back(dst);
+            }
+
+            // up/downscale
+            const auto &c_conf = config.camera[0];
+            if (c_conf.output_width != c_conf.width
+                && c_conf.output_height != c_conf.height) {
+                const auto new_size = cv::Size(c_conf.output_width, c_conf.output_height);
+                const auto type = c_conf.output_width < c_conf.width ? cv::INTER_AREA : cv::INTER_CUBIC;
+                for (auto &frame: frames_pair) {
+                    cv::UMat u_dst;
+                    cv::resize(frame, u_dst, new_size, 0, 0, type);
+                    frame = u_dst;
+                }
             }
 
             // unpacking rectification maps to GPU matrices
@@ -53,9 +68,8 @@ namespace eox {
             rect.R_MAP2.copyTo(R_MAP2);
 
             // unpacking left and right frames to GPU matrices
-            cv::UMat frame_l, frame_r;
-            frames_pair[0].copyTo(frame_l);
-            frames_pair[1].copyTo(frame_r);
+            cv::UMat &frame_l = frames_pair[0];
+            cv::UMat &frame_r = frames_pair[1];
 
             // remapping frames according to stereo rectification
             cv::UMat rect_l, rect_r;
@@ -63,18 +77,18 @@ namespace eox {
             cv::remap(frame_r, rect_r, R_MAP1, R_MAP2, cv::INTER_LINEAR);
 
             // convert from BGR to Grayscale
-            cv::UMat gray_l, gray_r, disparity;
+            cv::UMat gray_l, gray_r, disparity_raw;
             cv::cvtColor(rect_l, gray_l, cv::COLOR_BGR2GRAY);
             cv::cvtColor(rect_r, gray_r, cv::COLOR_BGR2GRAY);
 
             // computing disparity map
-            blockMatcher->compute(gray_l, gray_r, disparity);
+            blockMatcher->compute(gray_l, gray_r, disparity_raw);
 
             // Filter Speckles
-//            cv::filterSpeckles(disparity, 0, 32, 25);
+//            cv::filterSpeckles(gray_disparity, 0, 32, 25);
 
-            cv::UMat filtered_disparity;
-            wlsFilter->filter(disparity, gray_l, filtered_disparity);
+            cv::UMat disparity;
+            wlsFilter->filter(disparity_raw, gray_l, disparity);
 
 
 
@@ -86,7 +100,7 @@ namespace eox {
 
             // Convert the disparity values to a range that can be represented in 8-bit format
             cv::UMat normalized_disp;
-            cv::normalize(filtered_disparity, normalized_disp, 0, 255, cv::NORM_MINMAX, CV_8U);
+            cv::normalize(disparity, normalized_disp, 0, 255, cv::NORM_MINMAX, CV_8U);
 
             // converting back to BGR
             cv::UMat bgr_l, bgr_r, bgr_disparity;
