@@ -119,6 +119,14 @@ namespace sex::cli {
                 .help("set the height")
                 .default_value(480)
                 .scan<'i', int>();
+        program.add_argument("--output-width")
+                .help("set the output width")
+                .default_value(0)
+                .scan<'i', int>();
+        program.add_argument("--output-height")
+                .help("set the output height")
+                .default_value(0)
+                .scan<'i', int>();
         program.add_argument("--scale")
                 .help("scale video output (for gui)")
                 .default_value(1.0f)
@@ -129,6 +137,9 @@ namespace sex::cli {
                 .scan<'i', int>();
         program.add_argument("--fast")
                 .help("enable fast mode, faster frame grabbing with the cost of lack of synchronization between devices")
+                .flag();
+        program.add_argument("--denoise")
+                .help("perform de-noising filter")
                 .flag();
         program.add_argument("--api")
                 .help("set the backend API for video capturing (see: cv::CAP_*)")
@@ -212,6 +223,14 @@ namespace sex::cli {
                 program.get<std::vector<std::string>>("--device")
         );
 
+        int o_w = program.get<int>("--output-width");
+        int o_h = program.get<int>("--output-height");
+
+        if (o_w <= 0)
+            o_w = program.get<int>("--width");
+        if (o_h <= 0)
+            o_h = program.get<int>("--height");
+
         std::vector<sex::data::camera_properties> props;
         props.reserve(devices.size());
         for (const auto &[id, index]: devices) {
@@ -221,6 +240,8 @@ namespace sex::cli {
 
                                     .width = program.get<int>("--width"),
                                     .height = program.get<int>("--height"),
+                                    .output_width = o_w,
+                                    .output_height = o_h,
                                     .fps = program.get<int>("--fps"),
                                     .buffer = program.get<int>("--buffer"),
                                     .codec = {codec[0],
@@ -256,6 +277,7 @@ namespace sex::cli {
             }
 
             return {
+                    .denoise = program.get<bool>("--denoise"),
                     .scale = scale,
                     .work_dir = work_dir,
                     .configs = new_configs,
@@ -283,6 +305,7 @@ namespace sex::cli {
             const auto algo = instance.get<std::string>("--algorithm");
 
             return {
+                    .denoise = program.get<bool>("--denoise"),
                     .scale = scale,
                     .work_dir = work_dir,
                     .configs = new_configs,
@@ -298,6 +321,7 @@ namespace sex::cli {
         }
 
         return {
+                .denoise = program.get<bool>("--denoise"),
                 .scale = scale,
                 .work_dir = work_dir,
                 .configs = new_configs,

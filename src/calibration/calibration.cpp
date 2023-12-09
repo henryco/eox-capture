@@ -3,6 +3,7 @@
 //
 
 #include "ui_calibration.h"
+#include <opencv2/photo.hpp>
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
@@ -17,6 +18,49 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         log->debug("skip");
         return;
     }
+
+
+    // GPU SECTION
+    const auto &c_conf = config.camera[0];
+    if (config.denoise || c_conf.output_width != c_conf.width
+                          && c_conf.output_height != c_conf.height) {
+
+        // copying mat to gpu
+        std::vector<cv::UMat> u_frames;
+        u_frames.reserve(captured.size());
+        for (const auto &mat: captured) {
+            cv::UMat frame;
+            mat.copyTo(frame);
+            u_frames.push_back(frame);
+        }
+
+        // up/downscale
+        if (c_conf.output_width != c_conf.width
+            && c_conf.output_height != c_conf.height) {
+            const auto new_size = cv::Size(c_conf.output_width, c_conf.output_height);
+            const auto type = c_conf.output_width < c_conf.width ? cv::INTER_AREA : cv::INTER_CUBIC;
+            for (auto &frame: u_frames) {
+                cv::UMat u_dst;
+                cv::resize(frame, u_dst, new_size, 0, 0, type);
+                frame = u_dst;
+            }
+        }
+
+        // denoising
+        if (config.denoise) {
+            for (auto &frame: u_frames) {
+                cv::UMat u_dst;
+                cv::fastNlMeansDenoisingColored(frame, u_dst);
+                frame = u_dst;
+            }
+        }
+
+        // back to regular mat
+        for (int i = 0; i < u_frames.size(); i++) {
+            u_frames[i].copyTo(captured[i]);
+        }
+    }
+
 
     if (!active) {
         // calibration off, just return captured frames

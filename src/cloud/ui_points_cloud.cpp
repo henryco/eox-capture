@@ -82,9 +82,22 @@ namespace eox {
         {
             // init block matcher
 
+            wlsFilter = cv::ximgproc::createDisparityWLSFilterGeneric(false);
+
             // TODO stereo block matcher configuration here
-            if (config.stereo.algorithm == sex::data::Algorithm::BM)
-                blockMatcher = cv::StereoBM::create(1, 21);
+            if (config.stereo.algorithm == sex::data::Algorithm::BM) {
+                blockMatcher = cv::StereoBM::create(16*4, 21);
+
+                auto bm = static_pointer_cast<cv::StereoBM>(blockMatcher);
+                bm->setPreFilterType(cv::StereoBM::PREFILTER_XSOBEL);
+                bm->setPreFilterSize(9);
+                bm->setPreFilterCap(31);
+                bm->setTextureThreshold(10);
+                bm->setUniquenessRatio(15);
+                bm->setSpeckleWindowSize(100);
+                bm->setSpeckleRange(32);
+                bm->setDisp12MaxDiff(1);
+            }
 
             else if (config.stereo.algorithm == sex::data::Algorithm::SGBM)
                 blockMatcher = cv::StereoSGBM::create();

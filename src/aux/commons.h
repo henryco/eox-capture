@@ -17,6 +17,8 @@ namespace sex::data {
         uint index;
         int width;
         int height;
+        int output_width;
+        int output_height;
         int fps;
         int buffer;
         char codec[4];
@@ -40,6 +42,7 @@ namespace sex::data {
     } stereo_config;
 
     typedef struct {
+        bool denoise;
         float scale;
         std::string work_dir;
         std::vector<std::string> configs;

@@ -5,6 +5,7 @@
 #ifndef STEREOX_UI_POINTS_CLOUD_H
 #define STEREOX_UI_POINTS_CLOUD_H
 
+#include <opencv2/ximgproc/disparity_filter.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include "../aux/gtk/gtk_sex_window.h"
 #include "../aux/ocv/stereo_camera.h"
@@ -30,6 +31,8 @@ namespace eox {
         std::map<uint, uint> deviceGroupMap;
 
         cv::Ptr<cv::StereoMatcher> blockMatcher;
+
+        cv::Ptr<cv::ximgproc::DisparityWLSFilter> wlsFilter;
 
         float FPS = 0;
 
