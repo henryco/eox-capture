@@ -143,8 +143,8 @@ void UiCalibration::update(float delta, float latency, float _fps) {
             const auto result = eox::ocv::calibrate_solo(
                     image_points[c_id],
                     c_id,
-                    config.camera[0].width,
-                    config.camera[0].height,
+                    config.camera[0].output_width,
+                    config.camera[0].output_height,
                     config.calibration.rows,
                     config.calibration.columns
             );

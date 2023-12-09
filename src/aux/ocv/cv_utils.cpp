@@ -205,6 +205,7 @@ namespace eox::ocv {
             CalibrationStereo &stereo,
             double alpha
     ) {
+        const auto img_size = cv::Size((int) stereo.width, (int) stereo.height);
 
         // output parameters
         cv::Mat R1, R2, P1, P2, Q, L_MAP1, L_MAP2, R_MAP1, R_MAP2;
@@ -217,7 +218,7 @@ namespace eox::ocv {
                 calibration_l.distortion_coefficients,
                 calibration_r.camera_matrix,
                 calibration_r.distortion_coefficients,
-                cv::Size((int) stereo.width, (int) stereo.height),
+                img_size,
                 stereo.R,
                 stereo.T,
                 R1, R2, P1, P2, Q,
@@ -233,7 +234,7 @@ namespace eox::ocv {
                 calibration_l.distortion_coefficients,
                 R1,
                 P1,
-                cv::Size((int) stereo.width, (int) stereo.height),
+                img_size,
                 CV_16SC2, // CV_32FC2 for high accuracy
                 L_MAP1,
                 L_MAP2
@@ -244,7 +245,7 @@ namespace eox::ocv {
                 calibration_r.distortion_coefficients,
                 R2,
                 P2,
-                cv::Size((int) stereo.width, (int) stereo.height),
+                img_size,
                 CV_16SC2, // CV_32FC2 for high accuracy
                 R_MAP1,
                 R_MAP2
