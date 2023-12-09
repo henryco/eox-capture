@@ -70,6 +70,8 @@ add_executable(${PROJECT_NAME}
         src/cloud/ui_points_cloud.cpp
         src/cloud/ui_points_cloud.h
         src/cloud/cloud.cpp
+        src/aux/gtk/gtk_control.cpp
+        src/aux/gtk/gtk_control.h
 )
 
 # Include directories for the specific target
