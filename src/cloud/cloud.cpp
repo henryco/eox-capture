@@ -44,10 +44,6 @@ namespace eox {
                 frames_pair.push_back(frame);
             }
 
-            // unpacking left and right frames
-//            auto &frame_l = frames_pair[0];
-//            auto &frame_r = frames_pair[1];
-
             // unpacking rectification maps to GPU matrices
             const auto &rect = packages.at(g_id).rectification;
             cv::UMat L_MAP1, L_MAP2, R_MAP1, R_MAP2;
