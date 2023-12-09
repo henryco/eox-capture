@@ -44,21 +44,41 @@ namespace eox {
                 frames_pair.push_back(frame);
             }
 
-            // unpacking left and right frame
-            auto &frame_l = frames_pair[0];
-            auto &frame_r = frames_pair[1];
+            // unpacking left and right frames
+//            auto &frame_l = frames_pair[0];
+//            auto &frame_r = frames_pair[1];
+
+            // unpacking rectification maps to GPU matrices
+            const auto &rect = packages.at(g_id).rectification;
+            cv::UMat L_MAP1, L_MAP2, R_MAP1, R_MAP2;
+            rect.L_MAP1.copyTo(L_MAP1);
+            rect.L_MAP2.copyTo(L_MAP2);
+            rect.R_MAP1.copyTo(R_MAP1);
+            rect.R_MAP2.copyTo(R_MAP2);
+
+            // unpacking left and right frames to GPU matrices
+            cv::UMat frame_l, frame_r;
+            frames_pair[0].copyTo(frame_l);
+            frames_pair[1].copyTo(frame_r);
 
             // remapping frames according to stereo rectification
-            const auto &rect = packages.at(g_id).rectification;
-            cv::Mat rect_l, rect_r;
-            cv::remap(frame_l, rect_l, rect.L_MAP1, rect.L_MAP2, cv::INTER_CUBIC);
-            cv::remap(frame_r, rect_r, rect.R_MAP1, rect.R_MAP2, cv::INTER_CUBIC);
+            cv::UMat rect_l, rect_r;
+            cv::remap(frame_l, rect_l, L_MAP1, L_MAP2, cv::INTER_LINEAR);
+            cv::remap(frame_r, rect_r, R_MAP1, R_MAP2, cv::INTER_LINEAR);
 
-            // TODO MAGIC
+            {
+                // TODO MAGIC
+
+            }
+
+            // converting back to regular cv::Mat
+            cv::Mat left, right;
+            rect_l.copyTo(left);
+            rect_r.copyTo(right);
 
             // saving results to global vector of frames (goes to render output)
-            _frames.push_back(frame_l);
-            _frames.push_back(frame_r);
+            _frames.push_back(left);
+            _frames.push_back(right);
         }
 
         glImage.setFrames(_frames);
