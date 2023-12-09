@@ -93,7 +93,7 @@ namespace eox {
 
 
             // ! ! !
-            // NOTE, SHOULD USE [ filtered_disparity ] matrix for further computation
+            // NOTE, SHOULD USE [ disparity ] matrix for further computation
             // ! ! !
 
 
