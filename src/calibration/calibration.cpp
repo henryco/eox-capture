@@ -38,7 +38,7 @@ void UiCalibration::update(float delta, float latency, float _fps) {
         if (c_conf.output_width != c_conf.width
             && c_conf.output_height != c_conf.height) {
             const auto new_size = cv::Size(c_conf.output_width, c_conf.output_height);
-            const auto type = c_conf.output_width < c_conf.width ? cv::INTER_AREA : cv::INTER_CUBIC;
+            const auto type = c_conf.output_width < c_conf.width ? cv::INTER_AREA : cv::INTER_LANCZOS4;
             for (auto &frame: u_frames) {
                 cv::UMat u_dst;
                 cv::resize(frame, u_dst, new_size, 0, 0, type);

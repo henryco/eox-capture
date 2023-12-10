@@ -184,7 +184,9 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 }
 
 void UiCalibration::onRefresh() {
-    set_title("StereoX++ calibration [ " + std::to_string((int) FPS) + " FPS ]");
+    const auto &cam = config.camera[0];
+    const auto res = std::to_string(cam.width) + "x" + std::to_string(cam.height);
+    set_title("StereoX++ calibration " + res + " [ " + std::to_string((int) FPS) + " FPS ]");
     progressBar.set_fraction(progress);
     start.set_label(active ? "Stop" : "Start");
     progressBar.set_text(std::to_string(cap) + " / " + std::to_string(config.calibration.number));

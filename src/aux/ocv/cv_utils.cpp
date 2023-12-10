@@ -36,13 +36,22 @@ namespace eox::ocv {
 
         const auto size = cv::Size((int) columns - 1, (int) rows - 1);
         const int flags = flag
-                          | cv::CALIB_CB_FAST_CHECK
                           | cv::CALIB_CB_NORMALIZE_IMAGE
                           | cv::CALIB_CB_FILTER_QUADS
-                          | cv::CALIB_CB_ADAPTIVE_THRESH;
+                          | cv::CALIB_CB_ADAPTIVE_THRESH
+                          | cv::CALIB_CB_ACCURACY
+                          | cv::CALIB_CB_EXHAUSTIVE
+                          ;
 
         std::vector<cv::Point2f> corners;
         const bool found = cv::findChessboardCorners(gray, size, corners, flags);
+
+        if (found) {
+            const auto term = cv::TermCriteria(cv::TermCriteria::EPS | cv::TermCriteria::MAX_ITER, 30, 0.001);
+            const auto window = cv::Size(11, 11);
+            const auto zone = cv::Size(-1, -1);
+            cv::cornerSubPix(gray, corners, window, zone, term);
+        }
 
         cv::drawChessboardCorners(copy, size, corners, found);
         return {
