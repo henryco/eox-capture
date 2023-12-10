@@ -25,9 +25,6 @@ namespace eox {
             return;
         }
 
-        // vector with output frames (goes to render)
-        std::vector<cv::Mat> _frames;
-
         // group_id | frames
         std::map<uint, frame_container> frames;
         for (const auto &[d_id, frame]: captured) {
@@ -35,6 +32,9 @@ namespace eox {
             auto &container = frames[group_id];
             container.frames.emplace(d_id, frame);
         }
+
+        // vector with output frames (goes to render)
+        std::vector<cv::Mat> _frames;
 
         // iterating over each device group (main magic here)
         for (const auto &[g_id, container]: frames) {
