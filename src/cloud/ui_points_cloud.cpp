@@ -103,6 +103,8 @@ namespace eox {
                 blockMatcher = cv::StereoSGBM::create();
 
             else throw std::runtime_error("Unknown block matcher algorithm");
+
+
         }
 
         {

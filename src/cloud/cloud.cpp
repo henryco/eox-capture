@@ -4,6 +4,8 @@
 
 #include "ui_points_cloud.h"
 
+#include <opencv2/photo.hpp>
+
 namespace eox {
 
     using frame_container = struct {
@@ -71,24 +73,35 @@ namespace eox {
             cv::UMat &frame_l = frames_pair[0];
             cv::UMat &frame_r = frames_pair[1];
 
-            // remapping frames according to stereo rectification
-            cv::UMat rect_l, rect_r;
-            cv::remap(frame_l, rect_l, L_MAP1, L_MAP2, cv::INTER_LINEAR);
-            cv::remap(frame_r, rect_r, R_MAP1, R_MAP2, cv::INTER_LINEAR);
-
             // convert from BGR to Grayscale
-            cv::UMat gray_l, gray_r, disparity_raw;
-            cv::cvtColor(rect_l, gray_l, cv::COLOR_BGR2GRAY);
-            cv::cvtColor(rect_r, gray_r, cv::COLOR_BGR2GRAY);
+            cv::UMat gray_l, gray_r;
+            cv::cvtColor(frame_l, gray_l, cv::COLOR_BGR2GRAY);
+            cv::cvtColor(frame_r, gray_r, cv::COLOR_BGR2GRAY);
+
+            // remapping frames according to stereo rectification
+            cv::UMat source_l, source_r;
+            cv::remap(gray_l, source_l, L_MAP1, L_MAP2, cv::INTER_LINEAR);
+            cv::remap(gray_r, source_r, R_MAP1, R_MAP2, cv::INTER_LINEAR);
+
+            // denoising, might be very resource intensive
+            if (config.denoise) {
+                cv::UMat filtered_l, filtered_r;
+                cv::fastNlMeansDenoising(source_l, filtered_l);
+                cv::fastNlMeansDenoising(source_r, filtered_r);
+                source_l = filtered_l;
+                source_r = filtered_r;
+            }
 
             // computing disparity map
-            blockMatcher->compute(gray_l, gray_r, disparity_raw);
+            cv::UMat disparity_raw;
+            blockMatcher->compute(source_l, source_r, disparity_raw);
 
             // Filter Speckles
-//            cv::filterSpeckles(gray_disparity, 0, 32, 25);
+            //cv::filterSpeckles(disparity_raw, 0, 32, 25);
 
+            // filtering disparity map
             cv::UMat disparity;
-            wlsFilter->filter(disparity_raw, gray_l, disparity);
+            wlsFilter->filter(disparity_raw, source_l, disparity);
 
 
 
