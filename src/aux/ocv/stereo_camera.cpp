@@ -32,10 +32,15 @@ namespace sex::xocv {
 
     StereoCamera::StereoCamera(StereoCamera &&other) noexcept:
             captures(std::move(other.captures)),
-            properties(std::move(other.properties)) {
-    }
+            properties(std::move(other.properties)),
+            properties_map(std::move(other.properties_map)),
+            executor(std::move(other.executor)) {}
 
     std::vector<camera_controls> StereoCamera::getControls() {
+        return getControls(homogeneous);
+    }
+
+    std::vector<camera_controls> StereoCamera::getControls(bool _homogeneous) {
         if (api == cv::CAP_V4L2) {
             std::vector<camera_controls> vec;
             for (const auto &prop: properties) {
@@ -58,7 +63,7 @@ namespace sex::xocv {
                                        });
                 }
 
-                if (homogeneous) {
+                if (_homogeneous) {
                     camera_controls data = {.id = 0, .controls = std::move(controls)};
                     vec.emplace_back(data);
                     return vec;
@@ -136,7 +141,7 @@ namespace sex::xocv {
         return frames;
     }
 
-    void StereoCamera::open() {
+    void StereoCamera::open(bool normalize) {
         for (const auto &property: properties) {
 
             log->debug("open [{}]", property.index);
@@ -150,7 +155,7 @@ namespace sex::xocv {
             captures.push_back(std::move(capture));
         }
 
-        if (homogeneous) {
+        if (normalize) {
             // ONLY FOR V4L2
             if (api == cv::CAP_V4L2) {
 
@@ -187,8 +192,17 @@ namespace sex::xocv {
         log->debug("opened devices total: {}", captures.size());
     }
 
+    void StereoCamera::open() {
+        open(properties.empty() ? false : properties[0].homogeneous);
+    }
+
+    void StereoCamera::open(std::vector<sex::data::camera_properties> props, bool normalize) {
+        setProperties(std::move(props));
+        open(normalize);
+    }
+
     void StereoCamera::open(std::vector<sex::data::camera_properties> props) {
-        properties = std::move(props);
+        setProperties(std::move(props));
         open();
     }
 
@@ -327,10 +341,35 @@ namespace sex::xocv {
 
     void StereoCamera::setProperties(std::vector<sex::data::camera_properties> props) {
         this->properties = std::move(props);
+
+        properties_map.clear();
+        for (const auto &prop: properties) {
+            properties_map.emplace(prop.id, prop);
+        }
     }
 
     void StereoCamera::setThreadPool(std::shared_ptr<sex::util::ThreadPool> _executor) {
         this->executor = std::move(_executor);
     }
+
+    void StereoCamera::setPropValue(uint device_id, uint prop_id, int value) {
+        if (api == cv::CAP_V4L2) {
+            sex::v4l2::set_camera_prop(properties_map.at(device_id).index, prop_id, value);
+        } else {
+            // TODO WINDOWS?
+        }
+    }
+
+    void StereoCamera::resetDefaults(uint device_id) {
+        if (api == cv::CAP_V4L2) {
+            sex::v4l2::reset_defaults(properties_map.at(device_id).index);
+        }
+    }
+
+    uint StereoCamera::getDeviceIndex(uint device_id) {
+        return properties_map.at(device_id).index;
+    }
+
+
 
 }

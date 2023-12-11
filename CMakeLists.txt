@@ -72,6 +72,7 @@ add_executable(${PROJECT_NAME}
         src/cloud/cloud.cpp
         src/aux/gtk/gtk_control.cpp
         src/aux/gtk/gtk_control.h
+        src/aux/utils/mappers/cam_gtk_mapper.cpp
 )
 
 # Include directories for the specific target

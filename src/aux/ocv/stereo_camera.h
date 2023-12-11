@@ -39,6 +39,7 @@ namespace sex::xocv {
                 spdlog::stdout_color_mt("stereo_camera");
 
         std::vector<std::unique_ptr<cv::VideoCapture>> captures;
+        std::map<uint, sex::data::camera_properties> properties_map;
         std::vector<sex::data::camera_properties> properties;
         std::shared_ptr<sex::util::ThreadPool> executor;
 
@@ -76,6 +77,8 @@ namespace sex::xocv {
 
         std::map<uint, cv::Mat> captureWithId();
 
+        void setPropValue(uint device_id, uint prop_id, int value);
+
         /**
          * This function releases any resources held by the current instance.
          */
@@ -87,6 +90,8 @@ namespace sex::xocv {
          */
         void open();
 
+        void open(bool normalize);
+
         /**
          * @brief Opens the cameras based on the provided properties.
          *
@@ -96,10 +101,13 @@ namespace sex::xocv {
          * can be used to capture frames or perform other camera-related operations.
          *
          * @param props A vector of CameraProp objects representing the properties of the cameras to be opened.
+         * @param normalize Apply same configuration for all stereo camera devices (heads)
          * @return void
          *
          * @see sex::CameraProp
          */
+
+        void open(std::vector<sex::data::camera_properties> props, bool normalize);
 
         void open(std::vector<sex::data::camera_properties> props);
 
@@ -152,9 +160,15 @@ namespace sex::xocv {
 
         std::vector<camera_controls> getControls();
 
+        std::vector<camera_controls> getControls(bool homogeneous);
+
         void setProperties(std::vector<sex::data::camera_properties> props);
 
         void setThreadPool(std::shared_ptr<sex::util::ThreadPool> executor);
+
+        uint getDeviceIndex(uint device_id);
+
+        void resetDefaults(uint device_id);
     };
 
 }
