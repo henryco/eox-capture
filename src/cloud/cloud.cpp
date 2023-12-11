@@ -117,8 +117,8 @@ namespace eox {
 
             // converting back to BGR
             cv::UMat bgr_l, bgr_r, bgr_disparity;
-            cv::cvtColor(gray_l, bgr_l, cv::COLOR_GRAY2BGR);
-            cv::cvtColor(gray_r, bgr_r, cv::COLOR_GRAY2BGR);
+            cv::cvtColor(source_l, bgr_l, cv::COLOR_GRAY2BGR);
+            cv::cvtColor(source_r, bgr_r, cv::COLOR_GRAY2BGR);
             cv::cvtColor(normalized_disp, bgr_disparity, cv::COLOR_GRAY2BGR);
 
             // converting back to regular cv::Mat

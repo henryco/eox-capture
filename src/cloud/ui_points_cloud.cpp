@@ -23,9 +23,11 @@ namespace eox {
             std::vector<std::string> group_ids;
             group_ids.reserve((int) groups.size() + (groups.size() * 2));
             for (const auto &group: config.groups) {
-                group_ids.push_back(std::to_string(group.first) + "_1");
-                group_ids.push_back(std::to_string(group.first) + "_2");
-                group_ids.push_back(std::to_string(group.first) + "_S");
+                const auto p = props[0];
+                const auto dim = std::to_string(p.output_width) + "x" + std::to_string(p.output_height);
+                group_ids.push_back(std::to_string(group.first) + "_1 [" + dim + "]");
+                group_ids.push_back(std::to_string(group.first) + "_2 [" + dim + "]");
+                group_ids.push_back(std::to_string(group.first) + "_S [" + dim + "]");
             }
 
             // Init oGL canvas
