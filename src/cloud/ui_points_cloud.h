@@ -15,6 +15,17 @@
 
 namespace eox {
 
+    namespace ts {
+        using group_id = unsigned int;
+        using device_id = unsigned int;
+        using Frame = cv::Mat;
+
+        using lr_matchers = struct {
+            cv::Ptr<cv::StereoMatcher> left;
+            cv::Ptr<cv::StereoMatcher> right;
+        };
+    }
+
     class UiPointsCloud : public sex::xgtk::GtkSexWindow { // NOLINT(*-special-member-functions)
 
         static inline const auto log =
@@ -27,12 +38,10 @@ namespace eox {
         sex::util::DeltaLoop deltaLoop;
         sex::xgtk::GLImage glImage;
 
-        std::map<uint, eox::ocv::StereoPackage> packages;
-        std::map<uint, uint> deviceGroupMap;
-
-        cv::Ptr<cv::StereoMatcher> blockMatcher;
-
-        cv::Ptr<cv::ximgproc::DisparityWLSFilter> wlsFilter;
+        std::map<ts::group_id, cv::Ptr<cv::ximgproc::DisparityWLSFilter>> wlsFilters;
+        std::map<ts::group_id, ts::lr_matchers> matchers;
+        std::map<ts::group_id, eox::ocv::StereoPackage> packages;
+        std::map<ts::device_id, ts::group_id> deviceGroupMap;
 
         float FPS = 0;
 

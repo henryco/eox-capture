@@ -3,11 +3,14 @@
 //
 
 #include <filesystem>
+#include <gtkmm/button.h>
 #include "ui_points_cloud.h"
 #include "../aux/gtk/gtk_config_stack.h"
 #include "../helpers/helpers.h"
 #include "../aux/gtk/gtk_cam_params.h"
 #include "../aux/utils/mappers/cam_gtk_mapper.h"
+#include "../aux/gtk/gtk_utils.h"
+#include "../aux/gtk/gtk_control.h"
 
 namespace eox {
 
@@ -160,28 +163,157 @@ namespace eox {
         }
 
         {
-            // init block matcher
 
-            wlsFilter = cv::ximgproc::createDisparityWLSFilterGeneric(false);
+            // each group has its own block matcher
+            for (const auto &[group_id, _]: packages) {
 
-            // TODO stereo block matcher configuration here
-            if (config.stereo.algorithm == sex::data::Algorithm::BM) {
-                blockMatcher = cv::StereoBM::create(16 * 4, 21);
+                auto scroll_pane = std::make_unique<Gtk::ScrolledWindow>();
+                auto v_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                auto button_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+                v_box->pack_start(*button_box, Gtk::PACK_SHRINK);
 
-                auto bm = static_pointer_cast<cv::StereoBM>(blockMatcher);
-                bm->setPreFilterType(cv::StereoBM::PREFILTER_XSOBEL);
-                bm->setPreFilterSize(9);
-                bm->setPreFilterCap(31);
-                bm->setTextureThreshold(10);
-                bm->setUniquenessRatio(15);
-                bm->setSpeckleWindowSize(100);
-                bm->setSpeckleRange(32);
-                bm->setDisp12MaxDiff(1);
-            } else if (config.stereo.algorithm == sex::data::Algorithm::SGBM)
-                blockMatcher = cv::StereoSGBM::create();
 
-            else throw std::runtime_error("Unknown block matcher algorithm");
+                {
+                    auto save = std::make_unique<Gtk::Button>();
+                    save->get_style_context()->add_class("button-save");
+                    save->set_size_request(-1, 30);
+                    save->set_label("Save settings");
+                    sex::xgtk::add_style(*save, R"css(
+                        .button-save {
+                             margin-right: 5px;
+                             margin-bottom: 5px;
+                         }
+                    )css");
 
+                    save->signal_clicked().connect([this]() {
+                        // TODO on save
+                    });
+
+                    button_box->pack_start(*save, Gtk::PACK_SHRINK);
+                    keep(std::move(save));
+                }
+
+
+                {
+                    auto reset = std::make_unique<Gtk::Button>();
+                    reset->set_label("Reset");
+                    reset->get_style_context()->add_class("button-reset");
+                    reset->set_size_request(-1, 30);
+                    sex::xgtk::add_style(*reset, R"css(
+                        .button-reset {
+                             margin-right: 5px;
+                             margin-bottom: 5px;
+                         }
+                    )css");
+
+                    reset->signal_clicked().connect([this]() {
+                        // todo on reset
+                    });
+
+                    button_box->pack_start(*reset, Gtk::PACK_SHRINK);
+                    keep(std::move(reset));
+                }
+
+
+                // TODO stereo block matcher configuration here
+                if (config.stereo.algorithm == sex::data::Algorithm::BM) {
+                    log->debug("BM block matcher");
+
+                    auto matcher = cv::StereoBM::create();
+                    {
+                        // default config here
+                        matcher->setPreFilterType(cv::StereoBM::PREFILTER_XSOBEL);
+                    }
+
+                    auto right = config.stereo.confidence
+                                 ? cv::ximgproc::createRightMatcher(matcher)
+                                 : nullptr;
+                    const ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
+                    matchers.emplace(group_id, lr_matchers);
+
+
+                    {
+                        auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+
+                        {
+                            auto control = std::make_unique<eox::gtk::GtkControl>(
+                                    ([this, group_id](double value){
+                                        matchers.at(group_id).left->setNumDisparities((int) value);
+                                        return value;
+                                    }),
+                                    "NumDisparities",
+                                    matcher->getNumDisparities(),
+                                    16,
+                                    0,
+                                    16,
+                                    16 * 20
+                            );
+                            c_box->pack_start(*control);
+                            keep(std::move(control));
+                        }
+
+                        {
+                            log->info("DEFAULT: {}", matcher->getBlockSize());
+                            auto control = std::make_unique<eox::gtk::GtkControl>(
+                                    ([this, group_id](double value){
+                                        matchers.at(group_id).left->setBlockSize((int) value);
+                                        return value;
+                                    }),
+                                    "BlockSize",
+                                    matcher->getBlockSize(),
+                                    2,
+                                    21,
+                                    5,
+                                    255
+                            );
+                            c_box->pack_start(*control);
+                            keep(std::move(control));
+                        }
+
+                        v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
+                        keep(std::move(c_box));
+                    }
+                }
+
+                else if (config.stereo.algorithm == sex::data::Algorithm::SGBM) {
+                    log->debug("SGBM block matcher");
+
+                    auto matcher = cv::StereoSGBM::create();
+                    {
+                        // default config here
+                    }
+
+                    auto right = config.stereo.confidence
+                                       ? cv::ximgproc::createRightMatcher(matcher)
+                                       : nullptr;
+                    const ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
+                    matchers.emplace(group_id, lr_matchers);
+                }
+
+                else {
+                    log->error("Unknown block matcher algorithm");
+                    throw std::runtime_error("Unknown block matcher algorithm");
+                }
+
+                {
+                    // init wls filter
+                    if (config.stereo.confidence) {
+                        auto filter = cv::ximgproc::createDisparityWLSFilter(matchers.at(group_id).left);
+                        wlsFilters.emplace(group_id, filter);
+                    }
+
+                    else {
+                        auto filter = cv::ximgproc::createDisparityWLSFilterGeneric(false);
+                        wlsFilters.emplace(group_id, filter);
+                    }
+                }
+
+                scroll_pane->add(*v_box);
+                config_stack->add(*scroll_pane, std::to_string(group_id));
+                keep(std::move(scroll_pane));
+                keep(std::move(button_box));
+                keep(std::move(v_box));
+            }
         }
 
         {

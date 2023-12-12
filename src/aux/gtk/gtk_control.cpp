@@ -12,14 +12,26 @@
 
 namespace eox::gtk {
 
-    GtkControl::GtkControl(std::string id, std::string label, double value, double step, double def_value,
+    GtkControl::GtkControl(
+            std::function<double(double value)> callback,
+            std::string label,
+            double value,
+            double step,
+            double def_value,
+            double min_value,
+            double max_value)
+            : GtkControl(std::move(label), value, step, def_value, min_value, max_value) {
+        setCallback(std::move(callback));
+    }
+
+    GtkControl::GtkControl(std::string label, double value, double step, double def_value,
                            double min_value, double max_value)
-            : id(std::move(id)), label(std::move(label)), value(value), step(step),
+            : label(std::move(label)), value(value), step(step),
               def_value(def_value), min_value(min_value), max_value(max_value) {
         set_orientation(Gtk::ORIENTATION_VERTICAL);
     }
 
-    GtkControl &GtkControl::setCallback(std::function<double(std::string, double)> _callback) {
+    GtkControl &GtkControl::setCallback(std::function<double(double)> _callback) {
         this->callback = std::move(_callback);
 
         for (const auto &widget: controls) {
@@ -64,7 +76,7 @@ namespace eox::gtk {
             // Slider
             scale->set_size_request(260);
             scale->set_range(min_value, max_value);
-            scale->set_increments(step, std::min(max_value, step * 10));
+            scale->set_increments(step, step);
             scale->set_digits(0);
             scale->set_value_pos(Gtk::POS_TOP);
             scale->set_value(value);
@@ -74,7 +86,12 @@ namespace eox::gtk {
                     return;
                 programmatic_change = true;
                 {
-                    const auto _value = (int) s_ptr->get_value();
+                    auto _value = s_ptr->get_value();
+                    const auto reminder = std::fmod(_value, step);
+                    if (reminder != 0) {
+                        _value = _value + step - reminder;
+                        s_ptr->set_value(_value);
+                    }
                     e_ptr->set_value(_value);
 
                     if (debounce_connection.connected())
@@ -83,7 +100,7 @@ namespace eox::gtk {
                     debounce_connection = Glib::signal_timeout().connect([this, _value, e_ptr, s_ptr]() {
                         programmatic_change = true;
                         {
-                            const auto result = callback(id, _value);
+                            const auto result = callback(_value);
                             if (_value != result)
                                 s_ptr->set_value(result);
                             e_ptr->set_value(result);
@@ -105,7 +122,7 @@ namespace eox::gtk {
             entry->set_update_policy(Gtk::UPDATE_IF_VALID);
             entry->set_size_request(50, 50);
             entry->set_range(min_value, max_value);
-            entry->set_increments(step, std::min(max_value, step * 10));
+            entry->set_increments(step, step);
             entry->set_digits(0);
             entry->set_width_chars(5);
             entry->set_value(value);
@@ -114,7 +131,12 @@ namespace eox::gtk {
                     return;
                 programmatic_change = true;
                 {
-                    const auto _value = (int) e_ptr->get_value();
+                    auto _value = e_ptr->get_value();
+                    const auto reminder = std::fmod(_value, step);
+                    if (reminder != 0) {
+                        _value = _value + step - reminder;
+                        e_ptr->set_value(_value);
+                    }
                     s_ptr->set_value(_value);
 
                     if (debounce_connection.connected())
@@ -123,7 +145,7 @@ namespace eox::gtk {
                     debounce_connection = Glib::signal_timeout().connect([this, _value, e_ptr, s_ptr]() {
                         programmatic_change = true;
                         {
-                            const auto result = callback(id, _value);
+                            const auto result = callback(_value);
                             if (_value != result)
                                 e_ptr->set_value(result);
                             s_ptr->set_value(result);

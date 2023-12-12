@@ -39,6 +39,7 @@ namespace sex::data {
 
     typedef struct {
         Algorithm algorithm;
+        bool confidence;
     } stereo_config;
 
     typedef struct {

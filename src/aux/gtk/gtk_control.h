@@ -20,10 +20,10 @@ namespace eox::gtk {
         // preventing memory leak for dynamically allocated u_widgets
         std::vector<std::unique_ptr<Gtk::Widget>> controls;
 
-        std::function<double(std::string name, double value)> callback;
+        std::function<double(double value)> callback;
         sigc::connection debounce_connection;
 
-        std::string id, label;
+        std::string label;
         bool programmatic_change = false;
         double def_value, min_value, max_value, value, step;
 
@@ -31,7 +31,15 @@ namespace eox::gtk {
         static inline const uint DELAY_MS = 500;
 
         GtkControl(
-                std::string id,
+                std::function<double(double value)> callback,
+                std::string label,
+                double value,
+                double step = 1,
+                double def_value = 0,
+                double min_value = 0,
+                double max_value = 8192);
+
+        GtkControl(
                 std::string label,
                 double value,
                 double step = 1,
@@ -41,7 +49,7 @@ namespace eox::gtk {
 
         ~GtkControl() override = default;
 
-        GtkControl& setCallback(std::function<double(std::string name, double value)> callback);
+        GtkControl& setCallback(std::function<double(double value)> callback);
 
         void reset();
     };

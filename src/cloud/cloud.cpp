@@ -9,8 +9,7 @@
 namespace eox {
 
     using frame_container = struct {
-        // key: device_id | value: Frame
-        std::map<uint, cv::Mat> frames;
+        std::map<ts::device_id, ts::Frame> frames;
     };
 
 #pragma clang diagnostic push
@@ -25,8 +24,7 @@ namespace eox {
             return;
         }
 
-        // group_id | frames
-        std::map<uint, frame_container> frames;
+        std::map<ts::group_id, frame_container> frames;
         for (const auto &[d_id, frame]: captured) {
             auto group_id = deviceGroupMap.at(d_id);
             auto &container = frames[group_id];
@@ -93,15 +91,39 @@ namespace eox {
             }
 
             // computing disparity map
-            cv::UMat disparity_raw;
-            blockMatcher->compute(source_l, source_r, disparity_raw);
-
-            // Filter Speckles
-            //cv::filterSpeckles(disparity_raw, 0, 32, 25);
-
-            // filtering disparity map
             cv::UMat disparity;
-            wlsFilter->filter(disparity_raw, source_l, disparity);
+            if (config.stereo.confidence) {
+                cv::UMat disparity_l, disparity_r;
+
+                matchers.at(g_id).left->compute(source_l, source_r, disparity_l);
+                matchers.at(g_id).right->compute(source_r, source_l, disparity_r);
+
+                // Filter Speckles
+                //cv::filterSpeckles(disparity_l, 0, 32, 25);
+                //cv::filterSpeckles(disparity_r, 0, 32, 25);
+
+                wlsFilters.at(g_id)->filter(
+                        disparity_l,
+                        source_l,
+                        disparity,
+                        disparity_r
+                );
+            }
+
+            else {
+                cv::UMat disparity_l;
+
+                matchers.at(g_id).left->compute(source_l, source_r, disparity_l);
+
+                // Filter Speckles
+                //cv::filterSpeckles(disparity_raw, 0, 32, 25);
+
+                wlsFilters.at(g_id)->filter(
+                        disparity_l,
+                        source_l,
+                        disparity
+                );
+            }
 
 
 

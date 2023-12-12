@@ -145,7 +145,13 @@ namespace sex::xgtk {
                             return;
                         programmatic_change = true;
                         {
-                            const auto value = (int) s_ptr->get_value();
+                            auto value = (int) s_ptr->get_value();
+                            const auto reminder = value % prop.step;
+                            if (reminder != 0) {
+                                value = value + prop.step - reminder;
+                                s_ptr->set_value(value);
+                            }
+
                             e_ptr->set_value(value);
 
                             if (debounce_connection.connected())
@@ -185,7 +191,12 @@ namespace sex::xgtk {
                             return;
                         programmatic_change = true;
                         {
-                            const auto value = (int) e_ptr->get_value();
+                            auto value = (int) e_ptr->get_value();
+                            const auto reminder = value % prop.step;
+                            if (reminder != 0) {
+                                value = value + prop.step - reminder;
+                                e_ptr->set_value(value);
+                            }
                             s_ptr->set_value(value);
 
                             if (debounce_connection.connected())

@@ -15,10 +15,10 @@
 namespace sex::cli {
 
     // lower casing strings
-    std::string to_lower_case(const std::string& str) {
+    std::string to_lower_case(const std::string &str) {
         std::string result = str;
         std::transform(str.begin(), str.end(), result.begin(),
-                       [](unsigned char c){ return std::tolower(c); });
+                       [](unsigned char c) { return std::tolower(c); });
         return result;
     }
 
@@ -190,6 +190,10 @@ namespace sex::cli {
                 Stereo points cloud module.
                 Use calibration -h for help.
         )desc");
+        stereo.add_argument("--confidence")
+                .help("filtering with confidence requires two disparity maps (for the left and right views) "
+                      "and is approximately two times slower. However, quality is typically significantly better.")
+                .flag();
         stereo.add_argument("-g", "--group")
                 .help("list of device groups (pairs id:d1,...,dn i.e.: '1:4,6 2:0,2' )")
                 .nargs(argparse::nargs_pattern::any)
@@ -314,8 +318,9 @@ namespace sex::cli {
                     .module = "stereo",
                     .stereo = {
                             .algorithm = to_lower_case(algo) == "sgbm"
-                                    ? sex::data::Algorithm::SGBM
-                                    : sex::data::Algorithm::BM
+                                         ? sex::data::Algorithm::SGBM
+                                         : sex::data::Algorithm::BM,
+                            .confidence = instance.get<bool>("--confidence")
                     }
             };
         }
