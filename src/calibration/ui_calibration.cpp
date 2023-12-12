@@ -156,8 +156,8 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 
     {
         // Init Window
-        layout_h->pack_start(glImage, Gtk::PACK_SHRINK);
-        layout_h->pack_start(*config_stack, Gtk::PACK_SHRINK);
+        layout_h->pack_start(glImage, Gtk::PACK_EXPAND_WIDGET);
+        layout_h->pack_end(*config_stack, Gtk::PACK_SHRINK);
         add(*layout_h);
         keep(std::move(layout_h));
         keep(std::move(config_stack));
