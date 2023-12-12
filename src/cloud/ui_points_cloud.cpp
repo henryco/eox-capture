@@ -220,10 +220,8 @@ namespace eox {
                     log->debug("BM block matcher");
 
                     auto matcher = cv::StereoBM::create();
-                    auto right = config.stereo.confidence
-                                 ? cv::ximgproc::createRightMatcher(matcher)
-                                 : nullptr;
-                    ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
+                    matcher->setTextureThreshold(0);
+                    ts::lr_matchers lr_matchers = {.left = matcher, .right = matcher};
                     matchers.emplace(group_id, std::move(lr_matchers));
 
                     {
@@ -320,7 +318,7 @@ namespace eox {
                                 "TextureThreshold",
                                 matcher->getTextureThreshold(),
                                 1,
-                                10,
+                                0,
                                 0,
                                 300
                         );
@@ -367,10 +365,7 @@ namespace eox {
                     log->debug("SGBM block matcher");
 
                     auto matcher = cv::StereoSGBM::create();
-                    auto right = config.stereo.confidence
-                                       ? cv::ximgproc::createRightMatcher(matcher)
-                                       : nullptr;
-                    ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
+                    ts::lr_matchers lr_matchers = {.left = matcher, .right = matcher};
                     matchers.emplace(group_id, std::move(lr_matchers));
 
                     {

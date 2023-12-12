@@ -93,7 +93,8 @@ namespace eox {
             // computing disparity map
             cv::UMat disparity, disparity_raw(source_l.rows, source_l.cols, CV_32FC1);
             if (config.stereo.confidence) {
-                cv::UMat disparity_l, disparity_r;
+                cv::UMat disparity_l(source_l.rows, source_l.cols, CV_32FC1);
+                cv::UMat disparity_r(source_l.rows, source_l.cols, CV_32FC1);
 
                 matchers.at(g_id).left->compute(source_l, source_r, disparity_l);
                 matchers.at(g_id).right->compute(source_r, source_l, disparity_r);
@@ -106,8 +107,11 @@ namespace eox {
                         disparity_l,
                         source_l,
                         disparity,
-                        disparity_r
+                        disparity_r,
+                        cv::Rect(),
+                        source_r
                 );
+                disparity_raw = disparity_l;
             }
 
             else {
