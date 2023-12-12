@@ -21,8 +21,6 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("gl_image");
 
-    Gtk::Box h_box = Gtk::Box(Gtk::ORIENTATION_HORIZONTAL);
-
     std::vector<std::unique_ptr<Gtk::Label>> labels;
     std::vector<std::unique_ptr<Gtk::Box>> containers;
     std::vector<std::unique_ptr<xogl::Texture1>> textures;
@@ -36,6 +34,9 @@ private:
 
     int v_w = 0;
     int v_h = 0;
+
+    int rows = 0;
+    int cols = 0;
 
 protected:
     std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> renderFunc(int num);

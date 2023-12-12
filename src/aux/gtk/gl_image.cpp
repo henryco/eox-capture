@@ -89,6 +89,10 @@ namespace sex::xgtk {
         this->v_w = (int) _number * _width;
         this->v_h = _height;
 
+        this->rows = 1;
+        this->cols = (int) _number;
+
+        auto h_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
         for (int i = 0; i < _number; ++i) {
             auto area = std::make_unique<Gtk::GLArea>();
             area->signal_realize().connect(initFunc(i), false);
@@ -103,7 +107,7 @@ namespace sex::xgtk {
 
             v_box->pack_start(*label, Gtk::PACK_SHRINK);
             v_box->pack_start(*area, Gtk::PACK_SHRINK);
-            h_box.pack_start(*v_box, Gtk::PACK_SHRINK);
+            h_box->pack_start(*v_box, Gtk::PACK_SHRINK);
 
             labels.push_back(std::move(label));
             containers.push_back(std::move(v_box));
@@ -114,7 +118,8 @@ namespace sex::xgtk {
 
         set_size_request(v_w, v_h);
         set_orientation(Gtk::ORIENTATION_VERTICAL);
-        pack_start(h_box, Gtk::PACK_SHRINK);
+        pack_start(*h_box, Gtk::PACK_SHRINK);
+        containers.push_back(std::move(h_box));
     }
 
     void GLImage::scale(float _scale) {
