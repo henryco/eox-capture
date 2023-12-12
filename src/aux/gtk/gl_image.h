@@ -35,8 +35,8 @@ private:
     int v_w = 0;
     int v_h = 0;
 
-    int rows = 0;
-    int cols = 0;
+    size_t rows = 0;
+    size_t cols = 0;
 
 protected:
     std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> renderFunc(int num);
@@ -48,6 +48,10 @@ public:
 
     void init(size_t number, int width, int height, std::vector<std::string> ids, GLenum format = GL_RGB);
     void init(size_t number, int width, int height, GLenum format = GL_RGB);
+
+    void init(size_t rows, size_t cols, size_t number, int width, int height, std::vector<std::string> ids, GLenum format = GL_RGB);
+    void init(size_t rows, size_t cols, size_t number, int width, int height, GLenum format = GL_RGB);
+
     void setFrames(const std::vector<cv::Mat>& _frames);
     void update(const std::vector<cv::Mat>& _frames);
     void update();

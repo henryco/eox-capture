@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <utility>
 #include "gl_image.h"
 
 namespace sex::xgtk {
@@ -67,16 +68,24 @@ namespace sex::xgtk {
         update();
     }
 
-    void GLImage::init(size_t _number, int _width, int _height, GLenum _format) {
+    void GLImage::init(size_t number, int _width, int _height, std::vector<std::string> ids, GLenum _format) {
+        init(1, number, number, _width, _height, std::move(ids), _format);
+    }
+
+    void GLImage::init(size_t number, int _width, int _height, GLenum _format) {
+        init(1, number, number, _width, _height, _format);
+    }
+
+    void GLImage::init(size_t _rows, size_t _cols, size_t _number, int _width, int _height, GLenum _format) {
         std::vector<std::string> _ids;
         _ids.reserve(_number);
         for (int i = 0; i < _number; i++) {
             _ids.push_back(std::to_string(i));
         }
-        init(_number, _width, _height, _ids, _format);
+        init(_rows, _cols, _number, _width, _height, _ids, _format);
     }
 
-    void GLImage::init(size_t _number, int _width, int _height, std::vector<std::string> _ids, GLenum _format) {
+    void GLImage::init(size_t _rows, size_t _cols, size_t _number, int _width, int _height, std::vector<std::string> _ids, GLenum _format) {
         this->width = _width;
         this->height = _height;
         this->format = _format;
@@ -89,8 +98,8 @@ namespace sex::xgtk {
         this->v_w = (int) _number * _width;
         this->v_h = _height;
 
-        this->rows = 1;
-        this->cols = (int) _number;
+        this->rows = _rows;
+        this->cols = _cols;
 
         auto h_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
         for (int i = 0; i < _number; ++i) {
