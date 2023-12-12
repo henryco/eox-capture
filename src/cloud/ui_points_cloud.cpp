@@ -169,6 +169,8 @@ namespace eox {
 
                 auto scroll_pane = std::make_unique<Gtk::ScrolledWindow>();
                 auto v_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+
                 auto button_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
                 v_box->pack_start(*button_box, Gtk::PACK_SHRINK);
 
@@ -220,43 +222,28 @@ namespace eox {
                     log->debug("BM block matcher");
 
                     auto matcher = cv::StereoBM::create();
-                    {
-                        // default config here
-                        matcher->setPreFilterType(cv::StereoBM::PREFILTER_XSOBEL);
-                    }
-
                     auto right = config.stereo.confidence
                                  ? cv::ximgproc::createRightMatcher(matcher)
                                  : nullptr;
-                    const ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
-                    matchers.emplace(group_id, lr_matchers);
+                    ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
+                    matchers.emplace(group_id, std::move(lr_matchers));
 
-
-
-                }
-
-                else if (config.stereo.algorithm == sex::data::Algorithm::SGBM) {
-                    log->debug("SGBM block matcher");
-
-                    auto matcher = cv::StereoSGBM::create();
                     {
-                        // default config here
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setBlockSize((int) value);
+                                    return value;
+                                }),
+                                "BlockSize",
+                                matchers.at(group_id).left->getBlockSize(),
+                                2,
+                                21,
+                                5,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
                     }
-
-                    auto right = config.stereo.confidence
-                                       ? cv::ximgproc::createRightMatcher(matcher)
-                                       : nullptr;
-                    const ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
-                    matchers.emplace(group_id, lr_matchers);
-                }
-
-                else {
-                    log->error("Unknown block matcher algorithm");
-                    throw std::runtime_error("Unknown block matcher algorithm");
-                }
-
-                {
-                    auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
@@ -277,6 +264,119 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([matcher](double value){
+                                    matcher->setPreFilterType((int) value);
+                                    return value;
+                                }),
+                                "PreFilterType",
+                                matcher->getPreFilterType(),
+                                1,
+                                1,
+                                0,
+                                1
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setPreFilterSize((int) value);
+                                    return value;
+                                },
+                                "PreFilterSize",
+                                matcher->getPreFilterSize(),
+                                2,
+                                9,
+                                5,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setPreFilterCap((int) value);
+                                    return value;
+                                },
+                                "PreFilterCap",
+                                matcher->getPreFilterCap(),
+                                1,
+                                31,
+                                1,
+                                63
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setTextureThreshold((int) value);
+                                    return value;
+                                },
+                                "TextureThreshold",
+                                matcher->getTextureThreshold(),
+                                1,
+                                10,
+                                0,
+                                300
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setUniquenessRatio((int) value);
+                                    return value;
+                                },
+                                "UniquenessRatio",
+                                matcher->getUniquenessRatio(),
+                                1,
+                                15,
+                                0,
+                                512
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setSmallerBlockSize((int) value);
+                                    return value;
+                                },
+                                "SmallerBlockSize",
+                                matcher->getSmallerBlockSize(),
+                                1,
+                                0,
+                                0,
+                                512
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+                }
+
+                else if (config.stereo.algorithm == sex::data::Algorithm::SGBM) {
+                    log->debug("SGBM block matcher");
+
+                    auto matcher = cv::StereoSGBM::create();
+                    auto right = config.stereo.confidence
+                                       ? cv::ximgproc::createRightMatcher(matcher)
+                                       : nullptr;
+                    ts::lr_matchers lr_matchers = {.left = matcher, .right = right};
+                    matchers.emplace(group_id, std::move(lr_matchers));
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
                                     matchers.at(group_id).left->setBlockSize((int) value);
                                     return value;
@@ -284,13 +384,123 @@ namespace eox {
                                 "BlockSize",
                                 matchers.at(group_id).left->getBlockSize(),
                                 2,
-                                21,
-                                5,
+                                3,
+                                1,
                                 255
                         );
                         c_box->pack_start(*control);
                         keep(std::move(control));
                     }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setNumDisparities((int) value);
+                                    return value;
+                                }),
+                                "NumDisparities",
+                                matchers.at(group_id).left->getNumDisparities(),
+                                16,
+                                64,
+                                16,
+                                16 * 20
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([matcher](double value){
+                                    matcher->setPreFilterCap((int) value);
+                                    return value;
+                                }),
+                                "PreFilterCap",
+                                matcher->getPreFilterCap(),
+                                1,
+                                0,
+                                0,
+                                100
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setUniquenessRatio((int) value);
+                                    return value;
+                                },
+                                "UniquenessRatio",
+                                matcher->getUniquenessRatio(),
+                                1,
+                                0,
+                                0,
+                                512
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setP1((int) value);
+                                    return value;
+                                },
+                                "P1",
+                                matcher->getP1(),
+                                1,
+                                0,
+                                0,
+                                5000
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setP2((int) value);
+                                    return value;
+                                },
+                                "P2",
+                                matcher->getP2(),
+                                1,
+                                0,
+                                0,
+                                5000
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                [matcher](double value) {
+                                    matcher->setMode((int) value);
+                                    return value;
+                                },
+                                "Mode",
+                                matcher->getMode(),
+                                1,
+                                0,
+                                0,
+                                3
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+                }
+
+                else {
+                    log->error("Unknown block matcher algorithm");
+                    throw std::runtime_error("Unknown block matcher algorithm");
+                }
+
+                {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
