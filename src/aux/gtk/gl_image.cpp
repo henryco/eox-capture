@@ -105,6 +105,7 @@ namespace sex::xgtk {
 
         for (size_t i = 0; i < _rows; i++) {
             auto h_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+            h_box->set_halign(Gtk::ALIGN_CENTER);
 
             for (size_t k = 0; k < _cols; k++) {
                 const size_t index = (i * _rows) + k;

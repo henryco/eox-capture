@@ -34,7 +34,7 @@ namespace eox {
             }
 
             // Init oGL canvas
-            glImage.init((int) group_ids.size(), props[0].width, props[0].height, group_ids, GL_BGR);
+            glImage.init(2, 2, (int) group_ids.size(), props[0].width, props[0].height, group_ids, GL_BGR);
             glImage.scale(config.scale);
         }
 
