@@ -232,114 +232,7 @@ namespace eox {
                     matchers.emplace(group_id, lr_matchers);
 
 
-                    {
-                        auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
 
-                        {
-                            auto control = std::make_unique<eox::gtk::GtkControl>(
-                                    ([this, group_id](double value){
-                                        matchers.at(group_id).left->setNumDisparities((int) value);
-                                        return value;
-                                    }),
-                                    "NumDisparities",
-                                    matcher->getNumDisparities(),
-                                    16,
-                                    64,
-                                    16,
-                                    16 * 20
-                            );
-                            c_box->pack_start(*control);
-                            keep(std::move(control));
-                        }
-
-                        {
-                            auto control = std::make_unique<eox::gtk::GtkControl>(
-                                    ([this, group_id](double value){
-                                        matchers.at(group_id).left->setBlockSize((int) value);
-                                        return value;
-                                    }),
-                                    "BlockSize",
-                                    matcher->getBlockSize(),
-                                    2,
-                                    21,
-                                    5,
-                                    255
-                            );
-                            c_box->pack_start(*control);
-                            keep(std::move(control));
-                        }
-
-                        {
-                            auto control = std::make_unique<eox::gtk::GtkControl>(
-                                    ([this, group_id](double value){
-                                        matchers.at(group_id).left->setMinDisparity((int) value);
-                                        return value;
-                                    }),
-                                    "MinDisparity",
-                                    matcher->getMinDisparity(),
-                                    1,
-                                    0,
-                                    -255,
-                                    255
-                            );
-                            c_box->pack_start(*control);
-                            keep(std::move(control));
-                        }
-
-                        {
-                            auto control = std::make_unique<eox::gtk::GtkControl>(
-                                    ([this, group_id](double value){
-                                        matchers.at(group_id).left->setSpeckleWindowSize((int) value);
-                                        return value;
-                                    }),
-                                    "SpeckleWindowSize",
-                                    matcher->getSpeckleWindowSize(),
-                                    1,
-                                    0,
-                                    0,
-                                    255
-                            );
-                            c_box->pack_start(*control);
-                            keep(std::move(control));
-                        }
-
-                        {
-                            auto control = std::make_unique<eox::gtk::GtkControl>(
-                                    ([this, group_id](double value){
-                                        matchers.at(group_id).left->setSpeckleRange((int) value);
-                                        return value;
-                                    }),
-                                    "SpeckleRange",
-                                    matcher->getSpeckleRange(),
-                                    1,
-                                    0,
-                                    -255,
-                                    255
-                            );
-                            c_box->pack_start(*control);
-                            keep(std::move(control));
-                        }
-
-                        {
-                            auto control = std::make_unique<eox::gtk::GtkControl>(
-                                    ([this, group_id](double value){
-                                        matchers.at(group_id).left->setDisp12MaxDiff((int) value);
-                                        return value;
-                                    }),
-                                    "Disp12MaxDiff",
-                                    matcher->getDisp12MaxDiff(),
-                                    1,
-                                    0,
-                                    -255,
-                                    255
-                            );
-                            c_box->pack_start(*control);
-                            keep(std::move(control));
-                        }
-
-                        v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
-                        keep(std::move(c_box));
-                    }
                 }
 
                 else if (config.stereo.algorithm == sex::data::Algorithm::SGBM) {
@@ -360,6 +253,115 @@ namespace eox {
                 else {
                     log->error("Unknown block matcher algorithm");
                     throw std::runtime_error("Unknown block matcher algorithm");
+                }
+
+                {
+                    auto c_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setNumDisparities((int) value);
+                                    return value;
+                                }),
+                                "NumDisparities",
+                                matchers.at(group_id).left->getNumDisparities(),
+                                16,
+                                64,
+                                16,
+                                16 * 20
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setBlockSize((int) value);
+                                    return value;
+                                }),
+                                "BlockSize",
+                                matchers.at(group_id).left->getBlockSize(),
+                                2,
+                                21,
+                                5,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setMinDisparity((int) value);
+                                    return value;
+                                }),
+                                "MinDisparity",
+                                matchers.at(group_id).left->getMinDisparity(),
+                                1,
+                                0,
+                                -255,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setSpeckleWindowSize((int) value);
+                                    return value;
+                                }),
+                                "SpeckleWindowSize",
+                                matchers.at(group_id).left->getSpeckleWindowSize(),
+                                1,
+                                0,
+                                0,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setSpeckleRange((int) value);
+                                    return value;
+                                }),
+                                "SpeckleRange",
+                                matchers.at(group_id).left->getSpeckleRange(),
+                                1,
+                                0,
+                                -255,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([this, group_id](double value){
+                                    matchers.at(group_id).left->setDisp12MaxDiff((int) value);
+                                    return value;
+                                }),
+                                "Disp12MaxDiff",
+                                matchers.at(group_id).left->getDisp12MaxDiff(),
+                                1,
+                                0,
+                                -255,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        keep(std::move(control));
+                    }
+
+                    v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
+                    keep(std::move(c_box));
                 }
 
                 {
@@ -386,7 +388,7 @@ namespace eox {
         {
             // Init Window
             layout_h->pack_start(glImage, Gtk::PACK_SHRINK);
-            layout_h->pack_start(*config_stack, Gtk::PACK_SHRINK);
+            layout_h->pack_end(*config_stack, Gtk::PACK_SHRINK);
             add(*layout_h);
             keep(std::move(layout_h));
             keep(std::move(config_stack));

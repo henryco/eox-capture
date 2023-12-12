@@ -114,7 +114,7 @@ namespace sex::xgtk {
 
         set_size_request(v_w, v_h);
         set_orientation(Gtk::ORIENTATION_VERTICAL);
-        pack_end(h_box, Gtk::PACK_SHRINK);
+        pack_start(h_box, Gtk::PACK_SHRINK);
     }
 
     void GLImage::scale(float _scale) {
