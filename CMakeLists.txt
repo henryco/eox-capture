@@ -55,6 +55,7 @@ add_executable(${PROJECT_NAME}
         src/aux/utils/globals/sex_globals.h
         src/aux/gtk/gtk_config_stack.cpp
         src/aux/gtk/gtk_config_stack.h
+        src/aux/gtk/gtk_sex_window.cpp
         src/aux/gtk/gtk_sex_window.h
         src/aux/utils/mappers/cam_gtk_mapper.h
         src/aux/commons.h

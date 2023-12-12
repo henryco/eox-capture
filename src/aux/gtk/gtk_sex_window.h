@@ -18,47 +18,32 @@ namespace sex::xgtk {
         std::vector<std::shared_ptr<Gtk::Widget>> s_widgets;
         Glib::Dispatcher dispatcher;
 
-        void on_dispatcher_signal() {
-            onRefresh();
-        }
+        void on_dispatcher_signal();
 
     public:
         virtual void init(sex::data::basic_config configuration) = 0;
 
-        void init() {
-            init({});
-        }
+        void init();
 
         virtual ~GtkSexWindow() = default; // NOLINT(*-use-override)
 
-        GtkSexWindow() {
-            dispatcher.connect(sigc::mem_fun(*this, &GtkSexWindow::on_dispatcher_signal));
-        }
+        GtkSexWindow();
 
     protected:
 
-        virtual void onRefresh() { /* Nothing goings-on here */ }
+        virtual void onResize(const Gtk::Allocation& allocation);
 
-        void refresh() {
-            dispatcher.emit();
-        }
+        virtual void onRefresh();
 
-        void keep(std::unique_ptr<Gtk::Widget> &&widget) {
-            u_widgets.push_back(std::move(widget));
-        }
+        void refresh();
 
-        void keep_shared(std::shared_ptr<Gtk::Widget> &widget) {
-            s_widgets.push_back(widget);
-        }
+        void keep(std::unique_ptr<Gtk::Widget> &&widget);
 
-        void keep_shared(std::shared_ptr<Gtk::Widget> &&widget) {
-            s_widgets.push_back(widget);
-        }
+        void keep_shared(std::shared_ptr<Gtk::Widget> &widget);
 
-        void un_keep() {
-            u_widgets.clear();
-            s_widgets.clear();
-        }
+        void keep_shared(std::shared_ptr<Gtk::Widget> &&widget);
+
+        void un_keep();
     };
 
 } // sex
