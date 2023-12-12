@@ -87,7 +87,8 @@ namespace eox::gtk {
                 programmatic_change = true;
                 {
                     auto _value = s_ptr->get_value();
-                    const auto reminder = std::fmod(_value, step);
+                    const auto corr = _value - std::fmod(min_value, step);
+                    const auto reminder = std::fmod(corr, step);
                     if (reminder != 0) {
                         _value = _value + step - reminder;
                         s_ptr->set_value(_value);
@@ -132,7 +133,8 @@ namespace eox::gtk {
                 programmatic_change = true;
                 {
                     auto _value = e_ptr->get_value();
-                    const auto reminder = std::fmod(_value, step);
+                    const auto corr = _value - std::fmod(min_value, step);
+                    const auto reminder = std::fmod(corr, step);
                     if (reminder != 0) {
                         _value = _value + step - reminder;
                         e_ptr->set_value(_value);

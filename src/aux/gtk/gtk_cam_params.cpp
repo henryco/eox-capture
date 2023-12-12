@@ -146,7 +146,8 @@ namespace sex::xgtk {
                         programmatic_change = true;
                         {
                             auto value = (int) s_ptr->get_value();
-                            const auto reminder = value % prop.step;
+                            const auto corr = value - (prop.min % prop.step);
+                            const auto reminder = corr % prop.step;
                             if (reminder != 0) {
                                 value = value + prop.step - reminder;
                                 s_ptr->set_value(value);
@@ -192,7 +193,8 @@ namespace sex::xgtk {
                         programmatic_change = true;
                         {
                             auto value = (int) e_ptr->get_value();
-                            const auto reminder = value % prop.step;
+                            const auto corr = value - (prop.min % prop.step);
+                            const auto reminder = corr % prop.step;
                             if (reminder != 0) {
                                 value = value + prop.step - reminder;
                                 e_ptr->set_value(value);
