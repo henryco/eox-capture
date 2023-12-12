@@ -244,7 +244,7 @@ namespace eox {
                                     "NumDisparities",
                                     matcher->getNumDisparities(),
                                     16,
-                                    0,
+                                    64,
                                     16,
                                     16 * 20
                             );
@@ -253,7 +253,6 @@ namespace eox {
                         }
 
                         {
-                            log->info("DEFAULT: {}", matcher->getBlockSize());
                             auto control = std::make_unique<eox::gtk::GtkControl>(
                                     ([this, group_id](double value){
                                         matchers.at(group_id).left->setBlockSize((int) value);
@@ -264,6 +263,23 @@ namespace eox {
                                     2,
                                     21,
                                     5,
+                                    255
+                            );
+                            c_box->pack_start(*control);
+                            keep(std::move(control));
+                        }
+
+                        {
+                            auto control = std::make_unique<eox::gtk::GtkControl>(
+                                    ([this, group_id](double value){
+                                        matchers.at(group_id).left->setMinDisparity((int) value);
+                                        return value;
+                                    }),
+                                    "MinDisparity",
+                                    matcher->getMinDisparity(),
+                                    1,
+                                    0,
+                                    -255,
                                     255
                             );
                             c_box->pack_start(*control);
