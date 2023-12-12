@@ -216,8 +216,6 @@ namespace eox {
                     keep(std::move(reset));
                 }
 
-
-                // TODO stereo block matcher configuration here
                 if (config.stereo.algorithm == sex::data::Algorithm::BM) {
                     log->debug("BM block matcher");
 
