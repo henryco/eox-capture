@@ -21,8 +21,7 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("gl_image");
 
-    std::vector<std::unique_ptr<Gtk::Label>> labels;
-    std::vector<std::unique_ptr<Gtk::Box>> containers;
+    std::vector<std::unique_ptr<Gtk::Widget>> widgets;
     std::vector<std::unique_ptr<xogl::Texture1>> textures;
     std::vector<std::unique_ptr<Gtk::GLArea>> glAreas;
     std::vector<cv::Mat> frames;
@@ -39,7 +38,7 @@ private:
     size_t cols = 0;
 
 protected:
-    std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> renderFunc(int num);
+    std::function<bool(const Glib::RefPtr<Gdk::GLContext> &)> renderFunc(size_t num);
     std::function<void()> initFunc(size_t num);
 
 public:
