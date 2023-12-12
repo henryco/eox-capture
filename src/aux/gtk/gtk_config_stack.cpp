@@ -3,6 +3,7 @@
 //
 
 #include "gtk_config_stack.h"
+#include "gtk_utils.h"
 
 namespace sex::xgtk {
 
@@ -12,6 +13,13 @@ namespace sex::xgtk {
 
         pack_start(switcher, Gtk::PACK_SHRINK);
         pack_start(stack);
+
+        get_style_context()->add_class("config-stack-box");
+        sex::xgtk::add_style(*this, R"css(
+            .config-stack-box {
+                 background-color: white;
+             }
+        )css");
     }
 
     void GtkConfigStack::add(Gtk::Widget &child, const Glib::ustring &name, const Glib::ustring &title) {
