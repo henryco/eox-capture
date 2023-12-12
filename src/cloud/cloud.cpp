@@ -91,7 +91,7 @@ namespace eox {
             }
 
             // computing disparity map
-            cv::UMat disparity;
+            cv::UMat disparity, disparity_raw;
             if (config.stereo.confidence) {
                 cv::UMat disparity_l, disparity_r;
 
@@ -111,15 +111,14 @@ namespace eox {
             }
 
             else {
-                cv::UMat disparity_l;
 
-                matchers.at(g_id).left->compute(source_l, source_r, disparity_l);
+                matchers.at(g_id).left->compute(source_l, source_r, disparity_raw);
 
                 // Filter Speckles
                 //cv::filterSpeckles(disparity_raw, 0, 32, 25);
 
                 wlsFilters.at(g_id)->filter(
-                        disparity_l,
+                        disparity_raw,
                         source_l,
                         disparity
                 );
@@ -134,24 +133,28 @@ namespace eox {
 
 
             // Convert the disparity values to a range that can be represented in 8-bit format
-            cv::UMat normalized_disp;
+            cv::UMat normalized_disp, normalized_raw;
             cv::normalize(disparity, normalized_disp, 0, 255, cv::NORM_MINMAX, CV_8U);
+            cv::normalize(disparity_raw, normalized_raw, 0, 255, cv::NORM_MINMAX, CV_8U);
 
             // converting back to BGR
-            cv::UMat bgr_l, bgr_r, bgr_disparity;
+            cv::UMat bgr_l, bgr_r, bgr_disparity, bgr_raw;
             cv::cvtColor(source_l, bgr_l, cv::COLOR_GRAY2BGR);
             cv::cvtColor(source_r, bgr_r, cv::COLOR_GRAY2BGR);
             cv::cvtColor(normalized_disp, bgr_disparity, cv::COLOR_GRAY2BGR);
+            cv::cvtColor(normalized_raw, bgr_raw, cv::COLOR_GRAY2BGR);
 
             // converting back to regular cv::Mat
-            cv::Mat left, right, disp;
+            cv::Mat left, right, disp, raw;
             bgr_l.copyTo(left);
             bgr_r.copyTo(right);
+            bgr_raw.copyTo(raw);
             bgr_disparity.copyTo(disp);
 
             // saving results to global vector of frames (goes to render output)
             _frames.push_back(left);
-            _frames.push_back(right);
+//            _frames.push_back(right);
+            _frames.push_back(raw);
             _frames.push_back(disp);
         }
 

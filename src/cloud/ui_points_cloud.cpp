@@ -286,6 +286,57 @@ namespace eox {
                             keep(std::move(control));
                         }
 
+                        {
+                            auto control = std::make_unique<eox::gtk::GtkControl>(
+                                    ([this, group_id](double value){
+                                        matchers.at(group_id).left->setSpeckleWindowSize((int) value);
+                                        return value;
+                                    }),
+                                    "SpeckleWindowSize",
+                                    matcher->getSpeckleWindowSize(),
+                                    1,
+                                    0,
+                                    0,
+                                    255
+                            );
+                            c_box->pack_start(*control);
+                            keep(std::move(control));
+                        }
+
+                        {
+                            auto control = std::make_unique<eox::gtk::GtkControl>(
+                                    ([this, group_id](double value){
+                                        matchers.at(group_id).left->setSpeckleRange((int) value);
+                                        return value;
+                                    }),
+                                    "SpeckleRange",
+                                    matcher->getSpeckleRange(),
+                                    1,
+                                    0,
+                                    -255,
+                                    255
+                            );
+                            c_box->pack_start(*control);
+                            keep(std::move(control));
+                        }
+
+                        {
+                            auto control = std::make_unique<eox::gtk::GtkControl>(
+                                    ([this, group_id](double value){
+                                        matchers.at(group_id).left->setDisp12MaxDiff((int) value);
+                                        return value;
+                                    }),
+                                    "Disp12MaxDiff",
+                                    matcher->getDisp12MaxDiff(),
+                                    1,
+                                    0,
+                                    -255,
+                                    255
+                            );
+                            c_box->pack_start(*control);
+                            keep(std::move(control));
+                        }
+
                         v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
                         keep(std::move(c_box));
                     }
