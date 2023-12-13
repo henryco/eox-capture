@@ -1,4 +1,4 @@
-# Real-time 3D Motion Capture (WIP)
+# Complex Real-time 3D Motion Capture tool (WIP)
 ### Dependencies
 - OpenGL (Should be installed)
 - [OpenCV](https://opencv.org/get-started) (tl;dr: `libopencv-dev`)
