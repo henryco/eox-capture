@@ -10,6 +10,7 @@
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <gtkmm/spinbutton.h>
+#include <gtkmm/scale.h>
 
 namespace eox::gtk {
 
@@ -22,6 +23,7 @@ namespace eox::gtk {
         std::vector<std::unique_ptr<Gtk::Widget>> controls;
 
         std::unique_ptr<Gtk::SpinButton> entry;
+        std::unique_ptr<Gtk::Scale> scale;
 
         std::function<double(double value)> callback;
         sigc::connection debounce_connection;
@@ -55,6 +57,8 @@ namespace eox::gtk {
         GtkControl& setCallback(std::function<double(double value)> callback);
 
         void reset();
+
+        void digits(int num);
     };
 
 } // gtk

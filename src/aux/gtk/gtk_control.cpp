@@ -40,9 +40,9 @@ namespace eox::gtk {
         controls.clear();
 
         entry = std::make_unique<Gtk::SpinButton>();
+        scale = std::make_unique<Gtk::Scale>(Gtk::ORIENTATION_HORIZONTAL);
 
         auto h_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
-        auto scale = std::make_unique<Gtk::Scale>(Gtk::ORIENTATION_HORIZONTAL);
         auto text = std::make_unique<Gtk::Label>();
 
         {
@@ -166,7 +166,6 @@ namespace eox::gtk {
         pack_start(*h_box, Gtk::PACK_SHRINK);
 
         controls.push_back(std::move(h_box));
-        controls.push_back(std::move(scale));
         controls.push_back(std::move(text));
         return *this;
     }
@@ -175,6 +174,11 @@ namespace eox::gtk {
         log->debug("reset control: {}, {}", label, def_value);
         value = def_value;
         entry->set_value(value);
+    }
+
+    void GtkControl::digits(int num) {
+        entry->set_digits(num);
+        scale->set_digits(num);
     }
 
 } // eox

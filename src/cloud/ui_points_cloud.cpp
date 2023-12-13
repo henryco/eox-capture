@@ -174,6 +174,27 @@ namespace eox {
                 auto button_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
                 v_box->pack_start(*button_box, Gtk::PACK_SHRINK);
 
+                {
+                    auto reset = std::make_unique<Gtk::Button>();
+                    reset->set_label("Matcher Defaults");
+                    reset->get_style_context()->add_class("button-reset");
+                    reset->set_size_request(-1, 30);
+                    sex::xgtk::add_style(*reset, R"css(
+                        .button-reset {
+                             margin-right: 5px;
+                             margin-bottom: 5px;
+                         }
+                    )css");
+
+                    reset->signal_clicked().connect([this]() {
+                        log->debug("reset stereo matcher controls");
+                        for (const auto &control: controls)
+                            control->reset();
+                    });
+
+                    button_box->pack_start(*reset, Gtk::PACK_SHRINK);
+                    keep(std::move(reset));
+                }
 
                 {
                     auto save = std::make_unique<Gtk::Button>();
@@ -193,29 +214,6 @@ namespace eox {
 
                     button_box->pack_start(*save, Gtk::PACK_SHRINK);
                     keep(std::move(save));
-                }
-
-
-                {
-                    auto reset = std::make_unique<Gtk::Button>();
-                    reset->set_label("Reset");
-                    reset->get_style_context()->add_class("button-reset");
-                    reset->set_size_request(-1, 30);
-                    sex::xgtk::add_style(*reset, R"css(
-                        .button-reset {
-                             margin-right: 5px;
-                             margin-bottom: 5px;
-                         }
-                    )css");
-
-                    reset->signal_clicked().connect([this]() {
-                        log->debug("reset stereo matcher controls");
-                        for (const auto &control: controls)
-                            control->reset();
-                    });
-
-                    button_box->pack_start(*reset, Gtk::PACK_SHRINK);
-                    keep(std::move(reset));
                 }
 
                 if (config.stereo.algorithm == sex::data::Algorithm::BM) {
@@ -564,30 +562,99 @@ namespace eox {
                         c_box->pack_start(*control);
                         controls.push_back(std::move(control));
                     }
-
-                    v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
-                    keep(std::move(c_box));
                 }
 
                 {
                     // init wls filter
+                    cv::Ptr<cv::ximgproc::DisparityWLSFilter> filter;
                     if (config.stereo.confidence) {
-                        auto filter = cv::ximgproc::createDisparityWLSFilter(matchers.at(group_id).left);
+                        filter = cv::ximgproc::createDisparityWLSFilter(matchers.at(group_id).left);
                         wlsFilters.emplace(group_id, filter);
                     }
 
                     else {
-                        auto filter = cv::ximgproc::createDisparityWLSFilterGeneric(false);
-                        // TODO
+                        filter = cv::ximgproc::createDisparityWLSFilterGeneric(false);
                         wlsFilters.emplace(group_id, filter);
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([filter](double value){
+                                    filter->setLambda(value);
+                                    return value;
+                                }),
+                                "[WLSF] Lambda",
+                                filter->getLambda(),
+                                0.1,
+                                8000,
+                                0,
+                                16000
+                        );
+                        control->digits(1);
+                        c_box->pack_start(*control);
+                        controls.push_back(std::move(control));
+                    }
+
+                    {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([filter](double value){
+                                    filter->setSigmaColor(value);
+                                    return value;
+                                }),
+                                "[WLSF] SigmaColor",
+                                filter->getSigmaColor(),
+                                0.01,
+                                1.0,
+                                0,
+                                100
+                        );
+                        control->digits(2);
+                        c_box->pack_start(*control);
+                        controls.push_back(std::move(control));
+                    }
+
+                    if (config.stereo.confidence) {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([filter](double value){
+                                    filter->setLRCthresh((int) value);
+                                    return value;
+                                }),
+                                "[WLSF] LRCthresh ",
+                                filter->getLRCthresh(),
+                                1,
+                                24,
+                                -255,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        controls.push_back(std::move(control));
+                    }
+
+                    if (config.stereo.confidence) {
+                        auto control = std::make_unique<eox::gtk::GtkControl>(
+                                ([filter](double value){
+                                    filter->setDepthDiscontinuityRadius((int) value);
+                                    return value;
+                                }),
+                                "[WLSF] DepthDiscontinuityRadius",
+                                filter->getDepthDiscontinuityRadius(),
+                                1,
+                                5,
+                                -255,
+                                255
+                        );
+                        c_box->pack_start(*control);
+                        controls.push_back(std::move(control));
                     }
                 }
 
+                v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
                 scroll_pane->add(*v_box);
                 config_stack->add(*scroll_pane, std::to_string(group_id));
                 keep(std::move(scroll_pane));
                 keep(std::move(button_box));
                 keep(std::move(v_box));
+                keep(std::move(c_box));
             }
         }
 
