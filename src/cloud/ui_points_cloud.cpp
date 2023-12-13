@@ -228,7 +228,17 @@ namespace eox {
                     auto matcher = cv::StereoBM::create();
                     matcher->setTextureThreshold(0);
 
-                    // TODO READ CONFIG FROM FILE
+                    {
+                        log->debug("initializing matcher from work directory implicitly");
+                        const auto paths = sex::helpers::work_paths(config);
+                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                    }
+
+                    {
+                        log->debug("initializing matcher from configuration files explicitly");
+                        const auto paths = sex::helpers::config_paths(config);
+                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                    }
 
                     std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>> lr_matchers(matcher, matcher);
                     matchers.emplace(group_id, std::move(lr_matchers));
@@ -375,7 +385,17 @@ namespace eox {
 
                     auto matcher = cv::StereoSGBM::create();
 
-                    // TODO READ CONFIG FROM FILE
+                    {
+                        log->debug("initializing matcher from work directory implicitly");
+                        const auto paths = sex::helpers::work_paths(config);
+                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                    }
+
+                    {
+                        log->debug("initializing matcher from configuration files explicitly");
+                        const auto paths = sex::helpers::config_paths(config);
+                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                    }
 
                     std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>> lr_matchers(matcher, matcher);
                     matchers.emplace(group_id, std::move(lr_matchers));
@@ -590,7 +610,15 @@ namespace eox {
                     }
 
                     {
-                        // TODO READ CONFIG FROM FILE
+                        log->debug("initializing disparity filter from work directory implicitly");
+                        const auto paths = sex::helpers::work_paths(config);
+                        sex::helpers::read_disparity_filter_data(filter, group_id, paths, log);
+                    }
+
+                    {
+                        log->debug("initializing disparity filter from configuration files explicitly");
+                        const auto paths = sex::helpers::config_paths(config);
+                        sex::helpers::read_disparity_filter_data(filter, group_id, paths, log);
                     }
 
                     {

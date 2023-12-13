@@ -537,6 +537,7 @@ namespace eox::ocv {
         {
             if (auto *f = dynamic_cast<cv::ximgproc::DisparityWLSFilter *>(filter)) {
                 fs << "type" << "eox::wls_filter";
+                fs << "name" << "DisparityFilter.WLS";
                 fs << "DepthDiscontinuityRadius" << f->getDepthDiscontinuityRadius();
                 fs << "LRCthresh" << f->getLRCthresh();
                 fs << "SigmaColor" << f->getSigmaColor();

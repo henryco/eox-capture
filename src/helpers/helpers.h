@@ -58,10 +58,24 @@ namespace sex::helpers {
 
     void save_bm_data(
             const cv::Ptr<cv::StereoMatcher>& matcher,
-            const cv::Ptr<cv::ximgproc::DisparityWLSFilter>& filter,
+            const cv::Ptr<cv::ximgproc::DisparityFilter>& filter,
             const uint group_id,
             Gtk::Window &window,
             const data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log
+    );
+
+    void read_matcher_data(
+            const cv::Ptr<cv::StereoMatcher>& matcher,
+            const uint group_id,
+            const std::vector<std::filesystem::path> &paths,
+            const std::shared_ptr<spdlog::logger> &log
+    );
+
+    void read_disparity_filter_data(
+            const cv::Ptr<cv::ximgproc::DisparityFilter>& filter,
+            const uint group_id,
+            const std::vector<std::filesystem::path> &paths,
             const std::shared_ptr<spdlog::logger> &log
     );
 

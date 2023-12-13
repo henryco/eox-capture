@@ -271,14 +271,109 @@ namespace sex::helpers {
         }
     }
 
+    void read_matcher_data(
+            const cv::Ptr<cv::StereoMatcher>& matcher,
+            const uint group_id,
+            const std::vector<std::filesystem::path> &paths,
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
+        log->debug("reading matcher data from files for group: {}", group_id);
+        for (const auto &path: paths) {
+            log->debug("checking {} file", path.string());
+
+            if (path.extension().string() != ".json") {
+                log->debug("file: {} is not a .json file", path.string());
+                continue;
+            }
+
+            cv::FileStorage fs(path.string(), cv::FileStorage::READ);
+
+            std::string type;
+            fs["type"] >> type;
+
+            if ("eox::group" != type) {
+                log->debug("file {} is not a group type", path.string());
+                fs.release();
+                continue;
+            }
+
+            int g_id = -1;
+            fs["group_id"] >> g_id;
+            if ((int) group_id != g_id) {
+                log->debug("{} group id does not match: {}, {}", path.string(), group_id, g_id);
+                fs.release();
+                continue;
+            }
+
+            std::string m_name;
+            fs["matcher"] >> m_name;
+            fs.release();
+
+            const auto m_path = path.parent_path() / m_name;
+            if (eox::ocv::read_stereo_matcher(matcher, m_path)) {
+                log->debug("stereo matcher initialized from file: {}", m_path.string());
+                return;
+            }
+        }
+        log->debug("No stereo matcher configuration found");
+    }
+
+    void read_disparity_filter_data(
+            const cv::Ptr<cv::ximgproc::DisparityFilter>& filter,
+            const uint group_id,
+            const std::vector<std::filesystem::path> &paths,
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
+        log->debug("reading disparity filter data from files for group: {}", group_id);
+        for (const auto &path: paths) {
+            log->debug("checking {} file", path.string());
+
+            if (path.extension().string() != ".json") {
+                log->debug("file: {} is not a .json file", path.string());
+                continue;
+            }
+
+            cv::FileStorage fs(path.string(), cv::FileStorage::READ);
+
+            std::string type;
+            fs["type"] >> type;
+
+            if ("eox::group" != type) {
+                log->debug("file {} is not a group type", path.string());
+                fs.release();
+                continue;
+            }
+
+            int g_id = -1;
+            fs["group_id"] >> g_id;
+            if ((int) group_id != g_id) {
+                log->debug("{} group id does not match: {}, {}", path.string(), group_id, g_id);
+                fs.release();
+                continue;
+            }
+
+            std::string f_name;
+            fs["filter"] >> f_name;
+            fs.release();
+
+            const auto m_path = path.parent_path() / f_name;
+            if (eox::ocv::read_disparity_filter(filter, m_path)) {
+                log->debug("disparity filter initialized from file: {}", m_path.string());
+                return;
+            }
+        }
+        log->debug("No disparity filter configuration found");
+    }
+
     void save_bm_data(
             const cv::Ptr<cv::StereoMatcher>& matcher,
-            const cv::Ptr<cv::ximgproc::DisparityWLSFilter>& filter,
+            const cv::Ptr<cv::ximgproc::DisparityFilter>& filter,
             const uint group_id,
             Gtk::Window &window,
             const data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger> &log
     ) {
+        log->debug("save group bm data: {}", group_id);
         const auto filter_text = Gtk::FileFilter::create();
         filter_text->set_name("Stereo matcher files (*.json)");
         filter_text->add_pattern("*.json");
@@ -301,7 +396,7 @@ namespace sex::helpers {
             const std::string f_name = "filter_" + std::to_string(group_id) + ".json";
             cv::FileStorage fs(file_name, cv::FileStorage::WRITE);
             fs << "type" << "eox::group";
-            fs << "group_id" << std::to_string(group_id);
+            fs << "group_id" << (int) group_id;
             fs << "matcher" << m_name;
             fs << "filter" << f_name;
             fs.release();
