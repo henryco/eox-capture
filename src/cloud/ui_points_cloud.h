@@ -16,17 +16,6 @@
 
 namespace eox {
 
-    namespace ts {
-        using group_id = unsigned int;
-        using device_id = unsigned int;
-        using Frame = cv::Mat;
-
-        using lr_matchers = struct {
-            cv::Ptr<cv::StereoMatcher> left;
-            cv::Ptr<cv::StereoMatcher> right;
-        };
-    }
-
     class UiPointsCloud : public sex::xgtk::GtkSexWindow { // NOLINT(*-special-member-functions)
 
         static inline const auto log =
@@ -39,13 +28,19 @@ namespace eox {
         sex::util::DeltaLoop deltaLoop;
         sex::xgtk::GLImage glImage;
 
+        // map of group -> disparity filter
         std::map<ts::group_id, cv::Ptr<cv::ximgproc::DisparityWLSFilter>> wlsFilters;
-        std::map<ts::group_id, ts::lr_matchers> matchers;
+
+        // map of group -> Left and Right stereo matchers pair
+        std::map<ts::group_id, std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>>> matchers;
+
+        // map of group -> stereo camera configuration
         std::map<ts::group_id, eox::ocv::StereoPackage> packages;
+
+        // map of device -> group
         std::map<ts::device_id, ts::group_id> deviceGroupMap;
 
         std::vector<std::unique_ptr<eox::gtk::GtkControl>> controls;
-
         float FPS = 0;
 
     public:

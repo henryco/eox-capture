@@ -207,8 +207,15 @@ namespace eox {
                          }
                     )css");
 
-                    save->signal_clicked().connect([this]() {
-                        // TODO on save
+                    save->signal_clicked().connect([this, group_id]() {
+                        sex::helpers::save_bm_data(
+                                matchers.at(group_id).first,
+                                wlsFilters.at(group_id),
+                                group_id,
+                                *this,
+                                config,
+                                log
+                        );
                     });
 
                     button_box->pack_start(*save, Gtk::PACK_SHRINK);
@@ -223,17 +230,17 @@ namespace eox {
 
                     // TODO READ CONFIG FROM FILE
 
-                    ts::lr_matchers lr_matchers = {.left = matcher, .right = matcher};
+                    std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>> lr_matchers(matcher, matcher);
                     matchers.emplace(group_id, std::move(lr_matchers));
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setBlockSize((int) value);
+                                    matchers.at(group_id).first->setBlockSize((int) value);
                                     return value;
                                 }),
                                 "BlockSize",
-                                matchers.at(group_id).left->getBlockSize(),
+                                matchers.at(group_id).second->getBlockSize(),
                                 2,
                                 21,
                                 5,
@@ -246,11 +253,11 @@ namespace eox {
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setNumDisparities((int) value);
+                                    matchers.at(group_id).first->setNumDisparities((int) value);
                                     return value;
                                 }),
                                 "NumDisparities",
-                                matchers.at(group_id).left->getNumDisparities(),
+                                matchers.at(group_id).second->getNumDisparities(),
                                 16,
                                 64,
                                 16,
@@ -370,17 +377,17 @@ namespace eox {
 
                     // TODO READ CONFIG FROM FILE
 
-                    ts::lr_matchers lr_matchers = {.left = matcher, .right = matcher};
+                    std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>> lr_matchers(matcher, matcher);
                     matchers.emplace(group_id, std::move(lr_matchers));
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setBlockSize((int) value);
+                                    matchers.at(group_id).first->setBlockSize((int) value);
                                     return value;
                                 }),
                                 "BlockSize",
-                                matchers.at(group_id).left->getBlockSize(),
+                                matchers.at(group_id).second->getBlockSize(),
                                 2,
                                 3,
                                 1,
@@ -393,11 +400,11 @@ namespace eox {
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setNumDisparities((int) value);
+                                    matchers.at(group_id).first->setNumDisparities((int) value);
                                     return value;
                                 }),
                                 "NumDisparities",
-                                matchers.at(group_id).left->getNumDisparities(),
+                                matchers.at(group_id).second->getNumDisparities(),
                                 16,
                                 64,
                                 16,
@@ -503,11 +510,11 @@ namespace eox {
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setMinDisparity((int) value);
+                                    matchers.at(group_id).first->setMinDisparity((int) value);
                                     return value;
                                 }),
                                 "MinDisparity",
-                                matchers.at(group_id).left->getMinDisparity(),
+                                matchers.at(group_id).second->getMinDisparity(),
                                 1,
                                 0,
                                 -255,
@@ -520,11 +527,11 @@ namespace eox {
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setSpeckleWindowSize((int) value);
+                                    matchers.at(group_id).first->setSpeckleWindowSize((int) value);
                                     return value;
                                 }),
                                 "SpeckleWindowSize",
-                                matchers.at(group_id).left->getSpeckleWindowSize(),
+                                matchers.at(group_id).second->getSpeckleWindowSize(),
                                 1,
                                 0,
                                 0,
@@ -537,11 +544,11 @@ namespace eox {
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setSpeckleRange((int) value);
+                                    matchers.at(group_id).first->setSpeckleRange((int) value);
                                     return value;
                                 }),
                                 "SpeckleRange",
-                                matchers.at(group_id).left->getSpeckleRange(),
+                                matchers.at(group_id).second->getSpeckleRange(),
                                 1,
                                 0,
                                 -255,
@@ -554,11 +561,11 @@ namespace eox {
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([this, group_id](double value){
-                                    matchers.at(group_id).left->setDisp12MaxDiff((int) value);
+                                    matchers.at(group_id).first->setDisp12MaxDiff((int) value);
                                     return value;
                                 }),
                                 "Disp12MaxDiff",
-                                matchers.at(group_id).left->getDisp12MaxDiff(),
+                                matchers.at(group_id).second->getDisp12MaxDiff(),
                                 1,
                                 0,
                                 -255,
@@ -573,7 +580,7 @@ namespace eox {
                     // init wls filter
                     cv::Ptr<cv::ximgproc::DisparityWLSFilter> filter;
                     if (config.stereo.confidence) {
-                        filter = cv::ximgproc::createDisparityWLSFilter(matchers.at(group_id).left);
+                        filter = cv::ximgproc::createDisparityWLSFilter(matchers.at(group_id).first);
                         wlsFilters.emplace(group_id, filter);
                     }
 

@@ -5,6 +5,11 @@
 #ifndef STEREOX_COMMONS_H
 #define STEREOX_COMMONS_H
 
+namespace eox::ts {
+    using group_id = unsigned int;
+    using device_id = unsigned int;
+}
+
 namespace sex::data {
 
     typedef enum  {

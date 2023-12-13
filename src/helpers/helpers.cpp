@@ -271,4 +271,51 @@ namespace sex::helpers {
         }
     }
 
+    void save_bm_data(
+            const cv::Ptr<cv::StereoMatcher>& matcher,
+            const cv::Ptr<cv::ximgproc::DisparityWLSFilter>& filter,
+            const uint group_id,
+            Gtk::Window &window,
+            const data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log
+    ) {
+        const auto filter_text = Gtk::FileFilter::create();
+        filter_text->set_name("Stereo matcher files (*.json)");
+        filter_text->add_pattern("*.json");
+
+        Gtk::FileChooserDialog dialog("Please select a file to save", Gtk::FILE_CHOOSER_ACTION_SAVE);
+        dialog.set_current_name("group_" + std::to_string(group_id) + ".json");
+        dialog.set_current_folder(configuration.work_dir);
+        dialog.add_filter(filter_text);
+        dialog.set_transient_for(window);
+
+        dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+        dialog.add_button("Save", Gtk::RESPONSE_OK);
+
+        const int result = dialog.run();
+        if (result == Gtk::RESPONSE_OK) {
+            auto const file_name = dialog.get_filename();
+
+            const std::filesystem::path parent = dialog.get_file()->get_parent()->get_path();
+            const std::string m_name = "matcher_" + std::to_string(group_id) + ".json";
+            const std::string f_name = "filter_" + std::to_string(group_id) + ".json";
+            cv::FileStorage fs(file_name, cv::FileStorage::WRITE);
+            fs << "type" << "eox::group";
+            fs << "group_id" << std::to_string(group_id);
+            fs << "matcher" << m_name;
+            fs << "filter" << f_name;
+            fs.release();
+
+            const auto m_path = (parent / m_name).string();
+            const auto f_path = (parent / f_name).string();
+
+            eox::ocv::write_stereo_matcher(matcher, m_path);
+            eox::ocv::write_disparity_filter(filter, f_path);
+
+            log->debug("group data saved");
+        } else {
+            log->debug("nothing selected");
+        }
+    }
+
 } // events

@@ -9,7 +9,7 @@
 namespace eox {
 
     using frame_container = struct {
-        std::map<ts::device_id, ts::Frame> frames;
+        std::map<ts::device_id, cv::Mat> frames;
     };
 
 #pragma clang diagnostic push
@@ -96,8 +96,8 @@ namespace eox {
                 cv::UMat disparity_l(source_l.rows, source_l.cols, CV_32FC1);
                 cv::UMat disparity_r(source_l.rows, source_l.cols, CV_32FC1);
 
-                matchers.at(g_id).left->compute(source_l, source_r, disparity_l);
-                matchers.at(g_id).right->compute(source_r, source_l, disparity_r);
+                matchers.at(g_id).first->compute(source_l, source_r, disparity_l);
+                matchers.at(g_id).second->compute(source_r, source_l, disparity_r);
 
                 // Filter Speckles
                 //cv::filterSpeckles(disparity_l, 0, 32, 25);
@@ -116,7 +116,7 @@ namespace eox {
 
             else {
 
-                matchers.at(g_id).left->compute(source_l, source_r, disparity_raw);
+                matchers.at(g_id).first->compute(source_l, source_r, disparity_raw);
 
                 // Filter Speckles
                 //cv::filterSpeckles(disparity_raw, 0, 32, 25);

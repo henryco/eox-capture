@@ -56,6 +56,15 @@ namespace sex::helpers {
             const sex::data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger> &log);
 
+    void save_bm_data(
+            const cv::Ptr<cv::StereoMatcher>& matcher,
+            const cv::Ptr<cv::ximgproc::DisparityWLSFilter>& filter,
+            const uint group_id,
+            Gtk::Window &window,
+            const data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log
+    );
+
 } // events
 
 #endif //STEREOX_HELPERS_H
