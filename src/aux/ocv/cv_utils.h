@@ -331,6 +331,20 @@ namespace eox::ocv {
      * if the file is not found or the data is improperly formatted.
      */
     StereoPackage read_stereo_package(const std::string &file_name);
+
+
+    void write_stereo_matcher(
+            const cv::StereoMatcher *const matcher,
+            const std::string &file_name,
+            bool b64 = false
+    );
+
+
+    bool read_stereo_matcher(
+            cv::StereoMatcher *matcher,
+            const std::string &file_name
+    );
+
 }
 
 

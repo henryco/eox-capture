@@ -487,5 +487,45 @@ namespace eox::ocv {
         return package;
     }
 
+    void write_stereo_matcher(const cv::StereoMatcher *const matcher, const std::string &file_name, bool b64) {
+        const auto flags = cv::FileStorage::WRITE | (b64 ? cv::FileStorage::BASE64 : 0);
+        cv::FileStorage fs(file_name, flags);
+        {
+            if (dynamic_cast<const cv::StereoBM *>(matcher)) {
+                fs << "eox::type" << "BM";
+            }
+            else if (dynamic_cast<const cv::StereoSGBM *>(matcher)) {
+                fs << "eox::type" << "SGBM";
+            }
+            else {
+                fs.release();
+                throw std::runtime_error("unknown stereo matcher type");
+            }
+            matcher->write(fs);
+        }
+        fs.release();
+    }
+
+    bool read_stereo_matcher(cv::StereoMatcher *matcher, const std::string &file_name) {
+        cv::FileStorage fs(file_name, cv::FileStorage::READ);
+
+        std::string type;
+        fs["eox::type"] >> type;
+
+        if ("BM" == type && dynamic_cast<cv::StereoBM *>(matcher)) {
+            matcher->read(fs.root());
+            fs.release();
+            return true;
+        }
+
+        else if ("SGBM" == type && dynamic_cast<cv::StereoSGBM *>(matcher)) {
+            matcher->read(fs.root());
+            fs.release();
+            return true;
+        }
+
+        fs.release();
+        return false;
+    }
 }
 #pragma clang diagnostic pop

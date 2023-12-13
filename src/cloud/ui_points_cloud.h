@@ -12,6 +12,7 @@
 #include "../aux/utils/loop/delta_loop.h"
 #include "../aux/gtk/gl_image.h"
 #include "../aux/ocv/cv_utils.h"
+#include "../aux/gtk/gtk_control.h"
 
 namespace eox {
 
@@ -42,6 +43,8 @@ namespace eox {
         std::map<ts::group_id, ts::lr_matchers> matchers;
         std::map<ts::group_id, eox::ocv::StereoPackage> packages;
         std::map<ts::device_id, ts::group_id> deviceGroupMap;
+
+        std::vector<std::unique_ptr<eox::gtk::GtkControl>> controls;
 
         float FPS = 0;
 

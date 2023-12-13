@@ -9,6 +9,7 @@
 #include <gtkmm/box.h>
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <gtkmm/spinbutton.h>
 
 namespace eox::gtk {
 
@@ -19,6 +20,8 @@ namespace eox::gtk {
     private:
         // preventing memory leak for dynamically allocated u_widgets
         std::vector<std::unique_ptr<Gtk::Widget>> controls;
+
+        std::unique_ptr<Gtk::SpinButton> entry;
 
         std::function<double(double value)> callback;
         sigc::connection debounce_connection;

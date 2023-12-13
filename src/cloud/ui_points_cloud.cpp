@@ -209,7 +209,9 @@ namespace eox {
                     )css");
 
                     reset->signal_clicked().connect([this]() {
-                        // todo on reset
+                        log->debug("reset stereo matcher controls");
+                        for (const auto &control: controls)
+                            control->reset();
                     });
 
                     button_box->pack_start(*reset, Gtk::PACK_SHRINK);
@@ -238,7 +240,7 @@ namespace eox {
                                 255
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -255,7 +257,7 @@ namespace eox {
                                 16 * 20
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -272,7 +274,7 @@ namespace eox {
                                 1
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -289,7 +291,7 @@ namespace eox {
                                 255
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -306,7 +308,7 @@ namespace eox {
                                 63
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -323,7 +325,7 @@ namespace eox {
                                 300
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -340,7 +342,7 @@ namespace eox {
                                 512
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -357,7 +359,7 @@ namespace eox {
                                 512
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
                 }
 
@@ -382,7 +384,7 @@ namespace eox {
                                 255
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -399,7 +401,7 @@ namespace eox {
                                 16 * 20
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -416,7 +418,7 @@ namespace eox {
                                 100
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -433,7 +435,7 @@ namespace eox {
                                 512
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -450,7 +452,7 @@ namespace eox {
                                 5000
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -467,7 +469,7 @@ namespace eox {
                                 5000
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -484,7 +486,7 @@ namespace eox {
                                 3
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
                 }
 
@@ -509,7 +511,7 @@ namespace eox {
                                 255
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -526,7 +528,7 @@ namespace eox {
                                 255
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -543,7 +545,7 @@ namespace eox {
                                 255
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     {
@@ -560,7 +562,7 @@ namespace eox {
                                 255
                         );
                         c_box->pack_start(*control);
-                        keep(std::move(control));
+                        controls.push_back(std::move(control));
                     }
 
                     v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
@@ -576,6 +578,7 @@ namespace eox {
 
                     else {
                         auto filter = cv::ximgproc::createDisparityWLSFilterGeneric(false);
+                        // TODO
                         wlsFilters.emplace(group_id, filter);
                     }
                 }
