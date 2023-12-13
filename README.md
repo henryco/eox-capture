@@ -6,7 +6,6 @@
 - [spdlog](https://github.com/gabime/spdlog) (tl;dr: `libspdlog-dev`)
 - [v4l2](https://trac.gateworks.com/wiki/linux/v4l2) (tl;dr: `libv4l-dev`) (linux)
 - [argparse](https://github.com/p-ranav/argparse#positional-arguments) (includes)
-- MediaPipe (in progress)
 
 ### Cooking in progress
 ![Cooking](https://raw.githubusercontent.com/henryco/eox-capture/master/media/cooking.png)
