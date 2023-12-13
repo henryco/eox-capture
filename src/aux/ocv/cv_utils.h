@@ -356,6 +356,7 @@ namespace eox::ocv {
     void write_stereo_matcher(
             const cv::StereoMatcher *const matcher,
             const std::string &file_name,
+            uint group_id,
             bool b64 = false
     );
 
@@ -379,7 +380,8 @@ namespace eox::ocv {
      */
     bool read_stereo_matcher(
             cv::StereoMatcher *matcher,
-            const std::string &file_name
+            const std::string &file_name,
+            uint group_id
     );
 
     /**
@@ -404,6 +406,7 @@ namespace eox::ocv {
     void write_disparity_filter(
             const cv::ximgproc::DisparityFilter *const filter,
             const std::string &file_name,
+            uint group_id,
             bool b64 = false
     );
 
@@ -426,7 +429,8 @@ namespace eox::ocv {
      */
     bool read_disparity_filter(
             cv::ximgproc::DisparityFilter *filter,
-            const std::string &file_name
+            const std::string &file_name,
+            uint group_id
     );
 }
 

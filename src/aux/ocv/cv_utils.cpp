@@ -486,14 +486,21 @@ namespace eox::ocv {
         return package;
     }
 
-    void write_stereo_matcher(const cv::StereoMatcher *const matcher, const std::string &file_name, bool b64) {
+    void write_stereo_matcher(
+            const cv::StereoMatcher *const matcher,
+            const std::string &file_name,
+            uint group_id,
+            bool b64
+    ) {
         const auto flags = cv::FileStorage::WRITE | (b64 ? cv::FileStorage::BASE64 : 0);
         cv::FileStorage fs(file_name, flags);
         {
             if (dynamic_cast<const cv::StereoBM *const>(matcher)) {
                 fs << "type" << "eox::BM";
+                fs << "group_id" << (int) group_id;
             } else if (dynamic_cast<const cv::StereoSGBM *const>(matcher)) {
                 fs << "type" << "eox::SGBM";
+                fs << "group_id" << (int) group_id;
             } else {
                 fs.release();
                 throw std::runtime_error("unknown stereo matcher type");
@@ -503,8 +510,19 @@ namespace eox::ocv {
         fs.release();
     }
 
-    bool read_stereo_matcher(cv::StereoMatcher *matcher, const std::string &file_name) {
+    bool read_stereo_matcher(
+            cv::StereoMatcher *matcher,
+            const std::string &file_name,
+            uint group_id
+    ) {
         cv::FileStorage fs(file_name, cv::FileStorage::READ);
+
+        int gid = -1;
+        fs["group_id"] >> gid;
+        if ((int) group_id != gid) {
+            fs.release();
+            return false;
+        }
 
         std::string type;
         fs["type"] >> type;
@@ -523,6 +541,7 @@ namespace eox::ocv {
     void write_disparity_filter(
             const cv::ximgproc::DisparityFilter *const filter,
             const std::string &file_name,
+            uint group_id,
             bool b64
     ) {
         const auto flags = cv::FileStorage::WRITE | (b64 ? cv::FileStorage::BASE64 : 0);
@@ -530,6 +549,7 @@ namespace eox::ocv {
         {
             if (dynamic_cast<const cv::ximgproc::DisparityWLSFilter *const>(filter)) {
                 fs << "type" << "eox::wls_filter";
+                fs << "group_id" << (int) group_id;
                 filter->write(fs);
             } else {
                 fs.release();
@@ -539,8 +559,19 @@ namespace eox::ocv {
         fs.release();
     }
 
-    bool read_disparity_filter(cv::ximgproc::DisparityFilter *filter, const std::string &file_name) {
+    bool read_disparity_filter(
+            cv::ximgproc::DisparityFilter *filter,
+            const std::string &file_name,
+            uint group_id
+    ) {
         cv::FileStorage fs(file_name, cv::FileStorage::READ);
+
+        int gid = -1;
+        fs["group_id"] >> gid;
+        if ((int) group_id != gid) {
+            fs.release();
+            return false;
+        }
 
         std::string type;
         fs["type"] >> type;
