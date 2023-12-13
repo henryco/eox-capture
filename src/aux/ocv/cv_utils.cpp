@@ -40,8 +40,7 @@ namespace eox::ocv {
                           | cv::CALIB_CB_FILTER_QUADS
                           | cv::CALIB_CB_ADAPTIVE_THRESH
                           | cv::CALIB_CB_ACCURACY
-                          | cv::CALIB_CB_EXHAUSTIVE
-                          ;
+                          | cv::CALIB_CB_EXHAUSTIVE;
 
         std::vector<cv::Point2f> corners;
         const bool found = cv::findChessboardCorners(gray, size, corners, flags);
@@ -491,13 +490,11 @@ namespace eox::ocv {
         const auto flags = cv::FileStorage::WRITE | (b64 ? cv::FileStorage::BASE64 : 0);
         cv::FileStorage fs(file_name, flags);
         {
-            if (dynamic_cast<const cv::StereoBM *>(matcher)) {
-                fs << "eox::type" << "BM";
-            }
-            else if (dynamic_cast<const cv::StereoSGBM *>(matcher)) {
-                fs << "eox::type" << "SGBM";
-            }
-            else {
+            if (dynamic_cast<const cv::StereoBM *const>(matcher)) {
+                fs << "type" << "eox::BM";
+            } else if (dynamic_cast<const cv::StereoSGBM *const>(matcher)) {
+                fs << "type" << "eox::SGBM";
+            } else {
                 fs.release();
                 throw std::runtime_error("unknown stereo matcher type");
             }
@@ -510,15 +507,10 @@ namespace eox::ocv {
         cv::FileStorage fs(file_name, cv::FileStorage::READ);
 
         std::string type;
-        fs["eox::type"] >> type;
+        fs["type"] >> type;
 
-        if ("BM" == type && dynamic_cast<cv::StereoBM *>(matcher)) {
-            matcher->read(fs.root());
-            fs.release();
-            return true;
-        }
-
-        else if ("SGBM" == type && dynamic_cast<cv::StereoSGBM *>(matcher)) {
+        if (("eox::BM" == type && dynamic_cast<cv::StereoBM *>(matcher)) ||
+            ("eox::SGBM" == type && dynamic_cast<cv::StereoSGBM *>(matcher))) {
             matcher->read(fs.root());
             fs.release();
             return true;
@@ -527,5 +519,41 @@ namespace eox::ocv {
         fs.release();
         return false;
     }
+
+    void write_disparity_filter(
+            const cv::ximgproc::DisparityFilter *const filter,
+            const std::string &file_name,
+            bool b64
+    ) {
+        const auto flags = cv::FileStorage::WRITE | (b64 ? cv::FileStorage::BASE64 : 0);
+        cv::FileStorage fs(file_name, flags);
+        {
+            if (dynamic_cast<const cv::ximgproc::DisparityWLSFilter *const>(filter)) {
+                fs << "type" << "eox::wls_filter";
+                filter->write(fs);
+            } else {
+                fs.release();
+                throw std::runtime_error("unknown disparity filter type");
+            }
+        }
+        fs.release();
+    }
+
+    bool read_disparity_filter(cv::ximgproc::DisparityFilter *filter, const std::string &file_name) {
+        cv::FileStorage fs(file_name, cv::FileStorage::READ);
+
+        std::string type;
+        fs["type"] >> type;
+
+        if ("eox::wls_filter" == type && dynamic_cast<cv::ximgproc::DisparityWLSFilter *>(filter)) {
+            filter->read(fs.root());
+            fs.release();
+            return true;
+        }
+
+        fs.release();
+        return false;
+    }
+
 }
 #pragma clang diagnostic pop

@@ -9,6 +9,7 @@
 #include <opencv4/opencv2/calib3d.hpp>
 #include <opencv2/imgproc.hpp>
 #include <map>
+#include <opencv2/ximgproc/disparity_filter.hpp>
 
 namespace eox::ocv {
 
@@ -333,6 +334,25 @@ namespace eox::ocv {
     StereoPackage read_stereo_package(const std::string &file_name);
 
 
+    /**
+     * @brief Writes a StereoMatcher object to a file.
+     *
+     * This function serializes the configuration of a cv::StereoMatcher object (either StereoBM or StereoSGBM)
+     * and writes it to a specified file.
+     * The file format can optionally be base64 encoded.
+     *
+     * @param matcher A pointer to a constant cv::StereoMatcher object.
+     * This object should be either of type cv::StereoBM or cv::StereoSGBM.
+     * @param file_name A string representing the name (and path) of the file where the matcher configuration will be saved.
+     * @param b64 A boolean flag indicating whether the file should be base64 encoded. If true, the file is encoded
+     * in base64, otherwise, it is saved in plain text.
+     *
+     * @throw std::runtime_error Throws a runtime error if the matcher type is neither cv::StereoBM nor cv::StereoSGBM.
+     *
+     * The function determines the type of the matcher object using dynamic casting and writes the type along with
+     * the matcher's configuration to the file.
+     * If the matcher type is unknown, it releases the file and throws an exception.
+     */
     void write_stereo_matcher(
             const cv::StereoMatcher *const matcher,
             const std::string &file_name,
@@ -340,11 +360,74 @@ namespace eox::ocv {
     );
 
 
+    /**
+     * @brief Reads and configures a StereoMatcher object from a file.
+     *
+     * This function deserializes a configuration for a cv::StereoMatcher object (either StereoBM or StereoSGBM)
+     * from a specified file and applies this configuration to the provided matcher object.
+     *
+     * @param matcher A pointer to a non-constant cv::StereoMatcher object. This object should be
+     * of type cv::StereoBM or cv::StereoSGBM, matching the type specified in the file.
+     * @param file_name A string representing the name (and path) of the file from which the matcher configuration will be read.
+     *
+     * @return Returns true if the matcher's type matches the type specified in the file and the configuration
+     * is successfully applied. Returns false otherwise.
+     *
+     * The function first reads the type of the matcher from the file and then checks if the provided matcher
+     * object is of the same type. If the types match, it applies the configuration from the file to the matcher.
+     * If the types do not match, the function returns false without modifying the matcher object.
+     */
     bool read_stereo_matcher(
             cv::StereoMatcher *matcher,
             const std::string &file_name
     );
 
+    /**
+     * @brief Writes a DisparityFilter object to a file.
+     *
+     * This function serializes the configuration of a cv::ximgproc::DisparityFilter object
+     * (specifically DisparityWLSFilter) and writes it to a specified file.
+     * The file format can optionally be base64 encoded.
+     *
+     * @param filter A pointer to a constant cv::ximgproc::DisparityFilter object. This object should be of type
+     * cv::ximgproc::DisparityWLSFilter.
+     * @param file_name A string representing the name (and path) of the file where the filter configuration will be saved.
+     * @param b64 A boolean flag indicating whether the file should be base64 encoded. If true,
+     * the file is encoded in base64, otherwise, it is saved in plain text.
+     *
+     * @throw std::runtime_error Throws a runtime error if the filter type is not cv::ximgproc::DisparityWLSFilter.
+     *
+     * The function checks the type of the filter object using dynamic casting and writes the type along
+     * with the filter's configuration to the file.
+     * If the filter type is unknown, it releases the file and throws an exception.
+     */
+    void write_disparity_filter(
+            const cv::ximgproc::DisparityFilter *const filter,
+            const std::string &file_name,
+            bool b64 = false
+    );
+
+    /**
+     * @brief Reads and configures a DisparityFilter object from a file.
+     *
+     * This function deserializes a configuration for a cv::ximgproc::DisparityFilter object (specifically DisparityWLSFilter)
+     * from a specified file and applies this configuration to the provided filter object.
+     *
+     * @param filter A pointer to a non-constant cv::ximgproc::DisparityFilter object. This object should be of type
+     * cv::ximgproc::DisparityWLSFilter, matching the type specified in the file.
+     * @param file_name A string representing the name (and path) of the file from which the filter configuration will be read.
+     *
+     * @return Returns true if the filter's type matches the type specified in the file and the configuration
+     * is successfully applied. Returns false otherwise.
+     *
+     * The function first reads the type of the filter from the file and then checks if the provided filter object
+     * is of the same type. If the types match, it applies the configuration from the file to the filter.
+     * If the types do not match, the function returns false without modifying the filter object.
+     */
+    bool read_disparity_filter(
+            cv::ximgproc::DisparityFilter *filter,
+            const std::string &file_name
+    );
 }
 
 
