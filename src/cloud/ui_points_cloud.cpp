@@ -10,7 +10,6 @@
 #include "../aux/gtk/gtk_cam_params.h"
 #include "../aux/utils/mappers/cam_gtk_mapper.h"
 #include "../aux/gtk/gtk_utils.h"
-#include "../aux/gtk/gtk_control.h"
 
 namespace eox {
 
@@ -87,9 +86,9 @@ namespace eox {
             if (config.camera[0].homogeneous) {
                 // homogeneous camera configuration, but it applies only for device groups
 
-                const auto controls = camera.getControls(false);
+                const auto _controls = camera.getControls(false);
                 std::map<uint, sex::xocv::camera_controls> cam_controls;
-                for (const auto &control: controls) {
+                for (const auto &control: _controls) {
                     cam_controls.emplace(control.id, control);
                 }
 
@@ -132,8 +131,8 @@ namespace eox {
             } else {
                 // non homogeneous camera configuration
 
-                const auto controls = camera.getControls(false);
-                for (const auto &control: controls) {
+                const auto _controls = camera.getControls(false);
+                for (const auto &control: _controls) {
                     const auto dev_id = control.id;
 
                     auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
@@ -221,6 +220,9 @@ namespace eox {
 
                     auto matcher = cv::StereoBM::create();
                     matcher->setTextureThreshold(0);
+
+                    // TODO READ CONFIG FROM FILE
+
                     ts::lr_matchers lr_matchers = {.left = matcher, .right = matcher};
                     matchers.emplace(group_id, std::move(lr_matchers));
 
@@ -365,6 +367,9 @@ namespace eox {
                     log->debug("SGBM block matcher");
 
                     auto matcher = cv::StereoSGBM::create();
+
+                    // TODO READ CONFIG FROM FILE
+
                     ts::lr_matchers lr_matchers = {.left = matcher, .right = matcher};
                     matchers.emplace(group_id, std::move(lr_matchers));
 
@@ -578,6 +583,10 @@ namespace eox {
                     }
 
                     {
+                        // TODO READ CONFIG FROM FILE
+                    }
+
+                    {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
                                 ([filter](double value){
                                     filter->setLambda(value);
@@ -681,10 +690,8 @@ namespace eox {
     }
 
     void UiPointsCloud::onRefresh() {
-        set_title("StereoX++ stereo [ " + std::to_string((int) FPS) + " FPS ]");
-
-        // TODO
-
+        const std::string name = config.stereo.algorithm == sex::data::BM ? "BM" : "SGBM";
+        set_title("StereoX++ " + name + " [ " + std::to_string((int) FPS) + " FPS ]");
         glImage.update();
     }
 
