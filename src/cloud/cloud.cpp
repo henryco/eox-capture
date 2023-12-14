@@ -91,10 +91,10 @@ namespace eox {
             }
 
             // computing disparity map
-            cv::UMat disparity, disparity_raw(source_l.rows, source_l.cols, CV_32FC1);
+            cv::UMat disparity, disparity_raw;
             if (config.stereo.confidence) {
-                cv::UMat disparity_l(source_l.rows, source_l.cols, CV_32FC1);
-                cv::UMat disparity_r(source_l.rows, source_l.cols, CV_32FC1);
+                cv::UMat disparity_l;
+                cv::UMat disparity_r;
 
                 matchers.at(g_id).first->compute(source_l, source_r, disparity_l);
                 matchers.at(g_id).second->compute(source_r, source_l, disparity_r);
@@ -128,18 +128,26 @@ namespace eox {
                 );
             }
 
-
+            // converting to CV_16F
+            if ((disparity.depth() & CV_MAT_DEPTH_MASK) == CV_16S) {
+                cv::UMat temp;
+                disparity.convertTo(temp, CV_32F, 1. / 16.);
+                disparity = temp;
+            }
 
             // ! ! !
             // NOTE, SHOULD USE [ disparity ] matrix for further computation
             // ! ! !
 
+            cv::UMat points_cloud;
+            cv::reprojectImageTo3D(disparity, points_cloud, rect.Q);
 
 
             // Convert the disparity values to a range that can be represented in 8-bit format
-            cv::UMat normalized_disp, normalized_raw;
+            cv::UMat normalized_disp, normalized_raw, normalized_point;
             cv::normalize(disparity, normalized_disp, 0, 255, cv::NORM_MINMAX, CV_8U);
             cv::normalize(disparity_raw, normalized_raw, 0, 255, cv::NORM_MINMAX, CV_8U);
+            cv::normalize(points_cloud, normalized_point, 0, 255, cv::NORM_MINMAX, CV_8U);
 
             // converting back to BGR
             cv::UMat bgr_l, bgr_r, bgr_disparity, bgr_raw;
@@ -149,17 +157,18 @@ namespace eox {
             cv::cvtColor(normalized_raw, bgr_raw, cv::COLOR_GRAY2BGR);
 
             // converting back to regular cv::Mat
-            cv::Mat left, right, disp, raw;
+            cv::Mat left, right, disp, raw, point;
             bgr_l.copyTo(left);
             bgr_r.copyTo(right);
             bgr_raw.copyTo(raw);
             bgr_disparity.copyTo(disp);
+            normalized_point.copyTo(point);
 
             // saving results to global vector of frames (goes to render output)
             _frames.push_back(left);
-//            _frames.push_back(right);
             _frames.push_back(raw);
             _frames.push_back(disp);
+            _frames.push_back(point);
         }
 
         glImage.setFrames(_frames);

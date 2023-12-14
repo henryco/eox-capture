@@ -27,9 +27,10 @@ namespace eox {
             for (const auto &group: config.groups) {
                 const auto p = props[0];
                 const auto dim = std::to_string(p.output_width) + "x" + std::to_string(p.output_height);
-                group_ids.push_back(std::to_string(group.first) + "_1 [" + dim + "]");
-                group_ids.push_back(std::to_string(group.first) + "_2 [" + dim + "]");
-                group_ids.push_back(std::to_string(group.first) + "_S [" + dim + "]");
+                group_ids.push_back(std::to_string(group.first) + "_L [" + dim + "]");
+                group_ids.push_back(std::to_string(group.first) + "_D [" + dim + "]");
+                group_ids.push_back(std::to_string(group.first) + "_F [" + dim + "]");
+                group_ids.push_back(std::to_string(group.first) + "_P [" + dim + "]");
             }
 
             // Init oGL canvas
