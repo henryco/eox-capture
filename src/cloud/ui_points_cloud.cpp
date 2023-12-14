@@ -223,6 +223,26 @@ namespace eox {
                     keep(std::move(save));
                 }
 
+                {
+                    auto exp = std::make_unique<Gtk::Button>();
+                    exp->get_style_context()->add_class("button-export");
+                    exp->set_size_request(-1, 30);
+                    exp->set_label("Export 3D");
+                    sex::xgtk::add_style(*exp, R"css(
+                        .button-export {
+                             margin-right: 20px;
+                             margin-bottom: 5px;
+                         }
+                    )css");
+
+                    exp->signal_clicked().connect([this, group_id]() {
+                        // TODO
+                    });
+
+                    button_box->pack_end(*exp, Gtk::PACK_SHRINK);
+                    keep(std::move(exp));
+                }
+
                 if (config.stereo.algorithm == sex::data::Algorithm::BM) {
                     log->debug("BM block matcher");
 
