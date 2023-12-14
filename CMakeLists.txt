@@ -37,7 +37,6 @@ add_executable(${PROJECT_NAME}
         src/aux/ocv/stereo_camera.h
         src/aux/utils/tp/thread_pool.cpp
         src/aux/utils/tp/thread_pool.h
-        include/stb/stb_image.h
         src/aux/ogl/render/texture_1.cpp
         src/aux/ogl/render/texture_1.h
         src/aux/ogl/shader/simple_shader.cpp
@@ -74,6 +73,8 @@ add_executable(${PROJECT_NAME}
         src/aux/gtk/gtk_control.cpp
         src/aux/gtk/gtk_control.h
         src/aux/utils/mappers/cam_gtk_mapper.cpp
+        src/aux/ocv/point_cloud.cpp
+        src/aux/ocv/point_cloud.h
 )
 
 # Include directories for the specific target

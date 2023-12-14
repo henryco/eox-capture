@@ -71,23 +71,23 @@ namespace eox {
             cv::UMat &frame_l = frames_pair[0];
             cv::UMat &frame_r = frames_pair[1];
 
-            // convert from BGR to Grayscale
-            cv::UMat gray_l, gray_r;
-            cv::cvtColor(frame_l, gray_l, cv::COLOR_BGR2GRAY);
-            cv::cvtColor(frame_r, gray_r, cv::COLOR_BGR2GRAY);
-
             // remapping frames according to stereo rectification
             cv::UMat source_l, source_r;
-            cv::remap(gray_l, source_l, L_MAP1, L_MAP2, cv::INTER_LINEAR);
-            cv::remap(gray_r, source_r, R_MAP1, R_MAP2, cv::INTER_LINEAR);
+            cv::remap(frame_l, source_l, L_MAP1, L_MAP2, cv::INTER_LINEAR);
+            cv::remap(frame_r, source_r, R_MAP1, R_MAP2, cv::INTER_LINEAR);
+
+            // convert from BGR to Grayscale
+            cv::UMat gray_l, gray_r;
+            cv::cvtColor(source_l, gray_l, cv::COLOR_BGR2GRAY);
+            cv::cvtColor(source_r, gray_r, cv::COLOR_BGR2GRAY);
 
             // denoising, might be very resource intensive
             if (config.denoise) {
                 cv::UMat filtered_l, filtered_r;
-                cv::fastNlMeansDenoising(source_l, filtered_l);
+                cv::fastNlMeansDenoising(gray_l, filtered_l);
                 cv::fastNlMeansDenoising(source_r, filtered_r);
-                source_l = filtered_l;
-                source_r = filtered_r;
+                gray_l = filtered_l;
+                gray_r = filtered_r;
             }
 
             // computing disparity map
@@ -96,8 +96,8 @@ namespace eox {
                 cv::UMat disparity_l;
                 cv::UMat disparity_r;
 
-                matchers.at(g_id).first->compute(source_l, source_r, disparity_l);
-                matchers.at(g_id).second->compute(source_r, source_l, disparity_r);
+                matchers.at(g_id).first->compute(gray_l, gray_r, disparity_l);
+                matchers.at(g_id).second->compute(gray_r, gray_l, disparity_r);
 
                 // Filter Speckles
                 //cv::filterSpeckles(disparity_l, 0, 32, 25);
@@ -105,23 +105,23 @@ namespace eox {
 
                 wlsFilters.at(g_id)->filter(
                         disparity_l,
-                        source_l,
+                        gray_l,
                         disparity,
                         disparity_r,
                         cv::Rect(),
-                        source_r
+                        gray_r
                 );
                 disparity_raw = disparity_l;
             } else {
 
-                matchers.at(g_id).first->compute(source_l, source_r, disparity_raw);
+                matchers.at(g_id).first->compute(gray_l, gray_r, disparity_raw);
 
                 // Filter Speckles
                 //cv::filterSpeckles(disparity_raw, 0, 32, 25);
 
                 wlsFilters.at(g_id)->filter(
                         disparity_raw,
-                        source_l,
+                        gray_l,
                         disparity
                 );
             }
@@ -153,16 +153,13 @@ namespace eox {
             cv::normalize(points_cloud, normalized_point, 0, 255, cv::NORM_MINMAX, CV_8U);
 
             // converting back to BGR
-            cv::UMat bgr_l, bgr_r, bgr_disparity, bgr_raw;
-            cv::cvtColor(source_l, bgr_l, cv::COLOR_GRAY2BGR);
-            cv::cvtColor(source_r, bgr_r, cv::COLOR_GRAY2BGR);
+            cv::UMat bgr_l, bgr_disparity, bgr_raw;
             cv::cvtColor(normalized_disp, bgr_disparity, cv::COLOR_GRAY2BGR);
             cv::cvtColor(normalized_raw, bgr_raw, cv::COLOR_GRAY2BGR);
 
             // converting back to regular cv::Mat
-            cv::Mat left, right, disp, raw, point;
-            bgr_l.copyTo(left);
-            bgr_r.copyTo(right);
+            cv::Mat left, raw, disp, point;
+            source_l.copyTo(left);
             bgr_raw.copyTo(raw);
             bgr_disparity.copyTo(disp);
             normalized_point.copyTo(point);
@@ -172,6 +169,9 @@ namespace eox {
             _frames.push_back(raw);
             _frames.push_back(disp);
             _frames.push_back(point);
+
+            // assign to member properties
+            points[g_id] = ocv::PointCloud(disparity, points_cloud, source_l);
         }
 
         glImage.setFrames(_frames);

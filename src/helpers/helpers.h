@@ -12,6 +12,7 @@
 #include "../aux/commons.h"
 #include "../aux/ocv/stereo_camera.h"
 #include "../aux/ocv/cv_utils.h"
+#include "../aux/ocv/point_cloud.h"
 
 namespace sex::helpers {
 
@@ -78,6 +79,12 @@ namespace sex::helpers {
             const std::vector<std::filesystem::path> &paths,
             const std::shared_ptr<spdlog::logger> &log
     );
+
+    void save_points_ply(
+            const eox::ocv::PointCloud &points,
+            Gtk::Window &window,
+            const sex::data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log);
 
 } // events
 

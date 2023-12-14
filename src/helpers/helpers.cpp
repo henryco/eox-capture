@@ -413,4 +413,46 @@ namespace sex::helpers {
         }
     }
 
+    void save_points_ply(
+            const eox::ocv::PointCloud &points,
+            Gtk::Window &window,
+            const sex::data::basic_config &configuration,
+            const std::shared_ptr<spdlog::logger> &log) {
+        log->debug("saving points cloud to ply");
+
+        const auto filter_text = Gtk::FileFilter::create();
+        filter_text->set_name("Points cloud files (*.ply)");
+        filter_text->add_pattern("*.ply");
+
+        Gtk::FileChooserDialog dialog("Please select a file to save", Gtk::FILE_CHOOSER_ACTION_SAVE);
+        dialog.set_current_folder(configuration.work_dir);
+        dialog.set_current_name("points.ply");
+        dialog.add_filter(filter_text);
+        dialog.set_transient_for(window);
+
+        dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
+        dialog.add_button("Save", Gtk::RESPONSE_OK);
+
+        if (dialog.run() == Gtk::RESPONSE_OK) {
+
+            auto const file_name = dialog.get_filename();
+            log->debug("selected file: {}", file_name);
+
+            std::ofstream file_stream(file_name, std::ios::out);
+            if (!file_stream) {
+                log->error("File stream opening error");
+                // maybe throw some exception or show some modal?
+                return;
+            }
+
+            // save PLY file
+            points.write_to_ply(file_stream);
+
+            // closing the stream
+            file_stream.close();
+        } else {
+            log->debug("nothing selected");
+        }
+    }
+
 } // events

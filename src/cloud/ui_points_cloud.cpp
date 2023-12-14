@@ -236,7 +236,7 @@ namespace eox {
                     )css");
 
                     exp->signal_clicked().connect([this, group_id]() {
-                        // TODO
+                        sex::helpers::save_points_ply(points.at(group_id), *this, config, log);
                     });
 
                     button_box->pack_end(*exp, Gtk::PACK_SHRINK);

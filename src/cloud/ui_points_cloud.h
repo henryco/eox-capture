@@ -13,6 +13,7 @@
 #include "../aux/gtk/gl_image.h"
 #include "../aux/ocv/cv_utils.h"
 #include "../aux/gtk/gtk_control.h"
+#include "../aux/ocv/point_cloud.h"
 
 namespace eox {
 
@@ -42,6 +43,8 @@ namespace eox {
 
         std::vector<std::unique_ptr<eox::gtk::GtkControl>> controls;
         float FPS = 0;
+
+        std::map<ts::group_id, eox::ocv::PointCloud> points;
 
     public:
         UiPointsCloud() = default;
