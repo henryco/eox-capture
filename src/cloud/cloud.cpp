@@ -112,9 +112,7 @@ namespace eox {
                         source_r
                 );
                 disparity_raw = disparity_l;
-            }
-
-            else {
+            } else {
 
                 matchers.at(g_id).first->compute(source_l, source_r, disparity_raw);
 
@@ -135,12 +133,17 @@ namespace eox {
                 disparity = temp;
             }
 
+
             // ! ! !
             // NOTE, SHOULD USE [ disparity ] matrix for further computation
             // ! ! !
 
             cv::UMat points_cloud;
             cv::reprojectImageTo3D(disparity, points_cloud, rect.Q);
+
+            // ! ! !
+            // NOTE, SHOULD USE [ points_cloud ] matrix for further computation
+            // ! ! !
 
 
             // Convert the disparity values to a range that can be represented in 8-bit format
