@@ -12,6 +12,11 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 namespace eox::ocv {
 
+    void clamp(cv::InputOutputArray &mat, double min, double max) {
+        cv::threshold(mat, mat, min, min, cv::THRESH_TOZERO);
+        cv::threshold(mat, mat, max, max, cv::THRESH_TRUNC);
+    }
+
     cv::Mat img_copy(const cv::Mat &image, int color_space_conv_type, int matrix_data_type) {
         cv::Mat output;
         image.convertTo(output, matrix_data_type);

@@ -72,6 +72,7 @@ namespace eox::ocv {
         bool ok;
     };
 
+    void clamp(cv::InputOutputArray &mat, double min, double max);
 
     /**
      * \brief Create a copy of the given image.
