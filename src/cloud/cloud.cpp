@@ -137,6 +137,19 @@ namespace eox {
 
             // converting to CV_16F
             if ((disparity.depth() & CV_MAT_DEPTH_MASK) == CV_16S) {
+
+                double min = -1, max = -1;
+                cv::minMaxIdx(disparity, &min, &max);
+                log->info("MIN: {}, MAX: {}", ((int16_t) min) >> 4, ((int16_t) max )>> 4);
+
+//                const auto &m = disparity.getMat(cv::ACCESS_READ);
+//                for (int i = 0; i < m.rows; i++) {
+//                    auto element = m.at<int16_t>(i, 0);
+//                    log->info("> [{}]: {} | {}", i, element, (int16_t) (element >> 4));
+//                }
+
+
+
                 cv::UMat temp;
                 disparity.convertTo(temp, CV_32F, 1. / 16.);
                 disparity = temp;
@@ -148,7 +161,7 @@ namespace eox {
             // ! ! !
 
             cv::UMat points_cloud;
-            cv::reprojectImageTo3D(disparity, points_cloud, rect.Q);
+            cv::reprojectImageTo3D(disparity, points_cloud, rect.Q, true);
 
             // ! ! !
             // NOTE, SHOULD USE [ points_cloud ] matrix for further computation
@@ -163,8 +176,18 @@ namespace eox {
 
             // converting back to BGR
             cv::UMat bgr_l, bgr_disparity, bgr_raw;
-            cv::cvtColor(normalized_disp, bgr_disparity, cv::COLOR_GRAY2BGR);
-            cv::cvtColor(normalized_raw, bgr_raw, cv::COLOR_GRAY2BGR);
+            {
+                // using raw values
+                cv::cvtColor(normalized_disp, bgr_disparity, cv::COLOR_GRAY2BGR);
+                cv::cvtColor(normalized_raw, bgr_raw, cv::COLOR_GRAY2BGR);
+            }
+
+            {
+                // using colormap
+//                cv::applyColorMap(disparity, bgr_disparity, cv::COLORMAP_JET);
+//                cv::applyColorMap(disparity_raw, bgr_raw, cv::COLORMAP_JET);
+            }
+
 
             // converting back to regular cv::Mat
             cv::Mat left, raw, disp, point;

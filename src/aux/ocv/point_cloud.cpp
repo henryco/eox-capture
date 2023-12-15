@@ -24,15 +24,15 @@ namespace eox::ocv {
         u_rgb = u_rgb.reshape(1, (int) u_rgb.total() / 3);
 
         double min_z = -1;
-        cv::minMaxIdx(u_xyz.col(2), &min_z);
+        double max_z = -1;
+        cv::minMaxIdx(u_xyz.col(2), &min_z, &max_z);
 
         cv::Mat filtered_xyz, filtered_rgb, xyz, rgb;
         u_xyz.copyTo(xyz);
         u_rgb.copyTo(rgb);
 
         for (int i = 0; i < xyz.rows; ++i) {
-            float z = xyz.at<float>(i, 2);
-            if (z > static_cast<float>(min_z)) {
+            if (xyz.at<float>(i, 2) < max_z) {
                 filtered_xyz.push_back(xyz.row(i));
                 filtered_rgb.push_back(rgb.row(i));
             }
@@ -50,12 +50,12 @@ namespace eox::ocv {
         out << "end_header\n";
 
         for (int i = 0; i < xyz.rows; i++) {
-            out << xyz.at<float>(i, 0) << " ";
-            out << xyz.at<float>(i, 1) << " ";
-            out << xyz.at<float>(i, 2) << " ";
-            out << (uint) rgb.at<uchar>(i, 0) << " ";
-            out << (uint) rgb.at<uchar>(i, 1) << " ";
-            out << (uint) rgb.at<uchar>(i, 2) << "\n";
+            out << filtered_xyz.at<float>(i, 0) << " ";
+            out << filtered_xyz.at<float>(i, 1) << " ";
+            out << filtered_xyz.at<float>(i, 2) << " ";
+            out << (uint) filtered_rgb.at<uchar>(i, 0) << " ";
+            out << (uint) filtered_rgb.at<uchar>(i, 1) << " ";
+            out << (uint) filtered_rgb.at<uchar>(i, 2) << "\n";
         }
 
         out.flush();
