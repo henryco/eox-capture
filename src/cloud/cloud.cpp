@@ -142,14 +142,6 @@ namespace eox {
                 cv::minMaxIdx(disparity, &min, &max);
                 log->info("MIN: {}, MAX: {}", ((int16_t) min) >> 4, ((int16_t) max )>> 4);
 
-//                const auto &m = disparity.getMat(cv::ACCESS_READ);
-//                for (int i = 0; i < m.rows; i++) {
-//                    auto element = m.at<int16_t>(i, 0);
-//                    log->info("> [{}]: {} | {}", i, element, (int16_t) (element >> 4));
-//                }
-
-
-
                 cv::UMat temp;
                 disparity.convertTo(temp, CV_32F, 1. / 16.);
                 disparity = temp;
@@ -176,18 +168,8 @@ namespace eox {
 
             // converting back to BGR
             cv::UMat bgr_l, bgr_disparity, bgr_raw;
-            {
-                // using raw values
-                cv::cvtColor(normalized_disp, bgr_disparity, cv::COLOR_GRAY2BGR);
-                cv::cvtColor(normalized_raw, bgr_raw, cv::COLOR_GRAY2BGR);
-            }
-
-            {
-                // using colormap
-//                cv::applyColorMap(disparity, bgr_disparity, cv::COLORMAP_JET);
-//                cv::applyColorMap(disparity_raw, bgr_raw, cv::COLORMAP_JET);
-            }
-
+            cv::cvtColor(normalized_disp, bgr_disparity, cv::COLOR_GRAY2BGR);
+            cv::cvtColor(normalized_raw, bgr_raw, cv::COLOR_GRAY2BGR);
 
             // converting back to regular cv::Mat
             cv::Mat left, raw, disp, point;
