@@ -164,7 +164,14 @@ namespace eox {
             cv::UMat normalized_disp, normalized_raw, normalized_point;
             cv::normalize(disparity, normalized_disp, 0, 255, cv::NORM_MINMAX, CV_8U);
             cv::normalize(disparity_raw, normalized_raw, 0, 255, cv::NORM_MINMAX, CV_8U);
-            cv::normalize(points_cloud, normalized_point, 0, 255, cv::NORM_MINMAX, CV_8U);
+
+            {
+                cv::UMat depth, temp;
+                cv::extractChannel(points_cloud, depth, 2);
+                eox::ocv::clamp(depth, 0, 255);
+                depth.convertTo(temp, CV_8U);
+                cv::applyColorMap(temp, normalized_point, cv::COLORMAP_JET);
+            }
 
             // converting back to BGR
             cv::UMat bgr_l, bgr_disparity, bgr_raw;
