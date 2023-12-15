@@ -103,15 +103,20 @@ namespace eox {
                 //cv::filterSpeckles(disparity_l, 0, 32, 25);
                 //cv::filterSpeckles(disparity_r, 0, 32, 25);
 
-                wlsFilters.at(g_id)->filter(
-                        disparity_l,
-                        gray_l,
-                        disparity,
-                        disparity_r,
-                        cv::Rect(),
-                        gray_r
-                );
                 disparity_raw = disparity_l;
+
+                if (wlsFilters.at(g_id)->getLambda() != 0) {
+                    wlsFilters.at(g_id)->filter(
+                            disparity_l,
+                            gray_l,
+                            disparity,
+                            disparity_r,
+                            cv::Rect(),
+                            gray_r
+                    );
+                } else {
+                    disparity = disparity_raw;
+                }
             } else {
 
                 matchers.at(g_id).first->compute(gray_l, gray_r, disparity_raw);
@@ -119,11 +124,15 @@ namespace eox {
                 // Filter Speckles
                 //cv::filterSpeckles(disparity_raw, 0, 32, 25);
 
-                wlsFilters.at(g_id)->filter(
-                        disparity_raw,
-                        gray_l,
-                        disparity
-                );
+                if (wlsFilters.at(g_id)->getLambda() != 0) {
+                    wlsFilters.at(g_id)->filter(
+                            disparity_raw,
+                            gray_l,
+                            disparity
+                    );
+                } else {
+                    disparity = disparity_raw;
+                }
             }
 
             // converting to CV_16F
