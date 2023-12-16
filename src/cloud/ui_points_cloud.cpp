@@ -62,15 +62,18 @@ namespace eox {
                     return;
                 }
 
-                const auto distance= data.at<float>(2);
-                const auto text = "Distance: " + std::to_string(distance);
+                const auto _x = data.at<float>(0);
+                const auto _y = data.at<float>(0);
+                const auto _z = data.at<float>(2);
+                const auto _d = cv::norm(cv::Point3f(_x, _y, _z) - cv::Point3f(0, 0, 0));
+                const auto text = "Z: " + std::to_string(_z) + " \nD: " + std::to_string(_d);
 
                 set_tooltip_text("");
                 set_has_tooltip(false);
                 set_has_tooltip(true);
                 set_tooltip_text(text);
 
-                log->debug("distance: {}", distance);
+                log->debug("z: {}, d: {}", _z, _d);
             });
         }
 
@@ -302,7 +305,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setBlockSize((int) value);
                                     return value;
                                 }),
@@ -319,7 +322,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setNumDisparities((int) value);
                                     return value;
                                 }),
@@ -336,7 +339,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([matcher](double value){
+                                ([matcher](double value) {
                                     matcher->setPreFilterType((int) value);
                                     return value;
                                 }),
@@ -435,9 +438,7 @@ namespace eox {
                         c_box->pack_start(*control);
                         controls.push_back(std::move(control));
                     }
-                }
-
-                else if (config.stereo.algorithm == sex::data::Algorithm::SGBM) {
+                } else if (config.stereo.algorithm == sex::data::Algorithm::SGBM) {
                     log->debug("SGBM block matcher");
 
                     auto matcher = cv::StereoSGBM::create();
@@ -459,7 +460,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setBlockSize((int) value);
                                     return value;
                                 }),
@@ -476,7 +477,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setNumDisparities((int) value);
                                     return value;
                                 }),
@@ -493,7 +494,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([matcher](double value){
+                                ([matcher](double value) {
                                     matcher->setPreFilterCap((int) value);
                                     return value;
                                 }),
@@ -575,9 +576,7 @@ namespace eox {
                         c_box->pack_start(*control);
                         controls.push_back(std::move(control));
                     }
-                }
-
-                else {
+                } else {
                     log->error("Unknown block matcher algorithm");
                     throw std::runtime_error("Unknown block matcher algorithm");
                 }
@@ -586,7 +585,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setMinDisparity((int) value);
                                     return value;
                                 }),
@@ -603,7 +602,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setSpeckleWindowSize((int) value);
                                     return value;
                                 }),
@@ -620,7 +619,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setSpeckleRange((int) value);
                                     return value;
                                 }),
@@ -637,7 +636,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([this, group_id](double value){
+                                ([this, group_id](double value) {
                                     matchers.at(group_id).first->setDisp12MaxDiff((int) value);
                                     return value;
                                 }),
@@ -659,9 +658,7 @@ namespace eox {
                     if (config.stereo.confidence) {
                         filter = cv::ximgproc::createDisparityWLSFilter(matchers.at(group_id).first);
                         wlsFilters.emplace(group_id, filter);
-                    }
-
-                    else {
+                    } else {
                         filter = cv::ximgproc::createDisparityWLSFilterGeneric(false);
                         wlsFilters.emplace(group_id, filter);
                     }
@@ -680,7 +677,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([filter](double value){
+                                ([filter](double value) {
                                     filter->setLambda(value);
                                     return value;
                                 }),
@@ -698,7 +695,7 @@ namespace eox {
 
                     {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([filter](double value){
+                                ([filter](double value) {
                                     filter->setSigmaColor(value);
                                     return value;
                                 }),
@@ -716,7 +713,7 @@ namespace eox {
 
                     if (config.stereo.confidence) {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([filter](double value){
+                                ([filter](double value) {
                                     filter->setLRCthresh((int) value);
                                     return value;
                                 }),
@@ -733,7 +730,7 @@ namespace eox {
 
                     if (config.stereo.confidence) {
                         auto control = std::make_unique<eox::gtk::GtkControl>(
-                                ([filter](double value){
+                                ([filter](double value) {
                                     filter->setDepthDiscontinuityRadius((int) value);
                                     return value;
                                 }),
