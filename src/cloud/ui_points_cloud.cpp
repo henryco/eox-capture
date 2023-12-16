@@ -36,6 +36,42 @@ namespace eox {
             // Init oGL canvas
             glImage.init(2, 2, (int) group_ids.size(), props[0].width, props[0].height, group_ids, GL_BGR);
             glImage.scale(config.scale);
+            glImage.setMouseCallback([this](int index, int x, int y, bool released) {
+                if (released || index == 0 || (index + 1) % 4 != 0) {
+                    set_tooltip_text("");
+                    set_has_tooltip(false);
+                    return;
+                }
+
+                std::vector<ts::group_id> keys;
+                keys.reserve(config.groups.size());
+                for (const auto &key: config.groups) {
+                    keys.push_back(key.first);
+                }
+
+                const auto &g_id = keys.at(((index + 1) / 4) - 1);
+                const auto cloud = points.at(g_id);
+                const auto mat = cloud.points;
+                const auto r = mat(cv::Rect(x, y, 1, 1));
+
+                cv::Mat data;
+                r.copyTo(data);
+                if (data.empty()) {
+                    set_tooltip_text("");
+                    set_has_tooltip(false);
+                    return;
+                }
+
+                const auto distance= data.at<float>(2);
+                const auto text = "Distance: " + std::to_string(distance);
+
+                set_tooltip_text("");
+                set_has_tooltip(false);
+                set_has_tooltip(true);
+                set_tooltip_text(text);
+
+                log->debug("distance: {}", distance);
+            });
         }
 
         {

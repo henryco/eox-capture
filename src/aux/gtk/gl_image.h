@@ -21,6 +21,8 @@ private:
     static inline const auto log =
             spdlog::stdout_color_mt("gl_image");
 
+    std::function<void(int num, int x, int y, bool released)> callback = [](int a, int b, int c, bool d){};
+
     std::vector<std::unique_ptr<Gtk::Widget>> widgets;
     std::vector<std::unique_ptr<xogl::Texture1>> textures;
     std::vector<std::unique_ptr<Gtk::GLArea>> glAreas;
@@ -60,6 +62,7 @@ public:
     int getViewWidth() const;
     int getViewHeight() const;
 
+    void setMouseCallback(std::function<void(int num, int x, int y, bool released)> callback);
 };
 
 } // xgtk

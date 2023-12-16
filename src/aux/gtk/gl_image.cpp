@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <utility>
+#include <gtkmm/eventbox.h>
 #include "gl_image.h"
 
 namespace sex::xgtk {
@@ -119,16 +120,57 @@ namespace sex::xgtk {
                 area->set_size_request(_width, _height);
                 area->set_auto_render(true);
 
+                auto event_box = std::make_unique<Gtk::EventBox>();
+                event_box->add(*area);
+                event_box->signal_button_press_event().connect([this, p = area.get(), index](GdkEventButton *event) {
+                    if (event->x < 0 || event->x >= p->get_width() || event->y < 0 || event->y >= p->get_height()) {
+                        callback((int) index, 0, 0, true);
+                        return true;
+                    }
+                    float xs = (float) p->get_width() / (float) width;
+                    float ys = (float) p->get_height() / (float) height;
+                    int x = (int) ((float) event->x / xs);
+                    int y = (int)((float) event->y / ys);
+                    callback((int) index, x, y, false);
+                    return true;
+                });
+                event_box->signal_motion_notify_event().connect([this, p = area.get(), index](GdkEventMotion *event) {
+                    if (event->x < 0 || event->x >= p->get_width() || event->y < 0 || event->y >= p->get_height()) {
+                        callback((int) index, 0, 0, true);
+                        return true;
+                    }
+                    float xs = (float) p->get_width() / (float) width;
+                    float ys = (float) p->get_height() / (float) height;
+                    int x = (int) ((float) event->x / xs);
+                    int y = (int)((float) event->y / ys);
+                    callback((int) index, x, y, false);
+                    return true;
+                });
+                event_box->signal_button_release_event().connect([this, p = area.get(), index](GdkEventButton *event) {
+                    if (event->x < 0 || event->x >= p->get_width() || event->y < 0 || event->y >= p->get_height()) {
+                        callback((int) index, 0, 0, true);
+                        return true;
+                    }
+                    float xs = (float) p->get_width() / (float) width;
+                    float ys = (float) p->get_height() / (float) height;
+                    int x = (int) ((float) event->x / xs);
+                    int y = (int)((float) event->y / ys);
+                    callback((int) index, x, y, true);
+                    return true;
+                });
+
                 auto v_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
                 auto label = std::make_unique<Gtk::Label>();
                 const std::string id = _ids.at(index);
                 label->set_label(id);
 
                 v_box->pack_start(*label, Gtk::PACK_SHRINK);
-                v_box->pack_start(*area, Gtk::PACK_SHRINK);
+                v_box->pack_start(*event_box, Gtk::PACK_SHRINK);
                 h_box->pack_start(*v_box, Gtk::PACK_SHRINK);
 
                 widgets.push_back(std::move(label));
+                widgets.push_back(std::move(v_box));
+                widgets.push_back(std::move(event_box));
                 widgets.push_back(std::move(v_box));
                 glAreas.push_back(std::move(area));
                 textures.push_back(std::make_unique<xogl::Texture1>());
@@ -186,6 +228,10 @@ namespace sex::xgtk {
 
     int GLImage::getViewHeight() const {
         return v_h;
+    }
+
+    void GLImage::setMouseCallback(std::function<void(int, int, int, bool)> _callback) {
+        this->callback = std::move(_callback);
     }
 
 } // xgtk
