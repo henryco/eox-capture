@@ -41,10 +41,11 @@ namespace eox {
         // map of device -> group
         std::map<ts::device_id, ts::group_id> deviceGroupMap;
 
+        // map of group -> point_cloud
+        std::map<ts::group_id, eox::ocv::PointCloud> points;
+
         std::vector<std::unique_ptr<eox::gtk::GtkControl>> controls;
         float FPS = 0;
-
-        std::map<ts::group_id, eox::ocv::PointCloud> points;
 
     public:
         UiPointsCloud() = default;

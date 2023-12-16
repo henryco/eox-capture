@@ -137,11 +137,6 @@ namespace eox {
 
             // converting to CV_16F
             if ((disparity.depth() & CV_MAT_DEPTH_MASK) == CV_16S) {
-
-                double min = -1, max = -1;
-                cv::minMaxIdx(disparity, &min, &max);
-                log->info("MIN: {}, MAX: {}", ((int16_t) min) >> 4, ((int16_t) max )>> 4);
-
                 cv::UMat temp;
                 disparity.convertTo(temp, CV_32F, 1. / 16.);
                 disparity = temp;
