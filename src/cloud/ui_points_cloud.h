@@ -7,6 +7,7 @@
 
 #include <opencv2/ximgproc/disparity_filter.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <opencv2/core/ocl.hpp>
 #include "../aux/gtk/gtk_sex_window.h"
 #include "../aux/ocv/stereo_camera.h"
 #include "../aux/utils/loop/delta_loop.h"
@@ -14,6 +15,7 @@
 #include "../aux/ocv/cv_utils.h"
 #include "../aux/gtk/gtk_control.h"
 #include "../aux/ocv/point_cloud.h"
+#include "../aux/ocv/kernel.h"
 
 namespace eox {
 
@@ -28,6 +30,7 @@ namespace eox {
         sex::xocv::StereoCamera camera;
         sex::util::DeltaLoop deltaLoop;
         sex::xgtk::GLImage glImage;
+        eox::ocl::Kernel oclProgram;
 
         // map of group -> disparity filter
         std::map<ts::group_id, cv::Ptr<cv::ximgproc::DisparityWLSFilter>> wlsFilters;

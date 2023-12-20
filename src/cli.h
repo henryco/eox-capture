@@ -5,7 +5,7 @@
 #ifndef STEREOX_CLI_H
 #define STEREOX_CLI_H
 
-#include "../include/argparse/argparse.h"
+#include "../libraries/argparse/argparse.h"
 #include <opencv2/videoio.hpp>
 #include <spdlog/spdlog.h>
 #include "aux/commons.h"

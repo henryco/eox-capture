@@ -50,7 +50,7 @@ namespace eox {
                 }
 
                 const auto &g_id = keys.at(((index + 1) / 4) - 1);
-                const auto cloud = points.at(g_id);
+                const auto &cloud = points.at(g_id);
                 const auto mat = cloud.points;
                 const auto r = mat(cv::Rect(x, y, 1, 1));
 
@@ -768,6 +768,17 @@ namespace eox {
 
         {
             camera.open(false);
+        }
+
+        {
+            // opencl kernels
+            const std::string source =
+                    R"(__kernel void add(__global const float* A, __global const float* B, __global float* C) {
+                       int idx = get_global_id(0);
+                       C[idx] = A[idx] + B[idx];
+                    })";
+            oclProgram.compile(source);
+            oclProgram.procedure("add");
         }
 
         {

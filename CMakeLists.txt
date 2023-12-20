@@ -12,6 +12,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Must use GNUInstallDirs to install libraries into correct locations on all platforms:
 include(GNUInstallDirs)
 
+# Find OpenCL
+find_package(OpenCL REQUIRED)
+include_directories(${OpenCL_INCLUDE_DIRS})
+
 # Find OpenCV package
 find_package(OpenCV REQUIRED)
 
@@ -58,7 +62,7 @@ add_executable(${PROJECT_NAME}
         src/aux/gtk/gtk_sex_window.h
         src/aux/utils/mappers/cam_gtk_mapper.h
         src/aux/commons.h
-        include/argparse/argparse.h
+        libraries/argparse/argparse.h
         src/cli.h
         src/helpers/helpers.cpp
         src/helpers/helpers.h
@@ -75,7 +79,8 @@ add_executable(${PROJECT_NAME}
         src/aux/utils/mappers/cam_gtk_mapper.cpp
         src/aux/ocv/point_cloud.cpp
         src/aux/ocv/point_cloud.h
-)
+        src/aux/ocv/kernel.cpp
+        src/aux/ocv/kernel.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
