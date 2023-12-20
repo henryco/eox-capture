@@ -15,7 +15,6 @@
 #include "../aux/ocv/cv_utils.h"
 #include "../aux/gtk/gtk_control.h"
 #include "../aux/ocv/point_cloud.h"
-#include "../aux/ocv/kernel.h"
 
 namespace eox {
 
@@ -30,7 +29,6 @@ namespace eox {
         sex::xocv::StereoCamera camera;
         sex::util::DeltaLoop deltaLoop;
         sex::xgtk::GLImage glImage;
-        eox::ocl::Kernel oclProgram;
 
         // map of group -> disparity filter
         std::map<ts::group_id, cv::Ptr<cv::ximgproc::DisparityWLSFilter>> wlsFilters;

@@ -771,17 +771,6 @@ namespace eox {
         }
 
         {
-            // opencl kernels
-            const std::string source =
-                    R"(__kernel void add(__global const float* A, __global const float* B, __global float* C) {
-                       int idx = get_global_id(0);
-                       C[idx] = A[idx] + B[idx];
-                    })";
-            oclProgram.compile(source);
-            oclProgram.procedure("add");
-        }
-
-        {
             // Stable FPS worker loop
             deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
             deltaLoop.setFps(0);
