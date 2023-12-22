@@ -9,6 +9,9 @@
 #include <GLES3/gl3.h>
 #include "../shader/simple_shader.h"
 
+#include <spdlog/logger.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 namespace xogl {
 
     class Image {

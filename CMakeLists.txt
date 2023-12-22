@@ -80,7 +80,11 @@ add_executable(${PROJECT_NAME}
         src/aux/ocv/point_cloud.cpp
         src/aux/ocv/point_cloud.h
         src/aux/ocv/kernel.cpp
-        src/aux/ocv/kernel.h)
+        src/aux/ocv/kernel.h
+        src/aux/ogl/render/voxels.cpp
+        src/aux/ogl/render/voxels.h
+        src/aux/ogl/camera/camera.cpp
+        src/aux/ogl/camera/camera.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
