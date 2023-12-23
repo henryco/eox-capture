@@ -5,8 +5,6 @@
 #ifndef STEREOX_CAMERA_H
 #define STEREOX_CAMERA_H
 
-#include <opencv2/core/mat.hpp>
-
 namespace eox::ogl {
 
     class Camera {
@@ -30,11 +28,18 @@ namespace eox::ogl {
                 {0, 0, 1}, // F
         };
 
-        float matrix[4][4] = {
+        float view[4][4] = {
                 {1, 0, 0, 0},
                 {0, 1, 0, 0},
                 {0, 0, 1, 0},
                 {0, 0, 0, 1},
+        };
+
+        float projection[4][4] = {
+                {},
+                {},
+                {},
+                {},
         };
 
         Camera& translate_free(float x, float y, float z);
@@ -49,12 +54,10 @@ namespace eox::ogl {
 
         Camera& look_at(float x, float y, float z);
 
-        cv::Mat get_cv_mat();
-
     protected:
         void apply_transform_basis(const float t[3][3]);
 
-        void recalculate();
+        void recalculate_view();
 
     private:
         static void cross_v3(const float a[3], const float b[3], float* result);

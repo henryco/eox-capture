@@ -2,6 +2,7 @@
 // Created by henryco on 12/22/23.
 //
 
+#include <cmath>
 #include "camera.h"
 
 #pragma clang diagnostic push
@@ -32,7 +33,7 @@ namespace eox::ogl {
         P_x = x;
         P_y = y;
         P_z = z;
-        recalculate();
+        recalculate_view();
         return *this;
     }
 
@@ -103,7 +104,7 @@ namespace eox::ogl {
         U_y = c_v[1] / c_d;
         U_z = c_v[2] / c_d;
 
-        recalculate();
+        recalculate_view();
         return *this;
     }
 
@@ -137,31 +138,27 @@ namespace eox::ogl {
         F_z = f_z / f_d;
     }
 
-    void Camera::recalculate() {
-        matrix[0][0] = R_x;
-        matrix[0][1] = R_y;
-        matrix[0][2] = R_z;
+    void Camera::recalculate_view() {
+        view[0][0] = R_x;
+        view[0][1] = R_y;
+        view[0][2] = R_z;
 
-        matrix[1][0] = U_x;
-        matrix[1][1] = U_y;
-        matrix[1][2] = U_z;
+        view[1][0] = U_x;
+        view[1][1] = U_y;
+        view[1][2] = U_z;
 
-        matrix[2][0] = F_x;
-        matrix[2][1] = F_y;
-        matrix[2][2] = F_z;
+        view[2][0] = F_x;
+        view[2][1] = F_y;
+        view[2][2] = F_z;
 
-        matrix[0][3] = (-1.f) * ((R_x * P_x) + (R_y * P_y) + (R_z * P_z));
-        matrix[1][3] = (-1.f) * ((U_x * P_x) + (U_y * P_y) + (U_z * P_z));
-        matrix[2][3] = (-1.f) * ((F_x * P_x) + (F_y * P_y) + (F_z * P_z));
+        view[0][3] = (-1.f) * ((R_x * P_x) + (R_y * P_y) + (R_z * P_z));
+        view[1][3] = (-1.f) * ((U_x * P_x) + (U_y * P_y) + (U_z * P_z));
+        view[2][3] = (-1.f) * ((F_x * P_x) + (F_y * P_y) + (F_z * P_z));
 
-        matrix[3][0] = 0;
-        matrix[3][1] = 0;
-        matrix[3][2] = 0;
-        matrix[3][3] = 1;
-    }
-
-    cv::Mat Camera::get_cv_mat() {
-        return {4, 4, CV_32F, matrix};
+        view[3][0] = 0;
+        view[3][1] = 0;
+        view[3][2] = 0;
+        view[3][3] = 1;
     }
 
     void Camera::cross_v3(const float *a, const float *b, float *result) {
