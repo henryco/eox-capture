@@ -36,10 +36,10 @@ namespace eox::ogl {
         };
 
         float projection[4][4] = {
-                {},
-                {},
-                {},
-                {},
+                {1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 1, 0},
+                {0, 0, 0, 1},
         };
 
         Camera& translate_free(float x, float y, float z);
@@ -54,10 +54,20 @@ namespace eox::ogl {
 
         Camera& look_at(float x, float y, float z);
 
+        Camera& perspective(float aspect_ratio, float fov, float z_near, float z_far);
+
+        Camera& orthographic(float width, float height, float z_near, float z_far);
+
+        [[nodiscard]] const float (&get_view_matrix() const)[4][4];
+
+        [[nodiscard]] const float (&get_projection_matrix() const)[4][4];
+
     protected:
         void apply_transform_basis(const float t[3][3]);
 
         void recalculate_view();
+
+        void reset_projection();
 
     private:
         static void cross_v3(const float a[3], const float b[3], float* result);

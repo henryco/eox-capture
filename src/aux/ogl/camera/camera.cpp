@@ -161,6 +161,36 @@ namespace eox::ogl {
         view[3][3] = 1;
     }
 
+    Camera &Camera::perspective(float aspect_ratio, float fov, float z_near, float z_far) {
+        reset_projection();
+
+        projection[0][0] = 1.f / (aspect_ratio * std::tan(fov / 2.f));
+        projection[1][1] = 1.f / std::tan(fov / 2.f);
+        projection[2][2] = (z_near + z_far) / (z_near - z_far);
+        projection[2][3] = (2.f * z_near * z_far) / (z_near - z_far);
+        projection[3][2] = -1;
+
+        return *this;
+    }
+
+    Camera &Camera::orthographic(float width, float height, float z_near, float z_far) {
+        reset_projection();
+
+        projection[0][0] = 2.f / width;
+        projection[1][1] = 2.f / height;
+        projection[2][2] = 2.f / (z_near - z_far);
+        projection[2][3] = (z_near + z_far) / (z_near - z_far);
+        projection[3][3] = 1.f;
+
+        return *this;
+    }
+
+    void Camera::reset_projection() {
+        for (auto & i : projection)
+            for (float & k : i)
+                k = 0;
+    }
+
     void Camera::cross_v3(const float *a, const float *b, float *result) {
         result[0] = (a[1] * b[2]) - (a[2] * b[1]);
         result[1] = (a[2] * b[0]) - (a[0] * b[2]);
@@ -174,5 +204,14 @@ namespace eox::ogl {
         }
         return std::sqrt(a);
     }
+
+    const float (&Camera::get_view_matrix() const)[4][4] {
+        return view;
+    }
+
+    const float (&Camera::get_projection_matrix() const)[4][4] {
+        return projection;
+    }
+
 } // eox
 #pragma clang diagnostic pop
