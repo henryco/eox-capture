@@ -13,7 +13,7 @@
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace sex::util {
+namespace eox::util {
 
 
     /**
@@ -109,6 +109,6 @@ namespace sex::util {
 
     };
 
-} // sex
+} // eox
 
 #endif //STEREOX_DELTA_LOOP_H

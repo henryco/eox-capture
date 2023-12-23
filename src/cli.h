@@ -9,10 +9,10 @@
 #include <opencv2/videoio.hpp>
 #include <spdlog/spdlog.h>
 #include "aux/commons.h"
-#include "aux/utils/globals/sex_globals.h"
+#include "aux/utils/globals/eox_globals.h"
 #include <filesystem>
 
-namespace sex::cli {
+namespace eox::cli {
 
     // lower casing strings
     std::string to_lower_case(const std::string &str) {
@@ -70,7 +70,7 @@ namespace sex::cli {
         return map;
     }
 
-    sex::data::basic_config parse(int &argc, char **&argv) {
+    eox::data::basic_config parse(int &argc, char **&argv) {
         argparse::ArgumentParser program(
                 "stereox",
                 "1.0.0"
@@ -213,7 +213,7 @@ namespace sex::cli {
             std::exit(1);
         }
 
-        sex::globals::THREAD_POOL_CORES_MAX = program.get<int>("--jobs");
+        eox::globals::THREAD_POOL_CORES_MAX = program.get<int>("--jobs");
 
         if (program.get<bool>("--verbose")) {
             spdlog::set_level(spdlog::level::debug);
@@ -235,7 +235,7 @@ namespace sex::cli {
         if (o_h <= 0)
             o_h = program.get<int>("--height");
 
-        std::vector<sex::data::camera_properties> props;
+        std::vector<eox::data::camera_properties> props;
         props.reserve(devices.size());
         for (const auto &[id, index]: devices) {
             props.push_back({
@@ -318,8 +318,8 @@ namespace sex::cli {
                     .module = "stereo",
                     .stereo = {
                             .algorithm = to_lower_case(algo) == "sgbm"
-                                         ? sex::data::Algorithm::SGBM
-                                         : sex::data::Algorithm::BM,
+                                         ? eox::data::Algorithm::SGBM
+                                         : eox::data::Algorithm::BM,
                             .confidence = instance.get<bool>("--confidence")
                     }
             };

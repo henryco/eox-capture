@@ -13,12 +13,12 @@
 #include "../aux/gtk/gtk_config_stack.h"
 #include "../aux/gtk/gtk_utils.h"
 
-void UiCalibration::init(sex::data::basic_config configuration) {
+void UiCalibration::init(eox::data::basic_config configuration) {
     config = std::move(configuration);
 
     const auto &props = config.camera;
     auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
-    auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
+    auto config_stack = std::make_unique<eox::xgtk::GtkConfigStack>();
 
     {
         std::vector<std::string> c_ids;
@@ -34,7 +34,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
 
     {
         // init executor
-        executor = std::make_shared<sex::util::ThreadPool>();
+        executor = std::make_shared<eox::util::ThreadPool>();
         executor->start(props.size());
     }
 
@@ -52,22 +52,22 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             {
                 log->debug("using camera hardware defaults");
                 for (const auto &prop: props) {
-                    sex::v4l2::reset_defaults(prop.index);
+                    eox::v4l2::reset_defaults(prop.index);
                 }
             }
 
             {
                 log->debug("initializing from work directory implicitly");
-                const auto paths = sex::helpers::work_paths(config);
-                sex::helpers::load_camera_from_paths(camera, paths, log);
-                sex::helpers::init_pre_calibrated_data(preCalibrated, paths, config, log);
+                const auto paths = eox::helpers::work_paths(config);
+                eox::helpers::load_camera_from_paths(camera, paths, log);
+                eox::helpers::init_pre_calibrated_data(preCalibrated, paths, config, log);
             }
 
             {
                 log->debug("initializing from configuration files explicitly");
-                const auto paths = sex::helpers::config_paths(config);
-                sex::helpers::load_camera_from_paths(camera, paths, log);
-                sex::helpers::init_pre_calibrated_data(preCalibrated, paths, config, log);
+                const auto paths = eox::helpers::config_paths(config);
+                eox::helpers::load_camera_from_paths(camera, paths, log);
+                eox::helpers::init_pre_calibrated_data(preCalibrated, paths, config, log);
             }
 
             if (!preCalibrated.empty() && preCalibrated.size() != props.size()) {
@@ -80,11 +80,11 @@ void UiCalibration::init(sex::data::basic_config configuration) {
             const auto controls = camera.getControls();
             for (const auto &control: controls) {
 
-                const auto indexes = sex::mappers::cam_gtk::index(
+                const auto indexes = eox::mappers::cam_gtk::index(
                         props, control.id, props[0].homogeneous);
 
-                auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-                cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
+                auto cam_params = std::make_unique<eox::xgtk::GtkCamParams>();
+                cam_params->setProperties(eox::mappers::cam_gtk::map(control.controls));
                 cam_params->onUpdate(updateCamera(indexes));
                 cam_params->onReset(resetCamera(indexes));
                 cam_params->onSave(saveCamera(indexes));
@@ -116,7 +116,7 @@ void UiCalibration::init(sex::data::basic_config configuration) {
         start.set_halign(Gtk::ALIGN_CENTER);
         start.set_label("Start");
         start.get_style_context()->add_class("button-save");
-        sex::xgtk::add_style(start, css);
+        eox::xgtk::add_style(start, css);
         start.signal_clicked().connect([this]() {
             active = !active;
             if (active) {
@@ -141,9 +141,9 @@ void UiCalibration::init(sex::data::basic_config configuration) {
         save.set_label("Save");
         save.set_sensitive(false);
         save.get_style_context()->add_class("button-save");
-        sex::xgtk::add_style(save, css);
+        eox::xgtk::add_style(save, css);
         save.signal_clicked().connect([this]() {
-            sex::helpers::save_calibration_data(stereoPackage, *this, config, log);
+            eox::helpers::save_calibration_data(stereoPackage, *this, config, log);
         });
 
         _layout_h->pack_start(start, Gtk::PACK_SHRINK);
@@ -200,7 +200,7 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
     return [ids = std::move(devices)](uint prop_id, int value) -> int {
         log->debug("update_property: {}, {}", prop_id, value);
         for (const auto &id: ids) {
-            sex::v4l2::set_camera_prop(id, prop_id, value);
+            eox::v4l2::set_camera_prop(id, prop_id, value);
         }
         return value;
     };
@@ -209,7 +209,7 @@ std::function<int(uint, int)> UiCalibration::updateCamera(std::vector<uint> devi
 std::function<void()> UiCalibration::saveCamera(std::vector<uint> devices) {
     return [this, ids = std::move(devices)]() {
         log->debug("save camera configuration");
-        sex::helpers::gtk_save_camera_settings(camera, ids, *this, config, log);
+        eox::helpers::gtk_save_camera_settings(camera, ids, *this, config, log);
         log->debug("camera configuration done");
     };
 }
@@ -218,7 +218,7 @@ std::function<void()> UiCalibration::resetCamera(std::vector<uint> devices) {
     return [ids = std::move(devices)]() {
         log->debug("resetCamera");
         for (const auto &id: ids) {
-            sex::v4l2::reset_defaults(id);
+            eox::v4l2::reset_defaults(id);
         }
     };
 }

@@ -8,7 +8,7 @@
 #include <gtkmm/widget.h>
 #include <gtkmm/cssprovider.h>
 
-namespace sex::xgtk {
+namespace eox::xgtk {
 
     inline void add_style(Gtk::Widget &widget, const std::basic_string<char> &style,
                    guint priority = GTK_STYLE_PROVIDER_PRIORITY_USER) {
@@ -17,6 +17,6 @@ namespace sex::xgtk {
         widget.get_style_context()->add_provider(css_provider, priority);
     }
 
-} // sex
+} // eox
 
 #endif //STEREOX_GTK_UTILS_H

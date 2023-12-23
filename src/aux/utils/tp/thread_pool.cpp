@@ -4,9 +4,9 @@
 
 #include <iostream>
 #include "thread_pool.h"
-#include "../globals/sex_globals.h"
+#include "../globals/eox_globals.h"
 
-namespace sex::util {
+namespace eox::util {
 
     void ThreadPool::worker() {
         while (true) {
@@ -97,7 +97,7 @@ namespace sex::util {
     void ThreadPool::start(size_t size) {
         size_t n_cores = std::clamp(size,
                                     std::size_t(1),
-                                    sex::globals::THREAD_POOL_CORES_MAX);
+                                    eox::globals::THREAD_POOL_CORES_MAX);
         log->debug("start, requested: {}, given: {}", size, n_cores);
         shutdown();
         {

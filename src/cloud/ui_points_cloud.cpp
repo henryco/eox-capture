@@ -13,13 +13,13 @@
 
 namespace eox {
 
-    void UiPointsCloud::init(sex::data::basic_config configuration) {
+    void UiPointsCloud::init(eox::data::basic_config configuration) {
         config = std::move(configuration);
 
         const auto &groups = config.groups;
         const auto &props = config.camera;
         auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
-        auto config_stack = std::make_unique<sex::xgtk::GtkConfigStack>();
+        auto config_stack = std::make_unique<eox::xgtk::GtkConfigStack>();
 
         {
             std::vector<std::string> group_ids;
@@ -79,7 +79,7 @@ namespace eox {
 
         {
             // init executor
-            executor = std::make_shared<sex::util::ThreadPool>();
+            executor = std::make_shared<eox::util::ThreadPool>();
             executor->start(props.size());
         }
 
@@ -100,16 +100,16 @@ namespace eox {
 
             {
                 log->debug("initializing from work directory implicitly");
-                const auto paths = sex::helpers::work_paths(config);
-                sex::helpers::load_camera_from_paths(camera, paths, log);
-                sex::helpers::init_package_group(packages, paths, config, log);
+                const auto paths = eox::helpers::work_paths(config);
+                eox::helpers::load_camera_from_paths(camera, paths, log);
+                eox::helpers::init_package_group(packages, paths, config, log);
             }
 
             {
                 log->debug("initializing from configuration files explicitly");
-                const auto paths = sex::helpers::config_paths(config);
-                sex::helpers::load_camera_from_paths(camera, paths, log);
-                sex::helpers::init_package_group(packages, paths, config, log);
+                const auto paths = eox::helpers::config_paths(config);
+                eox::helpers::load_camera_from_paths(camera, paths, log);
+                eox::helpers::init_package_group(packages, paths, config, log);
             }
 
             if (packages.size() < config.groups.size()) {
@@ -127,7 +127,7 @@ namespace eox {
                 // homogeneous camera configuration, but it applies only for device groups
 
                 const auto _controls = camera.getControls(false);
-                std::map<uint, sex::xocv::camera_controls> cam_controls;
+                std::map<uint, eox::xocv::camera_controls> cam_controls;
                 for (const auto &control: _controls) {
                     cam_controls.emplace(control.id, control);
                 }
@@ -136,8 +136,8 @@ namespace eox {
                     const auto dev_id = devices[0];
                     const auto control = cam_controls.at(dev_id);
 
-                    auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-                    cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
+                    auto cam_params = std::make_unique<eox::xgtk::GtkCamParams>();
+                    cam_params->setProperties(eox::mappers::cam_gtk::map(control.controls));
 
                     cam_params->onUpdate([devices, this](uint prop_id, int value) {
                         for (const auto &d_id: devices) {
@@ -160,7 +160,7 @@ namespace eox {
                         indexes.reserve(devices.size());
                         for (const auto &d_id: devices)
                             indexes.push_back(camera.getDeviceIndex(d_id));
-                        sex::helpers::gtk_save_camera_settings(camera, indexes, *this, config, log);
+                        eox::helpers::gtk_save_camera_settings(camera, indexes, *this, config, log);
                         log->debug("camera configuration done");
                     });
 
@@ -175,8 +175,8 @@ namespace eox {
                 for (const auto &control: _controls) {
                     const auto dev_id = control.id;
 
-                    auto cam_params = std::make_unique<sex::xgtk::GtkCamParams>();
-                    cam_params->setProperties(sex::mappers::cam_gtk::map(control.controls));
+                    auto cam_params = std::make_unique<eox::xgtk::GtkCamParams>();
+                    cam_params->setProperties(eox::mappers::cam_gtk::map(control.controls));
 
                     cam_params->onUpdate([dev_id, this](uint prop_id, int value) {
                         log->debug("update camera property: {}, {}, {}", dev_id, prop_id, value);
@@ -191,7 +191,7 @@ namespace eox {
 
                     cam_params->onSave([dev_id, this]() {
                         log->debug("save camera configuration");
-                        sex::helpers::gtk_save_camera_settings(camera, {dev_id}, *this, config, log);
+                        eox::helpers::gtk_save_camera_settings(camera, {dev_id}, *this, config, log);
                         log->debug("camera configuration done");
                     });
 
@@ -218,7 +218,7 @@ namespace eox {
                     reset->set_label("Matcher Defaults");
                     reset->get_style_context()->add_class("button-reset");
                     reset->set_size_request(-1, 30);
-                    sex::xgtk::add_style(*reset, R"css(
+                    eox::xgtk::add_style(*reset, R"css(
                         .button-reset {
                              margin-right: 5px;
                              margin-bottom: 5px;
@@ -240,7 +240,7 @@ namespace eox {
                     save->get_style_context()->add_class("button-save");
                     save->set_size_request(-1, 30);
                     save->set_label("Save settings");
-                    sex::xgtk::add_style(*save, R"css(
+                    eox::xgtk::add_style(*save, R"css(
                         .button-save {
                              margin-right: 5px;
                              margin-bottom: 5px;
@@ -248,7 +248,7 @@ namespace eox {
                     )css");
 
                     save->signal_clicked().connect([this, group_id]() {
-                        sex::helpers::save_bm_data(
+                        eox::helpers::save_bm_data(
                                 matchers.at(group_id).first,
                                 wlsFilters.at(group_id),
                                 group_id,
@@ -267,7 +267,7 @@ namespace eox {
                     exp->get_style_context()->add_class("button-export");
                     exp->set_size_request(-1, 30);
                     exp->set_label("Export 3D");
-                    sex::xgtk::add_style(*exp, R"css(
+                    eox::xgtk::add_style(*exp, R"css(
                         .button-export {
                              margin-right: 20px;
                              margin-bottom: 5px;
@@ -275,14 +275,14 @@ namespace eox {
                     )css");
 
                     exp->signal_clicked().connect([this, group_id]() {
-                        sex::helpers::save_points_ply(points.at(group_id), *this, config, log);
+                        eox::helpers::save_points_ply(points.at(group_id), *this, config, log);
                     });
 
                     button_box->pack_end(*exp, Gtk::PACK_SHRINK);
                     keep(std::move(exp));
                 }
 
-                if (config.stereo.algorithm == sex::data::Algorithm::BM) {
+                if (config.stereo.algorithm == eox::data::Algorithm::BM) {
                     log->debug("BM block matcher");
 
                     auto matcher = cv::StereoBM::create();
@@ -290,14 +290,14 @@ namespace eox {
 
                     {
                         log->debug("initializing matcher from work directory implicitly");
-                        const auto paths = sex::helpers::work_paths(config);
-                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                        const auto paths = eox::helpers::work_paths(config);
+                        eox::helpers::read_matcher_data(matcher, group_id, paths, log);
                     }
 
                     {
                         log->debug("initializing matcher from configuration files explicitly");
-                        const auto paths = sex::helpers::config_paths(config);
-                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                        const auto paths = eox::helpers::config_paths(config);
+                        eox::helpers::read_matcher_data(matcher, group_id, paths, log);
                     }
 
                     std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>> lr_matchers(matcher, matcher);
@@ -438,21 +438,21 @@ namespace eox {
                         c_box->pack_start(*control);
                         controls.push_back(std::move(control));
                     }
-                } else if (config.stereo.algorithm == sex::data::Algorithm::SGBM) {
+                } else if (config.stereo.algorithm == eox::data::Algorithm::SGBM) {
                     log->debug("SGBM block matcher");
 
                     auto matcher = cv::StereoSGBM::create();
 
                     {
                         log->debug("initializing matcher from work directory implicitly");
-                        const auto paths = sex::helpers::work_paths(config);
-                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                        const auto paths = eox::helpers::work_paths(config);
+                        eox::helpers::read_matcher_data(matcher, group_id, paths, log);
                     }
 
                     {
                         log->debug("initializing matcher from configuration files explicitly");
-                        const auto paths = sex::helpers::config_paths(config);
-                        sex::helpers::read_matcher_data(matcher, group_id, paths, log);
+                        const auto paths = eox::helpers::config_paths(config);
+                        eox::helpers::read_matcher_data(matcher, group_id, paths, log);
                     }
 
                     std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>> lr_matchers(matcher, matcher);
@@ -665,14 +665,14 @@ namespace eox {
 
                     {
                         log->debug("initializing disparity filter from work directory implicitly");
-                        const auto paths = sex::helpers::work_paths(config);
-                        sex::helpers::read_disparity_filter_data(filter, group_id, paths, log);
+                        const auto paths = eox::helpers::work_paths(config);
+                        eox::helpers::read_disparity_filter_data(filter, group_id, paths, log);
                     }
 
                     {
                         log->debug("initializing disparity filter from configuration files explicitly");
-                        const auto paths = sex::helpers::config_paths(config);
-                        sex::helpers::read_disparity_filter_data(filter, group_id, paths, log);
+                        const auto paths = eox::helpers::config_paths(config);
+                        eox::helpers::read_disparity_filter_data(filter, group_id, paths, log);
                     }
 
                     {
@@ -779,7 +779,7 @@ namespace eox {
     }
 
     void UiPointsCloud::onRefresh() {
-        const std::string name = config.stereo.algorithm == sex::data::BM ? "BM" : "SGBM";
+        const std::string name = config.stereo.algorithm == eox::data::BM ? "BM" : "SGBM";
         set_title("StereoX++ " + name + " [ " + std::to_string((int) FPS) + " FPS ]");
         glImage.update();
     }

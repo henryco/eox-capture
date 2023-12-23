@@ -49,7 +49,7 @@ namespace eox::gtk {
             // Control container
             set_size_request(300, 100);
             get_style_context()->add_class("cam-param-c_box");
-            sex::xgtk::add_style(*this, R"css(
+            eox::xgtk::add_style(*this, R"css(
                     .cam-param-c_box {
                         background-color: white;
                         border-bottom: 1px solid lightgrey;
@@ -65,7 +65,7 @@ namespace eox::gtk {
             text->set_text(label);
             text->set_alignment(0);
             text->get_style_context()->add_class("cam-param-label");
-            sex::xgtk::add_style(*text, R"css(
+            eox::xgtk::add_style(*text, R"css(
                         .cam-param-label {
                             padding-bottom: 10px;
                         }

@@ -8,7 +8,7 @@
 #include <opencv2/ximgproc/disparity_filter.hpp>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <opencv2/core/ocl.hpp>
-#include "../aux/gtk/gtk_sex_window.h"
+#include "../aux/gtk/gtk_eox_window.h"
 #include "../aux/ocv/stereo_camera.h"
 #include "../aux/utils/loop/delta_loop.h"
 #include "../aux/gtk/gl_image.h"
@@ -18,17 +18,17 @@
 
 namespace eox {
 
-    class UiPointsCloud : public sex::xgtk::GtkSexWindow { // NOLINT(*-special-member-functions)
+    class UiPointsCloud : public eox::xgtk::GtkEoxWindow { // NOLINT(*-special-member-functions)
 
         static inline const auto log =
                 spdlog::stdout_color_mt("ui_cloud");
 
     private:
-        std::shared_ptr<sex::util::ThreadPool> executor;
-        sex::data::basic_config config;
-        sex::xocv::StereoCamera camera;
-        sex::util::DeltaLoop deltaLoop;
-        sex::xgtk::GLImage glImage;
+        std::shared_ptr<eox::util::ThreadPool> executor;
+        eox::data::basic_config config;
+        eox::xocv::StereoCamera camera;
+        eox::util::DeltaLoop deltaLoop;
+        eox::xgtk::GLImage glImage;
 
         // map of group -> disparity filter
         std::map<ts::group_id, cv::Ptr<cv::ximgproc::DisparityWLSFilter>> wlsFilters;
@@ -52,7 +52,7 @@ namespace eox {
         UiPointsCloud() = default;
         ~UiPointsCloud() override;
 
-        void init(sex::data::basic_config configuration) override;
+        void init(eox::data::basic_config configuration) override;
 
         void update(float delta, float late, float fps);
 

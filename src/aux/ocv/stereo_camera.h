@@ -9,7 +9,7 @@
 #include "../utils/tp/thread_pool.h"
 #include "../commons.h"
 
-namespace sex::xocv {
+namespace eox::xocv {
 
     typedef struct {
         uint id;
@@ -39,9 +39,9 @@ namespace sex::xocv {
                 spdlog::stdout_color_mt("stereo_camera");
 
         std::vector<std::unique_ptr<cv::VideoCapture>> captures;
-        std::map<uint, sex::data::camera_properties> properties_map;
-        std::vector<sex::data::camera_properties> properties;
-        std::shared_ptr<sex::util::ThreadPool> executor;
+        std::map<uint, eox::data::camera_properties> properties_map;
+        std::vector<eox::data::camera_properties> properties;
+        std::shared_ptr<eox::util::ThreadPool> executor;
 
         bool homogeneous = true;
         bool fast = false;
@@ -86,7 +86,7 @@ namespace sex::xocv {
         void release();
 
         /**
-         * @see sex::StereoCamera::open(std::vector<CameraProp> props)
+         * @see eox::StereoCamera::open(std::vector<CameraProp> props)
          */
         void open();
 
@@ -104,12 +104,12 @@ namespace sex::xocv {
          * @param normalize Apply same configuration for all stereo camera devices (heads)
          * @return void
          *
-         * @see sex::CameraProp
+         * @see eox::CameraProp
          */
 
-        void open(std::vector<sex::data::camera_properties> props, bool normalize);
+        void open(std::vector<eox::data::camera_properties> props, bool normalize);
 
-        void open(std::vector<sex::data::camera_properties> props);
+        void open(std::vector<eox::data::camera_properties> props);
 
         /**
          * @brief Get the properties of the stereo camera.
@@ -119,7 +119,7 @@ namespace sex::xocv {
          *
          * @return A structure containing the properties of the stereo camera.
          */
-        [[nodiscard]] const std::vector<sex::data::camera_properties>& getProperties() const;
+        [[nodiscard]] const std::vector<eox::data::camera_properties>& getProperties() const;
 
         /**
          * @brief Set the fast mode for the StereoCamera.
@@ -162,9 +162,9 @@ namespace sex::xocv {
 
         std::vector<camera_controls> getControls(bool homogeneous);
 
-        void setProperties(std::vector<sex::data::camera_properties> props);
+        void setProperties(std::vector<eox::data::camera_properties> props);
 
-        void setThreadPool(std::shared_ptr<sex::util::ThreadPool> executor);
+        void setThreadPool(std::shared_ptr<eox::util::ThreadPool> executor);
 
         uint getDeviceIndex(uint device_id);
 

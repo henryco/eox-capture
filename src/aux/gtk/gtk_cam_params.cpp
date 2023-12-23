@@ -11,7 +11,7 @@
 #include "gtk_cam_params.h"
 #include "gtk_utils.h"
 
-namespace sex::xgtk {
+namespace eox::xgtk {
 
     GtkCamProp::GtkCamProp(
             uint id,
@@ -77,7 +77,7 @@ namespace sex::xgtk {
         reset->get_style_context()->add_class("button-reset");
         reset->set_size_request(-1, 30);
         reset->set_label("Hardware Defaults");
-        sex::xgtk::add_style(*reset, R"css(
+        eox::xgtk::add_style(*reset, R"css(
             .button-reset {
                  margin-right: 5px;
                  margin-bottom: 5px;
@@ -90,7 +90,7 @@ namespace sex::xgtk {
         save->get_style_context()->add_class("button-save");
         save->set_size_request(-1, 30);
         save->set_label("Save settings");
-        sex::xgtk::add_style(*save, R"css(
+        eox::xgtk::add_style(*save, R"css(
             .button-save {
                  margin-right: 5px;
                  margin-bottom: 5px;
@@ -109,7 +109,7 @@ namespace sex::xgtk {
                 // Control container
                 c_box->set_size_request(300, 100);
                 c_box->get_style_context()->add_class("cam-param-c_box");
-                sex::xgtk::add_style(*c_box, R"css(
+                eox::xgtk::add_style(*c_box, R"css(
                     .cam-param-c_box {
                         background-color: white;
                         border-bottom: 1px solid lightgrey;
@@ -124,7 +124,7 @@ namespace sex::xgtk {
                     label->set_text(prop.name);
                     label->set_alignment(0);
                     label->get_style_context()->add_class("cam-param-label");
-                    sex::xgtk::add_style(*label, R"css(
+                    eox::xgtk::add_style(*label, R"css(
                         .cam-param-label {
                             padding-bottom: 10px;
                         }
@@ -242,4 +242,4 @@ namespace sex::xgtk {
 
 #pragma clang diagnostic pop
 
-} // sex
+} // eox

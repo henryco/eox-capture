@@ -10,9 +10,9 @@
 #include <filesystem>
 #include "helpers.h"
 
-namespace sex::helpers {
+namespace eox::helpers {
 
-    std::vector<std::filesystem::path> config_paths(const sex::data::basic_config &configuration) {
+    std::vector<std::filesystem::path> config_paths(const eox::data::basic_config &configuration) {
         std::vector<std::filesystem::path> paths;
         paths.reserve(configuration.configs.size());
         for (const auto &entry: configuration.configs)
@@ -20,7 +20,7 @@ namespace sex::helpers {
         return paths;
     }
 
-    std::vector<std::filesystem::path> work_paths(const sex::data::basic_config &configuration) {
+    std::vector<std::filesystem::path> work_paths(const eox::data::basic_config &configuration) {
         std::vector<std::filesystem::path> paths;
         for (const auto &entry: std::filesystem::directory_iterator(configuration.work_dir)) {
             const auto path = entry.path().string();
@@ -40,10 +40,10 @@ namespace sex::helpers {
     }
 
     void gtk_save_camera_settings(
-            sex::xocv::StereoCamera &camera,
+            eox::xocv::StereoCamera &camera,
             const std::vector<uint> &devices,
             Gtk::Window &window,
-            const sex::data::basic_config &configuration,
+            const eox::data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger> &log
     ) {
         std::vector<uint> ids;
@@ -99,7 +99,7 @@ namespace sex::helpers {
     }
 
     void load_camera_from_paths(
-            sex::xocv::StereoCamera &camera,
+            eox::xocv::StereoCamera &camera,
             const std::vector<std::filesystem::path> &paths,
             const std::shared_ptr<spdlog::logger> &log
     ) {
@@ -212,7 +212,7 @@ namespace sex::helpers {
     void init_pre_calibrated_data(
             std::map<uint, eox::ocv::CalibrationSolo> &preCalibrated,
             const std::vector<std::filesystem::path> &paths,
-            const sex::data::basic_config &configuration,
+            const eox::data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger> &log
     ) {
         const auto props = configuration.camera;
@@ -236,7 +236,7 @@ namespace sex::helpers {
     void init_package_group(
             std::map<uint, eox::ocv::StereoPackage> &packages,
             const std::vector<std::filesystem::path> &paths,
-            const sex::data::basic_config &configuration,
+            const eox::data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger> &log
     ) {
         log->debug("initializing package groups");
@@ -416,7 +416,7 @@ namespace sex::helpers {
     void save_points_ply(
             const eox::ocv::PointCloud &points,
             Gtk::Window &window,
-            const sex::data::basic_config &configuration,
+            const eox::data::basic_config &configuration,
             const std::shared_ptr<spdlog::logger> &log) {
         log->debug("saving points cloud to ply");
 

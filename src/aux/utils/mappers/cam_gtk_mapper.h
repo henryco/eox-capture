@@ -9,13 +9,13 @@
 #include "../../gtk/gtk_cam_params.h"
 #include "../../ocv/stereo_camera.h"
 
-namespace sex::mappers {
+namespace eox::mappers {
 
     namespace cam_gtk {
 
-        std::vector<sex::xgtk::GtkCamProp> map(const std::vector<sex::xocv::camera_control> &vec);
+        std::vector<eox::xgtk::GtkCamProp> map(const std::vector<eox::xocv::camera_control> &vec);
 
-        std::vector<uint> index(const std::vector<sex::data::camera_properties>& props, uint device_id, bool homogeneous);
+        std::vector<uint> index(const std::vector<eox::data::camera_properties>& props, uint device_id, bool homogeneous);
 
     }
 

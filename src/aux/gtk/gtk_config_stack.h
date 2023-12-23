@@ -9,7 +9,7 @@
 #include <gtkmm/stack.h>
 #include <gtkmm/stackswitcher.h>
 
-namespace sex::xgtk {
+namespace eox::xgtk {
 
     class GtkConfigStack : public Gtk::Box {
     private:
@@ -24,6 +24,6 @@ namespace sex::xgtk {
         void add(Widget &child, const Glib::ustring &title);
     };
 
-} // sex
+} // eox
 
 #endif //STEREOX_GTK_CONFIG_STACK_H

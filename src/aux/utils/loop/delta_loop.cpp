@@ -7,7 +7,7 @@
 #include <memory>
 #include <utility>
 
-namespace sex::util {
+namespace eox::util {
 
     DeltaLoop::DeltaLoop(const int fps) { // NOLINT(*-pro-type-member-init)
         setFps(fps);
@@ -143,4 +143,4 @@ namespace sex::util {
         return ((float) frame.count()) / 1000000;
     }
 
-} // sex
+} // eox

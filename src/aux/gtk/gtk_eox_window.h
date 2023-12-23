@@ -2,16 +2,16 @@
 // Created by henryco on 11/28/23.
 //
 
-#ifndef STEREOX_GTK_SEX_WINDOW_H
-#define STEREOX_GTK_SEX_WINDOW_H
+#ifndef STEREOX_GTK_EOX_WINDOW_H
+#define STEREOX_GTK_EOX_WINDOW_H
 
 #include <gtkmm/window.h>
 #include <glibmm/dispatcher.h>
 #include "../commons.h"
 
-namespace sex::xgtk {
+namespace eox::xgtk {
 
-    class GtkSexWindow : public Gtk::Window {
+    class GtkEoxWindow : public Gtk::Window {
 
     private:
         std::vector<std::unique_ptr<Gtk::Widget>> u_widgets;
@@ -21,13 +21,13 @@ namespace sex::xgtk {
         void on_dispatcher_signal();
 
     public:
-        virtual void init(sex::data::basic_config configuration) = 0;
+        virtual void init(eox::data::basic_config configuration) = 0;
 
         void init();
 
-        virtual ~GtkSexWindow() = default; // NOLINT(*-use-override)
+        virtual ~GtkEoxWindow() = default; // NOLINT(*-use-override)
 
-        GtkSexWindow();
+        GtkEoxWindow();
 
     protected:
 
@@ -46,6 +46,6 @@ namespace sex::xgtk {
         void un_keep();
     };
 
-} // sex
+} // eox
 
 #endif //STEREOX_GTK_SEX_WINDOW_H

@@ -10,7 +10,7 @@
 #include <ostream>
 #include <map>
 
-namespace sex::v4l2 {
+namespace eox::v4l2 {
 
     struct v4l2_queryctrl_ext : public v4l2_queryctrl {
         __s32 value;
@@ -35,7 +35,7 @@ namespace sex::v4l2 {
      * @note This function requires the v4l2 library to be installed.
      * In general it is already installed in most of linux distributions.
      */
-    std::vector<sex::v4l2::V4L2_QueryCtrl> get_camera_props(uint device_id);
+    std::vector<eox::v4l2::V4L2_QueryCtrl> get_camera_props(uint device_id);
 
     /**
      * @brief Sets the camera property for a given device.
@@ -71,7 +71,7 @@ namespace sex::v4l2 {
      * @param controls A vector of `V4L2_Control` objects representing the camera properties to be set.
      * @return Vector of booleans representing results of setting each of properties.
      *
-     * @see sex::v4l2::V4L2_Control
+     * @see eox::v4l2::V4L2_Control
      */
     std::vector<bool> set_camera_prop(uint device_id, std::vector<V4L2_Control> controls);
 
@@ -149,7 +149,7 @@ namespace sex::v4l2 {
      * @param is An input stream (std::istream&) from which V4L2 control data is read. The stream should be in
      *           binary format and must be already opened and in a good state.
      *
-     * @return std::map<uint, std::vector<sex::v4l2::V4L2_Control>> - A map where each key is a device ID and
+     * @return std::map<uint, std::vector<eox::v4l2::V4L2_Control>> - A map where each key is a device ID and
      *         the corresponding value is a vector of V4L2_Control structures for that device. If no data is read,
      *         or if the input stream is not in the expected format, the returned map may be empty.
      *

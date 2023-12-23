@@ -5,7 +5,7 @@
 #include "gtk_config_stack.h"
 #include "gtk_utils.h"
 
-namespace sex::xgtk {
+namespace eox::xgtk {
 
     GtkConfigStack::GtkConfigStack() {
         set_orientation(Gtk::ORIENTATION_VERTICAL);
@@ -15,7 +15,7 @@ namespace sex::xgtk {
         pack_start(stack);
 
         get_style_context()->add_class("config-stack-box");
-        sex::xgtk::add_style(*this, R"css(
+        eox::xgtk::add_style(*this, R"css(
             .config-stack-box {
                  background-color: white;
              }
@@ -30,4 +30,4 @@ namespace sex::xgtk {
         add(child, title, title);
     }
 
-} // sex::xgtk
+} // eox::xgtk

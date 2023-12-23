@@ -10,7 +10,7 @@ namespace eox::ts {
     using device_id = unsigned int;
 }
 
-namespace sex::data {
+namespace eox::data {
 
     typedef enum  {
         SGBM,

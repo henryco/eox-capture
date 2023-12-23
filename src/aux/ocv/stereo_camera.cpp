@@ -8,7 +8,7 @@
 #include <utility>
 #include <iostream>
 
-namespace sex::xocv {
+namespace eox::xocv {
 
     int fourCC(const char *name) {
         return cv::VideoWriter::fourcc(
@@ -18,7 +18,7 @@ namespace sex::xocv {
                 name[3]);
     }
 
-    void init_from_params(cv::VideoCapture &capture, const sex::data::camera_properties &prop, int api) {
+    void init_from_params(cv::VideoCapture &capture, const eox::data::camera_properties &prop, int api) {
         std::vector<int> params;
         params.assign({
                               cv::CAP_PROP_FOURCC, fourCC(prop.codec),
@@ -45,7 +45,7 @@ namespace sex::xocv {
             std::vector<camera_controls> vec;
             for (const auto &prop: properties) {
 
-                const auto control = sex::v4l2::get_camera_props(prop.index);
+                const auto control = eox::v4l2::get_camera_props(prop.index);
                 std::vector<camera_control> controls;
 
                 for (const auto &ctr: control) {
@@ -163,20 +163,20 @@ namespace sex::xocv {
                 const auto &first = properties[0];
 
                 // read V4L2 parameters for first device
-                auto v4_props = sex::v4l2::get_camera_props(first.index);
+                auto v4_props = eox::v4l2::get_camera_props(first.index);
 
                 // initialize data structure with config
-                std::vector<sex::v4l2::V4L2_Control> v4_controls;
+                std::vector<eox::v4l2::V4L2_Control> v4_controls;
                 for (const auto &prop: v4_props) {
                     if (prop.type == 6)
                         continue;
                     // add only modifiable parameters
-                    v4_controls.push_back(sex::v4l2::V4L2_Control{.id = prop.id, .value = prop.value});
+                    v4_controls.push_back(eox::v4l2::V4L2_Control{.id = prop.id, .value = prop.value});
                 }
 
                 // set parameters for all devices
                 for (int i = 1; i < properties.size(); i++) {
-                    sex::v4l2::set_camera_prop(properties[i].index, v4_controls);
+                    eox::v4l2::set_camera_prop(properties[i].index, v4_controls);
                 }
             } else {
                 // TODO: windows support
@@ -185,7 +185,7 @@ namespace sex::xocv {
 
         if (!executor) {
             // there is no assigned executors
-            executor = std::make_shared<sex::util::ThreadPool>();
+            executor = std::make_shared<eox::util::ThreadPool>();
             executor->start(properties.size());
         }
 
@@ -196,12 +196,12 @@ namespace sex::xocv {
         open(properties.empty() ? false : properties[0].homogeneous);
     }
 
-    void StereoCamera::open(std::vector<sex::data::camera_properties> props, bool normalize) {
+    void StereoCamera::open(std::vector<eox::data::camera_properties> props, bool normalize) {
         setProperties(std::move(props));
         open(normalize);
     }
 
-    void StereoCamera::open(std::vector<sex::data::camera_properties> props) {
+    void StereoCamera::open(std::vector<eox::data::camera_properties> props) {
         setProperties(std::move(props));
         open();
     }
@@ -236,7 +236,7 @@ namespace sex::xocv {
 
         if (backend == cv::CAP_V4L2) {
 
-            const auto controls = sex::v4l2::read_controls(input_stream);
+            const auto controls = eox::v4l2::read_controls(input_stream);
             for (const auto &[device_id, vec]: controls) {
                 log->debug("checking controls for device id: {}", device_id);
 
@@ -247,7 +247,7 @@ namespace sex::xocv {
 
                     log->debug("setting configuration for device: {}, index: {}", device_id, prop.index);
 
-                    sex::v4l2::set_camera_prop(prop.index, vec);
+                    eox::v4l2::set_camera_prop(prop.index, vec);
 
                     log->debug("configuration set: {}[{}]", device_id, prop.index);
                     break;
@@ -273,12 +273,12 @@ namespace sex::xocv {
 
             // iterative over devices
             // map <device_id, controls>
-            std::map<uint, std::vector<sex::v4l2::V4L2_Control>> map;
+            std::map<uint, std::vector<eox::v4l2::V4L2_Control>> map;
             for (const auto &index: devices) {
 
                 // iterating over controls for given device
-                const auto _properties = sex::v4l2::get_camera_props(index);
-                std::vector<sex::v4l2::V4L2_Control> controls;
+                const auto _properties = eox::v4l2::get_camera_props(index);
+                std::vector<eox::v4l2::V4L2_Control> controls;
                 for (const auto &prop: _properties) {
                     // skipping non modifiable controls
                     if (prop.type == 6)
@@ -311,7 +311,7 @@ namespace sex::xocv {
             // write aggregated config data
             for (const auto &[device_id, controls]: map) {
                 log->debug("writing camera [{}] configuration", device_id);
-                sex::v4l2::write_control(output_stream, device_id, controls);
+                eox::v4l2::write_control(output_stream, device_id, controls);
             }
 
         } else {
@@ -323,7 +323,7 @@ namespace sex::xocv {
         release();
     }
 
-    const std::vector<sex::data::camera_properties> &StereoCamera::getProperties() const {
+    const std::vector<eox::data::camera_properties> &StereoCamera::getProperties() const {
         return properties;
     }
 
@@ -339,7 +339,7 @@ namespace sex::xocv {
         this->api = _api;
     }
 
-    void StereoCamera::setProperties(std::vector<sex::data::camera_properties> props) {
+    void StereoCamera::setProperties(std::vector<eox::data::camera_properties> props) {
         this->properties = std::move(props);
 
         properties_map.clear();
@@ -348,13 +348,13 @@ namespace sex::xocv {
         }
     }
 
-    void StereoCamera::setThreadPool(std::shared_ptr<sex::util::ThreadPool> _executor) {
+    void StereoCamera::setThreadPool(std::shared_ptr<eox::util::ThreadPool> _executor) {
         this->executor = std::move(_executor);
     }
 
     void StereoCamera::setPropValue(uint device_id, uint prop_id, int value) {
         if (api == cv::CAP_V4L2) {
-            sex::v4l2::set_camera_prop(properties_map.at(device_id).index, prop_id, value);
+            eox::v4l2::set_camera_prop(properties_map.at(device_id).index, prop_id, value);
         } else {
             // TODO WINDOWS?
         }
@@ -362,7 +362,7 @@ namespace sex::xocv {
 
     void StereoCamera::resetDefaults(uint device_id) {
         if (api == cv::CAP_V4L2) {
-            sex::v4l2::reset_defaults(properties_map.at(device_id).index);
+            eox::v4l2::reset_defaults(properties_map.at(device_id).index);
         }
     }
 

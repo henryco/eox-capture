@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     }
 
     try {
-        const auto configuration = sex::cli::parse(argc, argv);
+        const auto configuration = eox::cli::parse(argc, argv);
 
         int n_argc = 1;
         const auto app = Gtk::Application::create(
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
                 "dev.tindersamurai.stereox"
         );
 
-        std::unique_ptr<sex::xgtk::GtkSexWindow> window;
+        std::unique_ptr<eox::xgtk::GtkEoxWindow> window;
 
         if (configuration.module == "calibration")
             window = std::make_unique<UiCalibration>();

@@ -10,7 +10,7 @@
 #include <gtkmm/box.h>
 #include <gtkmm/scrolledwindow.h>
 
-namespace sex::xgtk {
+namespace eox::xgtk {
 
     class GtkCamParams;
 
@@ -66,6 +66,6 @@ namespace sex::xgtk {
         void setProperties(const std::vector<GtkCamProp>& properties);
     };
 
-} // sex
+} // eox
 
 #endif //STEREOX_GTK_CAM_PARAMS_H

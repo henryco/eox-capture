@@ -7,7 +7,7 @@
 #include <gtkmm/eventbox.h>
 #include "gl_image.h"
 
-namespace sex::xgtk {
+namespace eox::xgtk {
 
     GLImage::~GLImage() {
         textures.clear();
