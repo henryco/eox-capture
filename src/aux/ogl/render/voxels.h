@@ -28,7 +28,7 @@ namespace eox::ogl {
         GLuint vbo[2];
         GLint uni_loc[3];
 
-        size_t total = 0;
+        long total = 0;
         float size = 10.;
 
     public:
@@ -36,13 +36,13 @@ namespace eox::ogl {
 
         ~Voxels();
 
-        void init(bool bgr = false);
+        void init(long count, bool bgr = false);
 
         void render(const float **view_mat, const float **projection_mat);
 
         void render(const float (view_mat)[4][4], const float (projection_mat)[4][4]);
 
-        Voxels &setPoints(const void *pos, const void *color, size_t elements);
+        Voxels &setPoints(const void *pos, const void *color);
 
         Voxels &setPointSize(float size);
 

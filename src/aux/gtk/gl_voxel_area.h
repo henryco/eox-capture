@@ -33,19 +33,21 @@ namespace eox::xgtk {
         int v_w = 0;
         int v_h = 0;
 
+        long total;
+
     protected:
         bool render_fn(const Glib::RefPtr<Gdk::GLContext> & context);
 
         void init_fn(bool bgr);
 
     public:
-        void setPoints(const float *pos, const float *color, size_t elements);
+        void setPoints(const float *pos, const float *color);
 
         void setPoints(cv::Mat pos, cv::Mat color);
 
         void setPointSize(float size);
 
-        void init(bool bgr = false, int width = 0, int height = 0);
+        void init(long total, bool bgr = false, int width = 0, int height = 0);
 
         void update();
 

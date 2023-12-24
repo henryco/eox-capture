@@ -84,7 +84,8 @@ namespace eox {
         }
 
         {
-            voxelArea.init(true, props[0].width * 2, props[0].height * 2);
+            const long total = props[0].width * props[0].height * 1 ;//* deviceGroupMap.size();
+            voxelArea.init(total,true, props[0].width * 2, props[0].height * 2);
             voxelArea.scale(config.scale);
             voxelArea.setPointSize(10.f);
             render_stack->add(voxelArea, "3D");

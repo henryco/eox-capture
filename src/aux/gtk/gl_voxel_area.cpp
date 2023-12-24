@@ -10,7 +10,8 @@
 #pragma ide diagnostic ignored "ConstantFunctionResult"
 namespace eox::xgtk {
 
-    void GLVoxelArea::init(bool bgr, int _width, int _height) {
+    void GLVoxelArea::init(long _total, bool bgr, int _width, int _height) {
+        total = _total;
         width = _width;
         height = _height;
         v_w = _width;
@@ -47,18 +48,19 @@ namespace eox::xgtk {
     void GLVoxelArea::init_fn(bool bgr) {
         gl_area.make_current();
         gl_area.throw_if_error();
-        voxels.init(bgr);
+        voxels.init(total, bgr);
     }
 
     bool GLVoxelArea::render_fn(const Glib::RefPtr<Gdk::GLContext> &_) {
         if (mat) {
-            log->info("--->");
-            voxels.setPoints(positions.data, colors.data, positions.total());
+            voxels.setPoints(positions.data, colors.data);
         }
 
-        glClearColor(.0f, .0f, .0f, .0f);
+        glClearColor(.0f, .274f, .44f, .1f);
         glClear(GL_COLOR_BUFFER_BIT);
+
         voxels.render(camera.get_view_matrix(), camera.get_projection_matrix());
+
         return true;
     }
 
@@ -66,8 +68,8 @@ namespace eox::xgtk {
         gl_area.queue_render();
     }
 
-    void GLVoxelArea::setPoints(const float *pos, const float *color, size_t elements) {
-        voxels.setPoints(pos, color, elements);
+    void GLVoxelArea::setPoints(const float *pos, const float *color) {
+        voxels.setPoints(pos, color);
         mat = false;
     }
 

@@ -43,7 +43,7 @@ out vec4 point_color;
 
 void main() {
     if (aPos.z >= 10000.) {
-        gl_Position = vec4(0., 0., 1000., 1.);
+        gl_Position = vec4(0., 0., 100000., 1.);
         return;
     }
 
@@ -77,17 +77,19 @@ in vec4 point_color;
 out vec4 FragColor;
 
 void main() {
-    FragColor = vec4(point_color.b, point_color.g, point_color.r, 1.0);
+    FragColor = vec4(1., point_color.g, point_color.r, 1.0);
 }
 
 )glsl";
 
-    void Voxels::init(bool bgr) {
+    void Voxels::init(long count, bool bgr) {
         if (bgr) {
             shader = xogl::SimpleShader(
                     vertex_source,
                     fragment_source_bgr);
         }
+
+        total = count;
 
         glGenBuffers(2, vbo);
         glGenVertexArrays(1, &vao);
@@ -97,15 +99,15 @@ void main() {
 
         // [X,Y,Z] | 3x4 bytes
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (long) (total * 3 * sizeof(float)), NULL, GL_DYNAMIC_DRAW);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0); // NOLINT(*-use-nullptr)
 
         // [R,G,B] | 3x1 bytes
         glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-        glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (long) (total * 3 * sizeof(u_char)), NULL, GL_DYNAMIC_DRAW);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_TRUE, 3 * sizeof(u_char), (void *) 0); // NOLINT(*-use-nullptr)
+        glVertexAttribPointer(1, 3, GL_UNSIGNED_BYTE, GL_TRUE, 3 * sizeof(u_char), (void *) 0); // NOLINT(*-use-nullptr)
 
         // unbind buffers
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -166,16 +168,14 @@ void main() {
         glUseProgram(0);
     }
 
-    Voxels &Voxels::setPoints(const void *pos, const void *color, size_t elements) {
+    Voxels &Voxels::setPoints(const void *pos, const void *color) {
+
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, 3 * (long) total * (long) sizeof(float), NULL, GL_DYNAMIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * (long) elements * (long) sizeof(float), pos);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, (long) (total * 3 * sizeof(float)), pos);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-        glBufferData(GL_ARRAY_BUFFER, 3 * (long) total * (long) sizeof(u_char), NULL, GL_DYNAMIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * (long) elements * (long) sizeof(u_char), color);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, (long) (total * 3 * sizeof(u_char)), color);
 
-        total = elements;
         return *this;
     }
 
