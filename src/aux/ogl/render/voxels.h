@@ -29,7 +29,7 @@ namespace eox::ogl {
         GLint uni_loc[3];
 
         long total = 0;
-        float size = 10.;
+        float size = 200.;
 
     public:
         Voxels() = default;

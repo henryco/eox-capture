@@ -11,16 +11,16 @@
 namespace eox::xgtk {
 
     void GLVoxelArea::init(long _total, bool bgr, int _width, int _height) {
-        total = 3;
-//        total = _total;
+        total = _total;
+
         width = _width;
         height = _height;
         v_w = _width;
         v_h = _height;
 
-        camera.perspective((float) width / (float) height, 110 * (M_PI / 180.f), 10, 1000);
-        camera.set_position(0, 100, -100);
-        camera.look_at(0, 0, 40);
+        camera.perspective((float) width / (float) height, 90 * (M_PI / 180.f), 0.1, 1000);
+        camera.set_position(0, 0, 0);
+        camera.look_at(0, 0, 1);
 
         gl_area.signal_realize().connect([this, bgr]() {
             init_fn(bgr);
@@ -54,22 +54,11 @@ namespace eox::xgtk {
 
     bool GLVoxelArea::render_fn(const Glib::RefPtr<Gdk::GLContext> &_) {
         if (mat) {
-//            voxels.setPoints(positions.data, colors.data);
-            float pos[9] = {
-                    -0.75, 0, 0,
-                    0, 0, 0,
-                    0.75, 0, 0,
-            };
-            float col[9] = {
-                    255, 0, 0,
-                    0, 255, 0,
-                    0, 0, 255,
-            };
-            voxels.setPoints(pos, col);
+            voxels.setPoints(positions.data, colors.data);
         }
 
         glClearColor(.0f, .274f, .44f, .1f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         voxels.render(camera.get_view_matrix(), camera.get_projection_matrix());
 

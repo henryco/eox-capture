@@ -48,11 +48,12 @@ void main() {
         return;
     }
 
-    gl_Position = mvp * vec4(aPos, 1.0);
+    gl_Position = projection * mvp * vec4(aPos, 1.0);
+    gl_PointSize = point_size;
     point_color = vec4(aColor, 1.0);
 
     float projectedPointSize = (projection[1][1] * point_size) / gl_Position.w;
-    gl_PointSize = max(projectedPointSize, 1.0);
+    gl_PointSize = max(projectedPointSize, 2.0);
 }
 
 )glsl";
@@ -93,6 +94,7 @@ void main() {
         total = count;
 
         glEnable(GL_PROGRAM_POINT_SIZE);
+        glEnable(GL_DEPTH_TEST);
 
         glGenBuffers(2, vbo);
         glGenVertexArrays(1, &vao);
@@ -118,9 +120,11 @@ void main() {
 
         shader.init();
 
+        glUseProgram(shader.getHandle());
         uni_loc[0] = glGetUniformLocation(shader.getHandle(), "mvp");
         uni_loc[1] = glGetUniformLocation(shader.getHandle(), "projection");
         uni_loc[2] = glGetUniformLocation(shader.getHandle(), "point_size");
+        glUseProgram(0);
     }
 
     void Voxels::renderFlatten(const float *mvp, const float *proj) {
@@ -158,7 +162,7 @@ void main() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 const int k = i * 4 + j;
-                mvp[k] = _mvp[j][i];
+                mvp[k] = view_mat[j][i];
                 proj[k] = projection_mat[j][i];
             }
         }
@@ -175,7 +179,7 @@ void main() {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 const int k = i * 4 + j;
-                mvp[k] = _mvp[j][i];
+                mvp[k] = view_mat[j][i];
                 proj[k] = projection_mat[j][i];
             }
         }
