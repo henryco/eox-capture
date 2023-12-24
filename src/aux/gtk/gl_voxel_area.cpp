@@ -18,6 +18,8 @@ namespace eox::xgtk {
         v_w = _width;
         v_h = _height;
 
+        camera.base[0][0] = -1;
+        camera.base[1][1] = -1;
         camera.perspective((float) width / (float) height, 90 * (M_PI / 180.f), 0.1, 1000);
         camera.set_position(0, 0, 0);
         camera.look_at(0, 0, 1);
