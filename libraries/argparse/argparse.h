@@ -79,7 +79,7 @@ namespace argparse {
         struct HasContainerTraits<
                 T, std::void_t<typename T::value_type, decltype(std::declval<T>().begin()),
                         decltype(std::declval<T>().end()),
-                        decltype(std::declval<T>().size())>> : std::true_type {};
+                        decltype(std::declval<T>().total())>> : std::true_type {};
 
         template <typename T>
         inline constexpr bool IsContainer = HasContainerTraits<T>::value;
@@ -106,7 +106,7 @@ namespace argparse {
             } else if constexpr (IsContainer<T>) {
                 std::stringstream out;
                 out << "{";
-                const auto size = val.size();
+                const auto size = val.total();
                 if (size > 1) {
                     out << repr(*val.begin());
                     std::for_each(
@@ -531,10 +531,10 @@ namespace argparse {
         std::size_t get_levenshtein_distance(const StringType &s1,
                                              const StringType &s2) {
             std::vector<std::vector<std::size_t>> dp(
-                    s1.size() + 1, std::vector<std::size_t>(s2.size() + 1, 0));
+                    s1.total() + 1, std::vector<std::size_t>(s2.total() + 1, 0));
 
-            for (std::size_t i = 0; i <= s1.size(); ++i) {
-                for (std::size_t j = 0; j <= s2.size(); ++j) {
+            for (std::size_t i = 0; i <= s1.total(); ++i) {
+                for (std::size_t j = 0; j <= s2.total(); ++j) {
                     if (i == 0) {
                         dp[i][j] = j;
                     } else if (j == 0) {
@@ -547,7 +547,7 @@ namespace argparse {
                 }
             }
 
-            return dp[s1.size()][s2.size()];
+            return dp[s1.total()][s2.total()];
         }
 
         template <typename ValueType>
@@ -604,7 +604,7 @@ namespace argparse {
             ((void)m_names.emplace_back(a[I]), ...);
             std::sort(
                     m_names.begin(), m_names.end(), [](const auto &lhs, const auto &rhs) {
-                        return lhs.size() == rhs.size() ? lhs < rhs : lhs.size() < rhs.size();
+                        return lhs.total() == rhs.total() ? lhs < rhs : lhs.total() < rhs.total();
                     });
         }
 
@@ -993,7 +993,7 @@ namespace argparse {
 
             std::size_t names_size = std::accumulate(
                     std::begin(m_names), std::end(m_names), std::size_t(0),
-                    [](const auto &sum, const auto &s) { return sum + s.size(); });
+                    [](const auto &sum, const auto &s) { return sum + s.total(); });
 
             if (is_positional(m_names.front(), m_prefix_chars)) {
                 // A set metavar means this replaces the names
