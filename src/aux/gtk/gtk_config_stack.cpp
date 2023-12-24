@@ -30,4 +30,12 @@ namespace eox::xgtk {
         add(child, title, title);
     }
 
+    void GtkConfigStack::onChange(std::function<void(std::string)> callback) {
+        stack.property_visible_child_name()
+                .signal_changed()
+                .connect([this, c = std::move(callback)]() {
+                    c(stack.get_visible_child_name());
+                });
+    }
+
 } // eox::xgtk

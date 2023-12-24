@@ -22,6 +22,8 @@ namespace eox::xgtk {
         void add(Widget &child, const Glib::ustring &name, const Glib::ustring &title);
 
         void add(Widget &child, const Glib::ustring &title);
+
+        void onChange(std::function<void(std::string name)> callback);
     };
 
 } // eox

@@ -48,6 +48,8 @@ namespace eox {
         std::vector<std::unique_ptr<eox::gtk::GtkControl>> controls;
         float FPS = 0;
 
+        bool aux = true;
+
     public:
         UiPointsCloud() = default;
         ~UiPointsCloud() override;

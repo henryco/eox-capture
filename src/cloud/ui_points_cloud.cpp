@@ -20,6 +20,11 @@ namespace eox {
         const auto &props = config.camera;
         auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
         auto config_stack = std::make_unique<eox::xgtk::GtkConfigStack>();
+        auto render_stack = std::make_unique<eox::xgtk::GtkConfigStack>();
+
+        render_stack->onChange([this](auto name) {
+            aux = (name == "AUX");
+        });
 
         {
             std::vector<std::string> group_ids;
@@ -75,6 +80,11 @@ namespace eox {
 
                 log->debug("z: {}, d: {}", _z, _d);
             });
+            render_stack->add(glImage, "AUX");
+        }
+
+        {
+            // TODO
         }
 
         {
@@ -758,11 +768,12 @@ namespace eox {
 
         {
             // Init Window
-            layout_h->pack_start(glImage, Gtk::PACK_EXPAND_WIDGET);
+            layout_h->pack_start(*render_stack, Gtk::PACK_EXPAND_WIDGET);
             layout_h->pack_end(*config_stack, Gtk::PACK_SHRINK);
             add(*layout_h);
             keep(std::move(layout_h));
             keep(std::move(config_stack));
+            keep(std::move(render_stack));
             show_all_children();
         }
 
@@ -781,7 +792,12 @@ namespace eox {
     void UiPointsCloud::onRefresh() {
         const std::string name = config.stereo.algorithm == eox::data::BM ? "BM" : "SGBM";
         set_title("StereoX++ " + name + " [ " + std::to_string((int) FPS) + " FPS ]");
-        glImage.update();
+
+        if (aux) {
+            glImage.update();
+        } else {
+            // TODO
+        }
     }
 
     UiPointsCloud::~UiPointsCloud() {
