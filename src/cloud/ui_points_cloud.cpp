@@ -84,7 +84,10 @@ namespace eox {
         }
 
         {
-            // TODO
+            voxelArea.init(true, props[0].width * 2, props[0].height * 2);
+            voxelArea.scale(config.scale);
+            voxelArea.setPointSize(10.f);
+            render_stack->add(voxelArea, "3D");
         }
 
         {
@@ -796,7 +799,7 @@ namespace eox {
         if (aux) {
             glImage.update();
         } else {
-            // TODO
+            voxelArea.update();
         }
     }
 

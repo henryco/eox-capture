@@ -36,15 +36,20 @@ namespace eox::ogl {
 
         ~Voxels();
 
-        void init();
+        void init(bool bgr = false);
 
         void render(const float **view_mat, const float **projection_mat);
 
-        Voxels &setPoints(const float *pos, const float *color, size_t elements);
+        void render(const float (view_mat)[4][4], const float (projection_mat)[4][4]);
+
+        Voxels &setPoints(const void *pos, const void *color, size_t elements);
 
         Voxels &setPointSize(float size);
 
         void cleanup();
+
+    protected:
+        void renderFlatten(const float *mvp, const float *proj);
     };
 
 } // eox

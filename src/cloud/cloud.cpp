@@ -190,7 +190,18 @@ namespace eox {
             points[g_id] = ocv::PointCloud(disparity, points_cloud, source_l);
         }
 
-        glImage.setFrames(_frames);
+        if (aux) {
+            glImage.setFrames(_frames);
+        } else {
+            for (const auto &[_, p]: points) {
+                // TODO FIXME, works only for one group
+                cv::Mat pos, col;
+                p.points.copyTo(pos);
+                p.colors.copyTo(col);
+                voxelArea.setPoints(pos, col);
+            }
+        }
+
         refresh();
     }
 

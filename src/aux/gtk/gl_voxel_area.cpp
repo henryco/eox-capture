@@ -1,0 +1,126 @@
+//
+// Created by henryco on 12/24/23.
+//
+
+#include "gl_voxel_area.h"
+#include <cmath>
+#include <gtkmm/eventbox.h>
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "ConstantFunctionResult"
+namespace eox::xgtk {
+
+    void GLVoxelArea::init(bool bgr, int _width, int _height) {
+        width = _width;
+        height = _height;
+        v_w = _width;
+        v_h = _height;
+
+        camera.perspective((float) width / (float) height, 110 * (M_PI / 180.f), 10, 1000);
+        camera.set_position(0, 100, -100);
+        camera.look_at(0, 0, 40);
+
+        gl_area.signal_realize().connect([this, bgr]() {
+            init_fn(bgr);
+        });
+        gl_area.signal_render().connect([this](const Glib::RefPtr<Gdk::GLContext>& c) {
+            return render_fn(c);
+        });
+
+        gl_area.set_size_request(v_w, v_h);
+        gl_area.set_auto_render(true);
+
+        auto event_box = Gtk::make_managed<Gtk::EventBox>();
+        event_box->add(gl_area);
+
+        auto h_box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+        h_box->set_halign(Gtk::ALIGN_CENTER);
+        h_box->pack_start(*event_box, Gtk::PACK_SHRINK);
+
+        pack_start(*h_box, Gtk::PACK_SHRINK);
+
+        set_size_request(v_w, v_h);
+        set_orientation(Gtk::ORIENTATION_VERTICAL);
+        set_valign(Gtk::ALIGN_CENTER);
+    }
+
+    void GLVoxelArea::init_fn(bool bgr) {
+        gl_area.make_current();
+        gl_area.throw_if_error();
+        voxels.init(bgr);
+    }
+
+    bool GLVoxelArea::render_fn(const Glib::RefPtr<Gdk::GLContext> &_) {
+        if (mat) {
+            log->info("--->");
+            voxels.setPoints(positions.data, colors.data, positions.total());
+        }
+
+        glClearColor(.0f, .0f, .0f, .0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        voxels.render(camera.get_view_matrix(), camera.get_projection_matrix());
+        return true;
+    }
+
+    void GLVoxelArea::update() {
+        gl_area.queue_render();
+    }
+
+    void GLVoxelArea::setPoints(const float *pos, const float *color, size_t elements) {
+        voxels.setPoints(pos, color, elements);
+        mat = false;
+    }
+
+    void GLVoxelArea::setPoints(cv::Mat pos, cv::Mat color) {
+        positions = std::move(pos);
+        colors = std::move(color);
+        mat = true;
+    }
+
+    void GLVoxelArea::setPointSize(float size) {
+        voxels.setPointSize(size);
+    }
+
+    void GLVoxelArea::scale(float _scale) {
+        resize((int) ((float) v_w * _scale), (int) ((float) v_h * _scale));
+    }
+
+    void GLVoxelArea::resize(int _width, int _height) {
+        if (_width == -1 && _height == -1) {
+            v_w = width;
+            v_h = height;
+        }
+
+        else if (_width != -1 && _height == -1) {
+            v_w = _width;
+
+            const auto ratio = (float) width / (float) height;
+            v_h = (int) ((float) v_w / ratio);
+        }
+
+        else if (_width == -1) {
+            v_h = _height;
+
+            const auto ratio = (float) width / (float) height;
+            v_w = (int) ((float) v_h * ratio);
+        }
+
+        else {
+            v_w = _width;
+            v_h = _height;
+        }
+
+        gl_area.set_size_request(v_w, v_h);
+        set_size_request(v_w, v_h);
+    }
+
+    int GLVoxelArea::getViewWidth() const {
+        return v_w;
+    }
+
+    int GLVoxelArea::getViewHeight() const {
+        return v_h;
+    }
+
+} // eox
+#pragma clang diagnostic pop

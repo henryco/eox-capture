@@ -29,18 +29,21 @@ namespace eox::ogl {
 #define P_y position[1]
 #define P_z position[2]
 
-    Camera &Camera::translate_free(float x, float y, float z) {
+    Camera &Camera::set_position(float x, float y, float z) {
         P_x = x;
         P_y = y;
         P_z = z;
+        return *this;
+    }
+
+    Camera &Camera::move_free(float x, float y, float z) {
+        set_position(x, y, z);
         recalculate_view();
         return *this;
     }
 
-    Camera &Camera::translate_lock(float x, float y, float z) {
-        P_x = x;
-        P_y = y;
-        P_z = z;
+    Camera &Camera::move_lock(float x, float y, float z) {
+        set_position(x, y, z);
         return look_at(T_x, T_y, T_z);
     }
 

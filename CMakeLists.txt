@@ -84,7 +84,9 @@ add_executable(${PROJECT_NAME}
         src/aux/ogl/render/voxels.cpp
         src/aux/ogl/render/voxels.h
         src/aux/ogl/camera/camera.cpp
-        src/aux/ogl/camera/camera.h)
+        src/aux/ogl/camera/camera.h
+        src/aux/gtk/gl_voxel_area.cpp
+        src/aux/gtk/gl_voxel_area.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}

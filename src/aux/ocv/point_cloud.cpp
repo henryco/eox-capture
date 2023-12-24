@@ -45,7 +45,8 @@ __kernel void merge_points(
 
         output[3] = 10.f;
     }
-})ocl";
+}
+)ocl";
         eox::ocl::Kernel oclProgram;
         oclProgram.compile(source);
         oclProgram.procedure("merge_points");

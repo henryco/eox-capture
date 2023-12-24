@@ -42,9 +42,11 @@ namespace eox::ogl {
                 {0, 0, 0, 1},
         };
 
-        Camera& translate_free(float x, float y, float z);
+        Camera& set_position(float x, float y, float z);
 
-        Camera& translate_lock(float x, float y, float z);
+        Camera& move_free(float x, float y, float z);
+
+        Camera& move_lock(float x, float y, float z);
 
         Camera& pitch(float rad);
 

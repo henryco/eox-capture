@@ -16,7 +16,6 @@ namespace xogl {
     private:
         std::string vertex;
         std::string fragment;
-
         unsigned int shaderProgram;
 
     public:
@@ -24,18 +23,24 @@ namespace xogl {
                 spdlog::stdout_color_mt("simple_shader");
 
         SimpleShader(std::string vertex, std::string fragment);
-        SimpleShader(SimpleShader&& ref) noexcept;
+
+        SimpleShader(SimpleShader &&ref) noexcept;
+
+        SimpleShader(const SimpleShader &src) = default;
+
+        SimpleShader& operator=(const SimpleShader &src) = default;
+
+        SimpleShader& operator=(SimpleShader &&ref) noexcept;
 
         ~SimpleShader();
 
         void init();
+
         void cleanup() const;
 
         [[nodiscard]] unsigned int getHandle() const;
     };
 }
-
-
 
 
 #endif //STEREOX_SIMPLE_SHADER_H

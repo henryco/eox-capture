@@ -9,12 +9,12 @@
 
 namespace xogl {
 
-    GLuint loadAndCompileShader(GLenum type, const char* shaderSrc) {
+    GLuint loadAndCompileShader(GLenum type, const char *shaderSrc) {
         GLuint shader = glCreateShader(type);
         glShaderSource(shader, 1, &shaderSrc, NULL);
         glCompileShader(shader);
 
-        GLint success;
+        GLint success = -1;
         GLchar infoLog[512];
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success) {
@@ -27,12 +27,21 @@ namespace xogl {
 
     SimpleShader::SimpleShader(
             std::string vertex,
-            std::string fragment):
+            std::string fragment) :
             vertex(std::move(vertex)),
-            fragment(std::move(fragment)) {}
+            fragment(std::move(fragment)),
+            shaderProgram(0) {}
 
-    SimpleShader::~SimpleShader() {
-        cleanup();
+    SimpleShader::SimpleShader(SimpleShader &&ref) noexcept:
+            vertex(std::move(ref.vertex)),
+            fragment(std::move(ref.fragment)),
+            shaderProgram(ref.shaderProgram) {}
+
+    SimpleShader &SimpleShader::operator=(SimpleShader &&ref) noexcept {
+        vertex = std::move(ref.vertex);
+        fragment = std::move(ref.fragment);
+        shaderProgram = ref.shaderProgram;
+        return *this;
     }
 
     void SimpleShader::init() {
@@ -44,7 +53,7 @@ namespace xogl {
         glAttachShader(shaderProgram, shaderFragment);
         glLinkProgram(shaderProgram);
 
-        GLint success;
+        GLint success = -1;
         GLchar infoLog[512];
         glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
         if (!success) {
@@ -64,8 +73,7 @@ namespace xogl {
         return shaderProgram;
     }
 
-    SimpleShader::SimpleShader(SimpleShader &&ref) noexcept:
-    vertex(std::move(ref.vertex)),
-    fragment(std::move(ref.fragment)),
-    shaderProgram(ref.shaderProgram) {}
+    SimpleShader::~SimpleShader() {
+        cleanup();
+    }
 }

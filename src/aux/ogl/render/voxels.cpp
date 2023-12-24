@@ -17,6 +17,17 @@ namespace eox::ogl {
         }
     }
 
+    void multiply_4x4(const float a[4][4], const float b[4][4], float result[4][4]) {
+        for (int i = 0; i < 4; ++i) {
+            for (int j = 0; j < 4; ++j) {
+                result[i][j] = 0;
+                for (int k = 0; k < 4; ++k) {
+                    result[i][j] += a[i][k] * b[k][j];
+                }
+            }
+        }
+    }
+
     const std::string Voxels::vertex_source = R"glsl(
 
 #version 330 core
@@ -58,7 +69,26 @@ void main() {
 
 )glsl";
 
-    void Voxels::init() {
+    const std::string fragment_source_bgr = R"glsl(
+
+#version 330 core
+
+in vec4 point_color;
+out vec4 FragColor;
+
+void main() {
+    FragColor = vec4(point_color.b, point_color.g, point_color.r, 1.0);
+}
+
+)glsl";
+
+    void Voxels::init(bool bgr) {
+        if (bgr) {
+            shader = xogl::SimpleShader(
+                    vertex_source,
+                    fragment_source_bgr);
+        }
+
         glGenBuffers(2, vbo);
         glGenVertexArrays(1, &vao);
 
@@ -88,6 +118,23 @@ void main() {
         uni_loc[2] = glGetUniformLocation(shader.getHandle(), "point_size");
     }
 
+    void Voxels::render(const float view_mat[4][4], const float projection_mat[4][4]) {
+        float _mvp[4][4];
+        multiply_4x4(view_mat, projection_mat, _mvp);
+
+        // reverse row-major to column-major order
+        float mvp[16], proj[16];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                const int k = i * 4 + j;
+                mvp[k] = _mvp[j][i];
+                proj[k] = projection_mat[j][i];
+            }
+        }
+
+        renderFlatten(mvp, proj);
+    }
+
     void Voxels::render(const float **view_mat, const float **projection_mat) {
         float _mvp[4][4];
         multiply_4x4(view_mat, projection_mat, _mvp);
@@ -102,6 +149,10 @@ void main() {
             }
         }
 
+        renderFlatten(mvp, proj);
+    }
+
+    void Voxels::renderFlatten(const float *mvp, const float *proj) {
         glUseProgram(shader.getHandle());
 
         glUniformMatrix4fv(uni_loc[0], 1, GL_FALSE, mvp);
@@ -115,7 +166,7 @@ void main() {
         glUseProgram(0);
     }
 
-    Voxels &Voxels::setPoints(const float *pos, const float *color, size_t elements) {
+    Voxels &Voxels::setPoints(const void *pos, const void *color, size_t elements) {
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, 3 * (long) total * (long) sizeof(float), NULL, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, 3 * (long) elements * (long) sizeof(float), pos);

@@ -11,6 +11,7 @@
 #include "../aux/gtk/gtk_eox_window.h"
 #include "../aux/ocv/stereo_camera.h"
 #include "../aux/utils/loop/delta_loop.h"
+#include "../aux/gtk/gl_voxel_area.h"
 #include "../aux/gtk/gl_image.h"
 #include "../aux/ocv/cv_utils.h"
 #include "../aux/gtk/gtk_control.h"
@@ -25,6 +26,7 @@ namespace eox {
 
     private:
         std::shared_ptr<eox::util::ThreadPool> executor;
+        eox::xgtk::GLVoxelArea voxelArea;
         eox::data::basic_config config;
         eox::xocv::StereoCamera camera;
         eox::util::DeltaLoop deltaLoop;
@@ -60,8 +62,6 @@ namespace eox {
 
     protected:
         void onRefresh() override;
-
-        // TODO
     };
 
 } // eox
