@@ -2,6 +2,7 @@
 // Created by henryco on 12/21/23.
 //
 
+#include <GL/gl.h>
 #include "voxels.h"
 
 namespace eox::ogl {
@@ -91,6 +92,8 @@ void main() {
 
         total = count;
 
+        glEnable(GL_PROGRAM_POINT_SIZE);
+
         glGenBuffers(2, vbo);
         glGenVertexArrays(1, &vao);
 
@@ -118,6 +121,32 @@ void main() {
         uni_loc[0] = glGetUniformLocation(shader.getHandle(), "mvp");
         uni_loc[1] = glGetUniformLocation(shader.getHandle(), "projection");
         uni_loc[2] = glGetUniformLocation(shader.getHandle(), "point_size");
+    }
+
+    void Voxels::renderFlatten(const float *mvp, const float *proj) {
+        glUseProgram(shader.getHandle());
+
+        glUniformMatrix4fv(uni_loc[0], 1, GL_FALSE, mvp);
+        glUniformMatrix4fv(uni_loc[1], 1, GL_FALSE, proj);
+        glUniform1f(uni_loc[2], size);
+        glPointSize(size);
+
+        glBindVertexArray(vao);
+        glDrawArrays(GL_POINTS, 0, (int) total);
+        glBindVertexArray(0);
+
+        glUseProgram(0);
+    }
+
+    Voxels &Voxels::setPoints(const void *pos, const void *color) {
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, (long) (total * 3 * sizeof(float)), pos);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, (long) (total * 3 * sizeof(u_char)), color);
+
+        return *this;
     }
 
     void Voxels::render(const float view_mat[4][4], const float projection_mat[4][4]) {
@@ -152,31 +181,6 @@ void main() {
         }
 
         renderFlatten(mvp, proj);
-    }
-
-    void Voxels::renderFlatten(const float *mvp, const float *proj) {
-        glUseProgram(shader.getHandle());
-
-        glUniformMatrix4fv(uni_loc[0], 1, GL_FALSE, mvp);
-        glUniformMatrix4fv(uni_loc[1], 1, GL_FALSE, proj);
-        glUniform1f(uni_loc[2], size);
-
-        glBindVertexArray(vao);
-        glDrawArrays(GL_POINTS, 0, (int) total);
-        glBindVertexArray(0);
-
-        glUseProgram(0);
-    }
-
-    Voxels &Voxels::setPoints(const void *pos, const void *color) {
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, (long) (total * 3 * sizeof(float)), pos);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, (long) (total * 3 * sizeof(u_char)), color);
-
-        return *this;
     }
 
     Voxels &Voxels::setPointSize(float _size) {

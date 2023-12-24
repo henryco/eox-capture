@@ -11,7 +11,8 @@
 namespace eox::xgtk {
 
     void GLVoxelArea::init(long _total, bool bgr, int _width, int _height) {
-        total = _total;
+        total = 3;
+//        total = _total;
         width = _width;
         height = _height;
         v_w = _width;
@@ -53,7 +54,18 @@ namespace eox::xgtk {
 
     bool GLVoxelArea::render_fn(const Glib::RefPtr<Gdk::GLContext> &_) {
         if (mat) {
-            voxels.setPoints(positions.data, colors.data);
+//            voxels.setPoints(positions.data, colors.data);
+            float pos[9] = {
+                    -0.75, 0, 0,
+                    0, 0, 0,
+                    0.75, 0, 0,
+            };
+            float col[9] = {
+                    255, 0, 0,
+                    0, 255, 0,
+                    0, 0, 255,
+            };
+            voxels.setPoints(pos, col);
         }
 
         glClearColor(.0f, .274f, .44f, .1f);
