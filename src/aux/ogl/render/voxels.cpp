@@ -31,6 +31,11 @@ uniform float point_size;
 out vec4 point_color;
 
 void main() {
+    if (aPos.z >= 10000.) {
+        gl_Position = vec4(0., 0., 1000., 1.);
+        return;
+    }
+
     gl_Position = mvp * vec4(aPos, 1.0);
     point_color = vec4(aColor, 1.0);
 
@@ -64,13 +69,13 @@ void main() {
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_DYNAMIC_DRAW);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0); // NOLINT(*-use-nullptr)
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *) 0); // NOLINT(*-use-nullptr)
 
         // [R,G,B] | 3x1 bytes
         glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
         glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_DYNAMIC_DRAW);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_TRUE, 3 * sizeof(u_char), (void*) 0); // NOLINT(*-use-nullptr)
+        glVertexAttribPointer(0, 3, GL_UNSIGNED_BYTE, GL_TRUE, 3 * sizeof(u_char), (void *) 0); // NOLINT(*-use-nullptr)
 
         // unbind buffers
         glBindBuffer(GL_ARRAY_BUFFER, 0);
