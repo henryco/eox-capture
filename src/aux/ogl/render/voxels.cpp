@@ -77,7 +77,7 @@ in vec4 point_color;
 out vec4 FragColor;
 
 void main() {
-    FragColor = vec4(1., point_color.g, point_color.r, 1.0);
+    FragColor = vec4(point_color.b, point_color.g, point_color.r, 1.0);
 }
 
 )glsl";
