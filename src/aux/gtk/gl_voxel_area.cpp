@@ -37,6 +37,31 @@ namespace eox::xgtk {
         auto event_box = Gtk::make_managed<Gtk::EventBox>();
         event_box->add(gl_area);
 
+        event_box->add_events(Gdk::SCROLL_MASK);
+        event_box->signal_scroll_event().connect([this](GdkEventScroll* e) {
+            log->info("scroll");
+
+            const float step = 5;
+
+            float direction = 1;
+            if (e->direction == GDK_SCROLL_UP) {
+                direction = -1;
+            } else if (e->direction != GDK_SCROLL_DOWN) {
+                return true;
+            }
+
+            const auto &pos = camera.position;
+            const auto &forward = camera.base[2];
+
+            float mov[3];
+            for (int i = 0; i < 3; i++) {
+                mov[i] = forward[i] * step * direction;
+            }
+
+            camera.move_free(pos[0] + mov[0], pos[1] + mov[1], pos[2] + mov[2]);
+            return true;
+        });
+
         auto h_box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
         h_box->set_halign(Gtk::ALIGN_CENTER);
         h_box->pack_start(*event_box, Gtk::PACK_SHRINK);
