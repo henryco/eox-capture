@@ -1,4 +1,0 @@
-/home/henryco/Projects/stereox/build/CMakeFiles/rebuild_cache.dir
-/home/henryco/Projects/stereox/build/CMakeFiles/edit_cache.dir
-/home/henryco/Projects/stereox/build/external/argparse/CMakeFiles/rebuild_cache.dir
-/home/henryco/Projects/stereox/build/external/argparse/CMakeFiles/edit_cache.dir
