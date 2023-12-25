@@ -35,6 +35,9 @@ namespace eox::xgtk {
 
         long total;
 
+        bool mouse_l_r[2];
+        float mouse_pos[2];
+
     protected:
         bool render_fn(const Glib::RefPtr<Gdk::GLContext> & context);
 

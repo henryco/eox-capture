@@ -128,6 +128,9 @@ void main() {
     }
 
     void Voxels::renderFlatten(const float *mvp, const float *proj) {
+        glClearColor(.0f, .274f, .44f, .1f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         glUseProgram(shader.getHandle());
 
         glUniformMatrix4fv(uni_loc[0], 1, GL_FALSE, mvp);
