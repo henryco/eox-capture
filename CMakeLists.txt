@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.26)
 project(stereox VERSION 0.1 LANGUAGES CXX)
 
+add_subdirectory(external/argparse)
+add_subdirectory(external/glm)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_COMPILER "clang-16")
@@ -35,6 +38,7 @@ pkg_check_modules(V4L2 REQUIRED libv4l2)
 # Create an executable
 add_executable(${PROJECT_NAME}
         src/main.cpp
+        src/cli.h
         src/calibration/ui_calibration.cpp
         src/aux/utils/errors/error_reporter.cpp
         src/aux/ocv/stereo_camera.cpp
@@ -62,8 +66,6 @@ add_executable(${PROJECT_NAME}
         src/aux/gtk/gtk_eox_window.h
         src/aux/utils/mappers/cam_gtk_mapper.h
         src/aux/commons.h
-        libraries/argparse/argparse.h
-        src/cli.h
         src/helpers/helpers.cpp
         src/helpers/helpers.h
         src/aux/utils/timer/timer.cpp
@@ -100,7 +102,9 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE ${GTKMM_LIBRARIES}
         PRIVATE OpenGL::GL
         PRIVATE spdlog::spdlog
-        PRIVATE ${V4L2_LIBRARIES})
+        PRIVATE ${V4L2_LIBRARIES}
+        PRIVATE argparse
+        PRIVATE glm)
 
 target_compile_options(${PROJECT_NAME}
         PRIVATE ${GTKMM_CFLAGS_OTHER}
