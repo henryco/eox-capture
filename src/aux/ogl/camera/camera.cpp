@@ -135,6 +135,8 @@ namespace eox::ogl {
 
     Camera &Camera::set_orbit(float azimuth_rad, float elevation_rad, float dist) {
 
+        // TODO FIXME, THERE IS AN ERROR
+
         const auto distance = glm::max(dist, 0.1f);
         const auto elevation = glm::clamp(
                 elevation_rad,

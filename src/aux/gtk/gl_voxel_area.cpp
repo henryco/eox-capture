@@ -21,11 +21,11 @@ namespace eox::xgtk {
         v_h = _height;
 
 
-        camera.perspective((float) width / (float) height, glm::radians(90.f), 0.1, 1000);
+        camera.perspective((float) width / (float) height, glm::radians(70.f), 0.1, 1000);
 
         camera.roll(glm::radians(180.f));
         camera.set_position(0, 0, 0);
-        camera.look_at(0, 0, 1);
+        camera.look_at(0, 0, 100);
 
         gl_area.signal_realize().connect([this, bgr]() {
             init_fn(bgr);
@@ -57,8 +57,7 @@ namespace eox::xgtk {
                 return true;
             }
 
-            // TODO
-
+            camera.orbit(0.f, 0.f, 0.05 * step * direction);
             return true;
         });
 
@@ -80,20 +79,13 @@ namespace eox::xgtk {
 
         event_box->signal_motion_notify_event().connect([this](GdkEventMotion *e) {
 
-            const float step = 1.f;
-            const float step_rad = 0.1f * M_PI / 180.f;
-
-            const float dx = -1.f * (e->x - mouse_pos[0]);
+            const float dx = 1.f * (e->x - mouse_pos[0]);
             const float dy = 1.f * (e->y - mouse_pos[1]);
 
             if (mouse_l_r[0]) {
-
-                // TODO
-
+                camera.orbit(glm::radians(dx), glm::radians(dy), 0.f);
             } else if (mouse_l_r[1]) {
-
-                // TODO
-
+                camera.translate_free(-0.5 * dx, -0.5 * dy, 0);
             }
 
             mouse_pos[0] = (float) e->x;
