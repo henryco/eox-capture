@@ -85,16 +85,19 @@ namespace eox::ogl {
     }
 
     Camera &Camera::set_position(float x, float y, float z) {
+        // here we are using absolute (world) coordinate system
         position = glm::vec3(x, y, z);
         return *this;
     }
 
     Camera &Camera::set_target(float x, float y, float z) {
+        // here we are using absolute (world) coordinate system
         target = glm::vec3(x, y, z);
         return *this;
     }
 
     Camera &Camera::move_free(float x, float y, float z) {
+        // here we are using absolute (world) coordinate system
         const auto distance = glm::distance(position, target);
 
         position = glm::vec3(x, y, z);
@@ -109,31 +112,40 @@ namespace eox::ogl {
     }
 
     Camera &Camera::move_lock(float x, float y, float z) {
+        // here we are using absolute (world) coordinate system
         position = glm::vec3(x, y, z);
         return look_at(target.x, target.y, target.z);
     }
 
 
     Camera &Camera::translate_free(float x, float y, float z) {
+        // here we are using absolute (world) coordinate system
         const auto pos = position + glm::vec3(x, y, z);
         return move_free(pos.x, pos.y, pos.z);
     }
 
     Camera &Camera::translate_lock(float x, float y, float z) {
+        // here we are using absolute (world) coordinate system
         const auto pos = position + glm::vec3(x, y, z);
         return move_lock(pos.x, pos.y, pos.z);
     }
 
     Camera &Camera::translate_free_relative(float r, float u, float f) {
+        // inverse to undo rotation
         const auto o_pos = glm::inverse(basis) * position;
+        // then add position
         const auto n_pos = o_pos + glm::vec3(r, u, f);
+        // then rotate again
         const auto pos = basis * n_pos;
         return move_free(pos.x, pos.y, pos.z);
     }
 
     Camera &Camera::translate_lock_relative(float r, float u, float f) {
+        // inverse to undo rotation
         const auto o_pos = glm::inverse(basis) * position;
+        // then add position
         const auto n_pos = o_pos + glm::vec3(r, u, f);
+        // then rotate again
         const auto pos = basis * n_pos;
         return move_lock(pos.x, pos.y, pos.z);
     }
@@ -198,6 +210,32 @@ namespace eox::ogl {
         };
     }
 
+    float Camera::get_lock_distance() const {
+        // distance is distance
+        return glm::distance(position, target);
+    }
+
+    float Camera::get_lock_elevation() const {
+        // here we are using coordinate system of rotated camera
+        const auto py = (orbit_basis * position).y;
+        const auto ty = (orbit_basis * target).y;
+
+        // basic trigonometry
+        return glm::asin(glm::distance(py, ty) / get_lock_distance());
+    }
+
+    float Camera::get_lock_azimuth() const {
+        // this gives us coordinates of camera and target in rotated camera coordinate system
+        const auto p = orbit_basis * position;
+        const auto t = orbit_basis * target;
+
+        // translated to origin of polar coordinate system
+        const auto pp = glm::vec2(p.x - t.x, p.z - t.z);
+
+        // angle in polar coordinate system
+        return glm::atan(pp.x, pp.y);
+    }
+
     const glm::mat3 &Camera::get_basis() const {
         return basis;
     }
@@ -220,30 +258,6 @@ namespace eox::ogl {
 
     const glm::mat3 &Camera::get_orbit_basis() const {
         return orbit_basis;
-    }
-
-    float Camera::get_lock_distance() const {
-        return glm::distance(position, target);
-    }
-
-    float Camera::get_lock_elevation() const {
-        const auto py = (orbit_basis * position).y;
-        const auto ty = (orbit_basis * target).y;
-        // basic trigonometry
-        return glm::asin(glm::distance(py, ty) / get_lock_distance());
-    }
-
-    float Camera::get_lock_azimuth() const {
-
-        // this gives us coordinates of camera and target in orbit coordinate system
-        const auto p = orbit_basis * position;
-        const auto t = orbit_basis * target;
-
-        // translated to origin of polar coordinate system
-        const auto pp = glm::vec2(p.x - t.x, p.z - t.z);
-
-        // angle in polar coordinate system
-        return glm::atan(pp.x, pp.y);
     }
 
 } // eox
