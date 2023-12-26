@@ -140,8 +140,8 @@ namespace eox::ogl {
         const auto distance = glm::max(dist, 0.1f);
         const auto elevation = glm::clamp(
                 elevation_rad,
-                -glm::pi<float>() / 2 + 0.1f,
-                glm::pi<float>() / 2 - 0.1f
+                -glm::half_pi<float>() + 0.1f,
+                glm::half_pi<float>() - 0.1f
         );
 
         position = glm::vec3(
@@ -198,10 +198,12 @@ namespace eox::ogl {
     }
 
     float Camera::get_lock_elevation() const {
+        // TODO FIXME, THERE IS AN ERROR
         return glm::asin(glm::normalize(target - position).y);
     }
 
     float Camera::get_lock_azimuth() const {
+        // TODO FIXME, THERE IS AN ERROR
         const auto direction = target - position;
         const auto plane_dir = glm::normalize(glm::vec3(direction.x, 0.f, direction.z));
         return std::atan2(plane_dir.z, plane_dir.x);
