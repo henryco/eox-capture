@@ -173,7 +173,7 @@ namespace eox::ogl {
         const auto distance = glm::max(dist, 0.1f);
         const auto elevation = glm::clamp(
                 elevation_rad,
-                -glm::half_pi<float>(),
+                -glm::half_pi<float>() * 0.95f,
                 glm::half_pi<float>() * 0.95f
         );
 
@@ -220,8 +220,11 @@ namespace eox::ogl {
         const auto py = (orbit_basis * position).y;
         const auto ty = (orbit_basis * target).y;
 
+        // do not forget about sign, because distance is absolute
+        const auto sign = py > ty ? 1.f : -1.f;
+
         // basic trigonometry
-        return glm::asin(glm::distance(py, ty) / get_lock_distance());
+        return sign * glm::asin(glm::distance(py, ty) / get_lock_distance());
     }
 
     float Camera::get_lock_azimuth() const {
