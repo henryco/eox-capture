@@ -21,9 +21,9 @@ namespace eox::xgtk {
         v_h = _height;
 
 
-        camera.perspective((float) width / (float) height, glm::radians(70.f), 0.1, 1000);
+        camera.perspective((float) width / (float) height, glm::radians(60.f), 0.1, 1000);
 
-//        camera.roll(glm::radians(180.f));
+        camera.roll(glm::radians(180.f));
         camera.set_position(0, 0, -10);
         camera.look_at(0, 0, 100);
 
