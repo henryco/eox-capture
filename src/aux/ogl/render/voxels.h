@@ -40,6 +40,8 @@ namespace eox::ogl {
 
         void render(const float **view_mat, const float **projection_mat);
 
+        void render(const float *view_mat, const float *projection_mat);
+
         void render(const float (view_mat)[4][4], const float (projection_mat)[4][4]);
 
         Voxels &setPoints(const void *pos, const void *color);

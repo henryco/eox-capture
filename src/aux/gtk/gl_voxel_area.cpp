@@ -3,6 +3,8 @@
 //
 
 #include "gl_voxel_area.h"
+#include "glm/trigonometric.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <cmath>
 #include <gtkmm/eventbox.h>
 
@@ -18,9 +20,10 @@ namespace eox::xgtk {
         v_w = _width;
         v_h = _height;
 
-        camera.base[0][0] = -1;
-        camera.base[1][1] = -1;
-        camera.perspective((float) width / (float) height, 90 * (M_PI / 180.f), 0.1, 1000);
+
+        camera.perspective((float) width / (float) height, glm::radians(90.f), 0.1, 1000);
+
+        camera.roll(glm::radians(180.f));
         camera.set_position(0, 0, 0);
         camera.look_at(0, 0, 1);
 
@@ -54,15 +57,8 @@ namespace eox::xgtk {
                 return true;
             }
 
-            const auto &pos = camera.position;
-            const auto &forward = camera.base[2];
+            // TODO
 
-            float mov[3];
-            for (int i = 0; i < 3; i++) {
-                mov[i] = forward[i] * step * direction;
-            }
-
-            camera.move_free(pos[0] + mov[0], pos[1] + mov[1], pos[2] + mov[2]);
             return true;
         });
 
@@ -91,47 +87,12 @@ namespace eox::xgtk {
             const float dy = 1.f * (e->y - mouse_pos[1]);
 
             if (mouse_l_r[0]) {
-                const float nx = camera.position[0] - camera.target[0];
-                const float ny = camera.position[1] - camera.target[1];
-                const float nz = camera.position[2] - camera.target[2];
 
-                const float hf = std::atan2(nx, nz);
-                const float hd = std::sqrt((nx * nx) + (nz * nz));
-                const float ha = hf + (step_rad * dx);
-
-                const float x = hd * std::cos(ha);
-                const float z = hd * std::sin(ha);
-
-                const float vf = std::atan2(ny, z);
-                const float vd = std::sqrt((ny * ny) + (z * z));
-                const float va = vf + (step_rad * dy);
-
-                const float y = vd * std::cos(va);
-
-                const float fx = x + camera.target[0];
-                const float fy = y + camera.target[1];
-                const float fz = z + camera.target[2];
-
-                camera.move_lock(fx, camera.position[1], fz);
+                // TODO
 
             } else if (mouse_l_r[1]) {
 
-                const auto &pos = camera.position;
-                const auto &right = camera.base[0];
-                const auto &up = camera.base[1];
-
-                float mov_r[3];
-                float mov_u[3];
-                for (int i = 0; i < 3; i++) {
-                    mov_r[i] = right[i] * step * dx;
-                    mov_u[i] = up[i] * step * dy;
-                }
-
-                camera.move_free(
-                        pos[0] + mov_r[0] + mov_u[0],
-                        pos[1] + mov_r[1] + mov_u[1],
-                        pos[2] + mov_r[2] + mov_u[2]
-                );
+                // TODO
 
             }
 
@@ -161,7 +122,12 @@ namespace eox::xgtk {
         if (mat) {
             voxels.setPoints(positions.data, colors.data);
         }
-        voxels.render(camera.get_view_matrix(), camera.get_projection_matrix());
+
+        voxels.render(
+                glm::value_ptr(camera.get_view_matrix()),
+                glm::value_ptr(camera.get_projection_matrix())
+        );
+
         return true;
     }
 

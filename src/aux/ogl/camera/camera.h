@@ -5,76 +5,75 @@
 #ifndef STEREOX_CAMERA_H
 #define STEREOX_CAMERA_H
 
+#include <glm/mat4x4.hpp>
+
 namespace eox::ogl {
 
     class Camera {
+    private:
+        glm::mat3 basis = glm::mat3(
+                glm::vec3(1.f, 0.f, 0.f), // R
+                glm::vec3(0.f, 1.f, 0.f), // U
+                glm::vec3(0.f, 0.f, 1.f)  // F
+        );
+
+        glm::vec3 position = glm::vec3(0.f, 0.f, 0.f);
+        glm::vec3 target = glm::vec3(0.f, 0.f, 1.f);
+        glm::mat4 view_matrix = glm::mat4(1.f);
+        glm::mat4 proj_matrix = glm::mat4(1.f);
+
     public:
 
-        float target[3] = {
-                0,
-                0,
-                0
-        };
+        Camera();
 
-        float position[3] = {
-                0, // x
-                0, // y
-                0  // z
-        };
+        Camera &set_basis(glm::vec3 r, glm::vec3 u, glm::vec3 f);
 
-        float base[3][3] = {
-                {1, 0, 0}, // R
-                {0, 1, 0}, // U
-                {0, 0, 1}, // F
-        };
+        Camera &set_position(float x, float y, float z);
 
-        float view[4][4] = {
-                {1, 0, 0, 0},
-                {0, 1, 0, 0},
-                {0, 0, 1, 0},
-                {0, 0, 0, 1},
-        };
+        Camera &set_target(float x, float y, float z);
 
-        float projection[4][4] = {
-                {1, 0, 0, 0},
-                {0, 1, 0, 0},
-                {0, 0, 1, 0},
-                {0, 0, 0, 1},
-        };
+        Camera &move_free(float x, float y, float z);
 
-        Camera& set_position(float x, float y, float z);
+        Camera &move_lock(float x, float y, float z);
 
-        Camera& move_free(float x, float y, float z);
+        Camera &translate_free(float x, float y, float z);
 
-        Camera& move_lock(float x, float y, float z);
+        Camera &translate_lock(float x, float y, float z);
 
-        Camera& pitch(float rad);
+        Camera &pitch(float rad);
 
-        Camera& roll(float rad);
+        Camera &roll(float rad);
 
-        Camera& yaw(float rad);
+        Camera &yaw(float rad);
 
-        Camera& look_at(float x, float y, float z);
+        Camera &look_at(float x, float y, float z);
 
-        Camera& perspective(float aspect_ratio, float fov, float z_near, float z_far);
+        Camera &orbit(float azimuth_rad_d, float elevation_rad_d, float distance_d);
 
-        Camera& orthographic(float width, float height, float z_near, float z_far);
+        Camera &set_orbit(float azimuth_rad, float elevation_rad, float distance);
 
-        [[nodiscard]] const float (&get_view_matrix() const)[4][4];
+        Camera &perspective(float aspect_ratio, float fov, float z_near, float z_far);
 
-        [[nodiscard]] const float (&get_projection_matrix() const)[4][4];
+        Camera &orthographic(float width, float height, float z_near, float z_far);
+
+        [[nodiscard]] const glm::mat3 &get_basis() const;
+
+        [[nodiscard]] const glm::vec3 &get_position() const;
+
+        [[nodiscard]] const glm::vec3 &get_target() const;
+
+        [[nodiscard]] const glm::mat4 &get_view_matrix() const;
+
+        [[nodiscard]] const glm::mat4 &get_projection_matrix() const;
+
+        [[nodiscard]] float get_lock_distance() const;
+
+        [[nodiscard]] float get_lock_elevation() const;
+
+        [[nodiscard]] float get_lock_azimuth() const;
 
     protected:
-        void apply_transform_basis(const float t[3][3]);
-
-        void recalculate_view();
-
-        void reset_projection();
-
-    private:
-        static void cross_v3(const float a[3], const float b[3], float* result);
-
-        static float len_v(const float* v, int size);
+        void refresh_basis();
     };
 
 } // eox

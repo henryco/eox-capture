@@ -2,218 +2,207 @@
 // Created by henryco on 12/22/23.
 //
 
-#include <cmath>
 #include "camera.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "ConstantParameter"
 namespace eox::ogl {
 
-#define R_x base[0][0]
-#define R_y base[0][1]
-#define R_z base[0][2]
+#define BASIS_R basis[0]
+#define BASIS_U basis[1]
+#define BASIS_F basis[2]
 
-#define U_x base[1][0]
-#define U_y base[1][1]
-#define U_z base[1][2]
-
-#define F_x base[2][0]
-#define F_y base[2][1]
-#define F_z base[2][2]
-
-#define T_x target[0]
-#define T_y target[1]
-#define T_z target[2]
-
-#define P_x position[0]
-#define P_y position[1]
-#define P_z position[2]
-
-    Camera &Camera::set_position(float x, float y, float z) {
-        P_x = x;
-        P_y = y;
-        P_z = z;
-        return *this;
-    }
-
-    Camera &Camera::move_free(float x, float y, float z) {
-        set_position(x, y, z);
-        recalculate_view();
-        return *this;
-    }
-
-    Camera &Camera::move_lock(float x, float y, float z) {
-        set_position(x, y, z);
-        return look_at(T_x, T_y, T_z);
+    Camera::Camera() {
+        look_at(0, 0, 1);
     }
 
     Camera &Camera::pitch(float rad) {
-        const float t[3][3] = {
-                {1, 0, 0},
-                {0, std::cos(rad), -(std::sin(rad))},
-                {0, std::sin(rad), std::cos(rad)}
-        };
-        apply_transform_basis(t);
+
+        const glm::mat4 rotation = glm::rotate(glm::mat4(1.f), rad, glm::normalize(BASIS_R));
+
+        const auto homo_f = glm::vec4(BASIS_F, 0.0f);
+        const auto forward = glm::normalize(glm::vec3(rotation * homo_f));
+        const auto right = glm::normalize(glm::cross(forward, BASIS_U));
+        const auto up = glm::normalize(glm::cross(right, forward));
+
+        target = position + forward;
+
+        view_matrix = glm::lookAt(position, target, up);
+        refresh_basis();
+
         return *this;
     }
 
     Camera &Camera::roll(float rad) {
-        const float t[3][3] = {
-                {std::cos(rad), 0, std::sin(rad)},
-                {0, 1, 0},
-                {-(std::sin(rad), 0, std::cos(rad))}
-        };
-        apply_transform_basis(t);
+
+        const glm::mat4 rotation = glm::rotate(glm::mat4(1.f), rad, glm::normalize(BASIS_F));
+
+        const auto homo_r = glm::vec4(BASIS_R, 0.0f);
+        const auto homo_u = glm::vec4(BASIS_U, 0.0f);
+
+        const auto up = glm::normalize(glm::vec3(rotation * homo_u));
+        const auto right = glm::normalize(glm::vec3(rotation * homo_r));
+        const auto forward = glm::normalize(glm::cross(right, up));
+
+        target = position + forward;
+
+        view_matrix = glm::lookAt(position, target, up);
+        refresh_basis();
+
         return *this;
     }
 
     Camera &Camera::yaw(float rad) {
-        const float t[3][3] = {
-                {std::cos(rad),-(std::sin(rad)), 0},
-                {std::sin(rad), std::cos(rad), 0},
-                {0, 0, 1}
-        };
-        apply_transform_basis(t);
+
+        const glm::mat4 rotation = glm::rotate(glm::mat4(1.f), rad, glm::normalize(BASIS_U));
+
+        const auto homo_f = glm::vec4(BASIS_F, 0.0f);
+        const auto homo_r = glm::vec4(BASIS_R, 0.0f);
+
+        const auto forward = glm::normalize(glm::vec3(rotation * homo_f));
+        const auto right = glm::normalize(glm::vec3(rotation * homo_r));
+        const auto up = glm::normalize(glm::cross(right, forward));
+
+        target = position + forward;
+
+        view_matrix = glm::lookAt(position, target, up);
+        refresh_basis();
+
         return *this;
+    }
+
+    Camera &Camera::set_basis(glm::vec3 r, glm::vec3 u, glm::vec3 f) {
+        basis = glm::mat3(r, u, f);
+        return *this;
+    }
+
+    Camera &Camera::set_position(float x, float y, float z) {
+        position = glm::vec3(x, y, z);
+        return *this;
+    }
+
+    Camera &Camera::set_target(float x, float y, float z) {
+        target = glm::vec3(x, y, z);
+        return *this;
+    }
+
+    Camera &Camera::move_free(float x, float y, float z) {
+        const auto distance = glm::distance(position, target);
+
+        position = glm::vec3(x, y, z);
+
+        // moving free but also moving target respectively
+        target = position + (distance * BASIS_F);
+
+        view_matrix = glm::lookAt(position, target, BASIS_U);
+        refresh_basis();
+
+        return *this;
+    }
+
+    Camera &Camera::move_lock(float x, float y, float z) {
+        position = glm::vec3(x, y, z);
+        return look_at(target.x, target.y, target.z);
+    }
+
+
+    Camera &Camera::translate_free(float x, float y, float z) {
+        const auto pos = position + glm::vec3(x, y, z);
+        return move_free(pos.x, pos.y, pos.z);
+    }
+
+    Camera &Camera::translate_lock(float x, float y, float z) {
+        const auto pos = position + glm::vec3(x, y, z);
+        return move_lock(pos.x, pos.y, pos.z);
     }
 
     Camera &Camera::look_at(float x, float y, float z) {
-        T_x = x;
-        T_y = y;
-        T_z = z;
+        target = glm::vec3(x, y, z);
+        view_matrix = glm::lookAt(position, target, BASIS_U);
+        refresh_basis();
 
-        const float lx = P_x - x;
-        const float ly = P_y - y;
-        const float lz = P_z - z;
-        const float ld = std::sqrt(std::pow(lx, 2.f) + std::pow(ly, 2.f) + std::pow(lz, 2.f));
-
-        F_x = lx / ld;
-        F_y = ly / ld;
-        F_z = lz / ld;
-
-        float u_v[3];
-        cross_v3(base[1], base[2], u_v);
-        float u_d = len_v(u_v, 3);
-
-        R_x = u_v[0] / u_d;
-        R_y = u_v[1] / u_d;
-        R_z = u_v[2] / u_d;
-
-        float c_v[3];
-        cross_v3(base[2], base[0], c_v);
-        float c_d = len_v(c_v, 3);
-
-        U_x = c_v[0] / c_d;
-        U_y = c_v[1] / c_d;
-        U_z = c_v[2] / c_d;
-
-        recalculate_view();
         return *this;
     }
 
-    void Camera::apply_transform_basis(const float (*t)[3]) {
-        const float r_x = t[0][0] * R_x + t[0][1] * R_y + t[0][2] * R_z;
-        const float r_y = t[1][0] * R_x + t[1][1] * R_y + t[1][2] * R_z;
-        const float r_z = t[2][0] * R_x + t[2][1] * R_y + t[2][2] * R_z;
-
-        const float u_x = t[0][0] * U_x + t[0][1] * U_y + t[0][2] * U_z;
-        const float u_y = t[1][0] * U_x + t[1][1] * U_y + t[1][2] * U_z;
-        const float u_z = t[2][0] * U_x + t[2][1] * U_y + t[2][2] * U_z;
-
-        const float f_x = t[0][0] * F_x + t[0][1] * F_y + t[0][2] * F_z;
-        const float f_y = t[1][0] * F_x + t[1][1] * F_y + t[1][2] * F_z;
-        const float f_z = t[2][0] * F_x + t[2][1] * F_y + t[2][2] * F_z;
-
-        const float r_d = std::sqrt(std::pow(r_x, 2.f) + std::pow(r_y, 2.f) + std::pow(r_z, 2.f));
-        const float u_d = std::sqrt(std::pow(u_x, 2.f) + std::pow(u_y, 2.f) + std::pow(u_z, 2.f));
-        const float f_d = std::sqrt(std::pow(f_x, 2.f) + std::pow(f_y, 2.f) + std::pow(f_z, 2.f));
-
-        R_x = r_x / r_d;
-        R_y = r_y / r_d;
-        R_z = r_z / r_d;
-
-        U_x = u_x / u_d;
-        U_y = u_y / u_d;
-        U_z = u_z / u_d;
-
-        F_x = f_x / f_d;
-        F_y = f_y / f_d;
-        F_z = f_z / f_d;
+    Camera &Camera::orbit(float azimuth_rad, float elevation_rad, float distance) {
+        return set_orbit(
+                get_lock_azimuth() + azimuth_rad,
+                get_lock_elevation() + elevation_rad,
+                get_lock_distance() + distance
+        );
     }
 
-    void Camera::recalculate_view() {
-        view[0][0] = R_x;
-        view[0][1] = R_y;
-        view[0][2] = R_z;
+    Camera &Camera::set_orbit(float azimuth_rad, float elevation_rad, float dist) {
 
-        view[1][0] = U_x;
-        view[1][1] = U_y;
-        view[1][2] = U_z;
+        const auto distance = glm::max(dist, 0.1f);
+        const auto elevation = glm::clamp(
+                elevation_rad,
+                -glm::pi<float>() / 2 + 0.1f,
+                glm::pi<float>() / 2 - 0.1f
+        );
 
-        view[2][0] = F_x;
-        view[2][1] = F_y;
-        view[2][2] = F_z;
+        position = glm::vec3(
+                target.x + distance * glm::cos(elevation) * glm::sin(azimuth_rad),
+                target.y + distance * glm::sin(elevation),
+                target.z + distance * glm::cos(elevation) * glm::cos(azimuth_rad)
+        );
 
-        view[0][3] = (-1.f) * ((R_x * P_x) + (R_y * P_y) + (R_z * P_z));
-        view[1][3] = (-1.f) * ((U_x * P_x) + (U_y * P_y) + (U_z * P_z));
-        view[2][3] = (-1.f) * ((F_x * P_x) + (F_y * P_y) + (F_z * P_z));
-
-        view[3][0] = 0;
-        view[3][1] = 0;
-        view[3][2] = 0;
-        view[3][3] = 1;
+        view_matrix = glm::lookAt(position, target, BASIS_U);
+        refresh_basis();
+        return *this;
     }
 
     Camera &Camera::perspective(float aspect_ratio, float fov, float z_near, float z_far) {
-        reset_projection();
-
-        projection[0][0] = 1.f / (aspect_ratio * std::tan(fov / 2.f));
-        projection[1][1] = 1.f / std::tan(fov / 2.f);
-        projection[2][2] = (z_near + z_far) / (z_near - z_far);
-        projection[2][3] = (2.f * z_near * z_far) / (z_near - z_far);
-        projection[3][2] = -1;
-
+        proj_matrix = glm::perspective(fov, aspect_ratio, z_near, z_far);
         return *this;
     }
 
     Camera &Camera::orthographic(float width, float height, float z_near, float z_far) {
-        reset_projection();
-
-        projection[0][0] = 2.f / width;
-        projection[1][1] = 2.f / height;
-        projection[2][2] = 2.f / (z_near - z_far);
-        projection[2][3] = (z_near + z_far) / (z_near - z_far);
-        projection[3][3] = 1.f;
-
+        proj_matrix = glm::ortho(0.f, width, 0.f, height, z_near, z_far);
         return *this;
     }
 
-    void Camera::reset_projection() {
-        for (auto & i : projection)
-            for (float & k : i)
-                k = 0;
+    void Camera::refresh_basis() {
+        basis = {
+                glm::vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]),    // R
+                glm::vec3(view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]),    // U
+                glm::vec3(-view_matrix[0][2], -view_matrix[1][2], -view_matrix[2][2])  // F
+        };
     }
 
-    void Camera::cross_v3(const float *a, const float *b, float *result) {
-        result[0] = (a[1] * b[2]) - (a[2] * b[1]);
-        result[1] = (a[2] * b[0]) - (a[0] * b[2]);
-        result[2] = (a[0] * b[1]) - (a[1] * b[0]);
+    const glm::mat3 &Camera::get_basis() const {
+        return basis;
     }
 
-    float Camera::len_v(const float *v, int size) {
-        float a = 0;
-        for (int i = 0; i < size; i++) {
-            a += std::pow(v[i], 2.f);
-        }
-        return std::sqrt(a);
+    const glm::vec3 &Camera::get_position() const {
+        return position;
     }
 
-    const float (&Camera::get_view_matrix() const)[4][4] {
-        return view;
+    const glm::vec3 &Camera::get_target() const {
+        return target;
     }
 
-    const float (&Camera::get_projection_matrix() const)[4][4] {
-        return projection;
+    const glm::mat4 &Camera::get_view_matrix() const {
+        return view_matrix;
+    }
+
+    const glm::mat4 &Camera::get_projection_matrix() const {
+        return proj_matrix;
+    }
+
+    float Camera::get_lock_distance() const {
+        return glm::distance(position, target);
+    }
+
+    float Camera::get_lock_elevation() const {
+        return glm::asin(glm::normalize(target - position).y);
+    }
+
+    float Camera::get_lock_azimuth() const {
+        const auto direction = target - position;
+        const auto plane_dir = glm::normalize(glm::vec3(direction.x, 0.f, direction.z));
+        return std::atan2(plane_dir.z, plane_dir.x);
     }
 
 } // eox

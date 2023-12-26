@@ -190,6 +190,10 @@ void main() {
         renderFlatten(mvp, proj);
     }
 
+    void Voxels::render(const float *view_mat, const float *projection_mat) {
+        renderFlatten(view_mat, projection_mat);
+    }
+
     Voxels &Voxels::setPointSize(float _size) {
         size = _size;
         return *this;
