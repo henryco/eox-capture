@@ -24,7 +24,7 @@ namespace eox::xgtk {
         camera.perspective((float) width / (float) height, glm::radians(70.f), 0.1, 1000);
 
         camera.roll(glm::radians(180.f));
-        camera.set_position(0, 0, 0);
+        camera.set_position(0, 0, -10);
         camera.look_at(0, 0, 100);
 
         gl_area.signal_realize().connect([this, bgr]() {
@@ -57,7 +57,12 @@ namespace eox::xgtk {
                 return true;
             }
 
-            camera.orbit(0.f, 0.f, 0.05 * step * direction);
+            log->info("D: {}, A: {}, E: {}",
+                      camera.get_lock_distance(),
+                      glm::degrees(camera.get_lock_azimuth()),
+                      glm::degrees(camera.get_lock_elevation()));
+
+            camera.orbit(0.f, 0.f, 1.f * step * direction);
             return true;
         });
 
@@ -83,7 +88,7 @@ namespace eox::xgtk {
             const float dy = 1.f * (e->y - mouse_pos[1]);
 
             if (mouse_l_r[0]) {
-                camera.orbit(glm::radians(dx), glm::radians(dy), 0.f);
+                camera.orbit(glm::radians(0.5f * dx), glm::radians(0.5f * dy), 0.f);
             } else if (mouse_l_r[1]) {
                 camera.translate_free(-0.5 * dx, -0.5 * dy, 0);
             }

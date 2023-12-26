@@ -17,6 +17,8 @@ namespace eox::ogl {
                 glm::vec3(0.f, 0.f, 1.f)  // F
         );
 
+        glm::mat3 orbit_basis = glm::mat3(basis);
+
         glm::vec3 position = glm::vec3(0.f, 0.f, 0.f);
         glm::vec3 target = glm::vec3(0.f, 0.f, 1.f);
         glm::mat4 view_matrix = glm::mat4(1.f);

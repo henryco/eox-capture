@@ -13,6 +13,10 @@ namespace eox::ogl {
 #define BASIS_U basis[1]
 #define BASIS_F basis[2]
 
+#define BASIS_O_R orbit_basis[0]
+#define BASIS_O_U orbit_basis[1]
+#define BASIS_O_F orbit_basis[2]
+
     Camera::Camera() {
         look_at(0, 0, 1);
     }
@@ -30,6 +34,8 @@ namespace eox::ogl {
 
         view_matrix = glm::lookAt(position, target, up);
         refresh_basis();
+
+        orbit_basis = glm::mat3(basis);
 
         return *this;
     }
@@ -50,6 +56,8 @@ namespace eox::ogl {
         view_matrix = glm::lookAt(position, target, up);
         refresh_basis();
 
+        orbit_basis = glm::mat3(basis);
+
         return *this;
     }
 
@@ -69,11 +77,14 @@ namespace eox::ogl {
         view_matrix = glm::lookAt(position, target, up);
         refresh_basis();
 
+        orbit_basis = glm::mat3(basis);
+
         return *this;
     }
 
     Camera &Camera::set_basis(glm::vec3 r, glm::vec3 u, glm::vec3 f) {
         basis = glm::mat3(r, u, f);
+        orbit_basis = glm::mat3(basis);
         return *this;
     }
 
@@ -140,15 +151,19 @@ namespace eox::ogl {
         const auto distance = glm::max(dist, 0.1f);
         const auto elevation = glm::clamp(
                 elevation_rad,
-                -glm::half_pi<float>() + 0.1f,
-                glm::half_pi<float>() - 0.1f
+                -glm::half_pi<float>(),
+                glm::half_pi<float>()
         );
 
-        position = glm::vec3(
-                target.x + distance * glm::cos(elevation) * glm::sin(azimuth_rad),
-                target.y + distance * glm::sin(elevation),
-                target.z + distance * glm::cos(elevation) * glm::cos(azimuth_rad)
+        const auto target_orbit = orbit_basis * target;
+
+        const auto position_orbit = glm::vec3(
+                target_orbit.x + distance * glm::cos(elevation) * glm::sin(azimuth_rad),
+                target_orbit.y + distance * glm::sin(elevation),
+                target_orbit.z + distance * glm::cos(elevation) * glm::cos(azimuth_rad)
         );
+
+        position = glm::inverse(orbit_basis) * position_orbit;
 
         view_matrix = glm::lookAt(position, target, BASIS_U);
         refresh_basis();
@@ -198,15 +213,24 @@ namespace eox::ogl {
     }
 
     float Camera::get_lock_elevation() const {
-        // TODO FIXME, THERE IS AN ERROR
-        return glm::asin(glm::normalize(target - position).y);
+        const auto py = (orbit_basis * position).y;
+        const auto ty = (orbit_basis * target).y;
+        // basic trigonometry
+        return glm::asin(glm::distance(py, ty) / get_lock_distance());
     }
 
     float Camera::get_lock_azimuth() const {
-        // TODO FIXME, THERE IS AN ERROR
-        const auto direction = target - position;
-        const auto plane_dir = glm::normalize(glm::vec3(direction.x, 0.f, direction.z));
-        return std::atan2(plane_dir.z, plane_dir.x);
+        // TODO FIXME ERROR
+
+        // this gives us coordinates of camera and target in orbit coordinate system
+        const auto p = orbit_basis * position;
+        const auto t = orbit_basis * target;
+
+        // translated to origin of polar coordinate system
+        const auto pp = glm::vec2(p.x - t.x, p.z - t.z);
+
+        // angle in polar coordinate system
+        return glm::atan(pp.x, pp.y);
     }
 
 } // eox
