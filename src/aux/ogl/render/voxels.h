@@ -31,6 +31,14 @@ namespace eox::ogl {
         long total = 0;
         float size = 200.;
 
+        // RGBA
+        float clear_color[4] = {
+                .0f,
+                .274f,
+                .44f,
+                .1f
+        };
+
     public:
         Voxels() = default;
 
@@ -44,9 +52,13 @@ namespace eox::ogl {
 
         void render(const float (view_mat)[4][4], const float (projection_mat)[4][4]);
 
+        Voxels &clear();
+
         Voxels &setPoints(const void *pos, const void *color);
 
         Voxels &setPointSize(float size);
+
+        Voxels &setClearColor(float r, float g, float b, float a = 0.f);
 
         void cleanup();
 

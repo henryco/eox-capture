@@ -23,7 +23,7 @@ namespace eox::xgtk {
 
         camera.perspective((float) width / (float) height, glm::radians(70.f), 0.1, 1000);
 
-        camera.roll(glm::radians(180.f));
+//        camera.roll(glm::radians(180.f));
         camera.set_position(0, 0, -10);
         camera.look_at(0, 0, 100);
 
@@ -122,6 +122,7 @@ namespace eox::xgtk {
             voxels.setPoints(positions.data, colors.data);
         }
 
+        voxels.clear();
         voxels.render(
                 glm::value_ptr(camera.get_view_matrix()),
                 glm::value_ptr(camera.get_projection_matrix())

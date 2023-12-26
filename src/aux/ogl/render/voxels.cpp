@@ -6,28 +6,7 @@
 #include "voxels.h"
 
 namespace eox::ogl {
-
-    void multiply_4x4(const float **a, const float **b, float result[4][4]) {
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                result[i][j] = 0;
-                for (int k = 0; k < 4; ++k) {
-                    result[i][j] += a[i][k] * b[k][j];
-                }
-            }
-        }
-    }
-
-    void multiply_4x4(const float a[4][4], const float b[4][4], float result[4][4]) {
-        for (int i = 0; i < 4; ++i) {
-            for (int j = 0; j < 4; ++j) {
-                result[i][j] = 0;
-                for (int k = 0; k < 4; ++k) {
-                    result[i][j] += a[i][k] * b[k][j];
-                }
-            }
-        }
-    }
+#define cc clear_color
 
     const std::string Voxels::vertex_source = R"glsl(
 
@@ -128,9 +107,13 @@ void main() {
         glUseProgram(0);
     }
 
-    void Voxels::renderFlatten(const float *mvp, const float *proj) {
-        glClearColor(.0f, .274f, .44f, .1f);
+    Voxels &Voxels::clear() {
+        glClearColor(cc[0], cc[1], cc[2], cc[3]);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        return *this;
+    }
+
+    void Voxels::renderFlatten(const float *mvp, const float *proj) {
 
         glUseProgram(shader.getHandle());
 
@@ -157,10 +140,15 @@ void main() {
         return *this;
     }
 
-    void Voxels::render(const float view_mat[4][4], const float projection_mat[4][4]) {
-        float _mvp[4][4];
-        multiply_4x4(view_mat, projection_mat, _mvp);
+    Voxels &Voxels::setClearColor(float r, float g, float b, float a) {
+        cc[0] = r;
+        cc[1] = g;
+        cc[2] = b;
+        cc[3] = a;
+        return *this;
+    }
 
+    void Voxels::render(const float view_mat[4][4], const float projection_mat[4][4]) {
         // reverse row-major to column-major order
         float mvp[16], proj[16];
         for (int i = 0; i < 4; i++) {
@@ -170,14 +158,10 @@ void main() {
                 proj[k] = projection_mat[j][i];
             }
         }
-
         renderFlatten(mvp, proj);
     }
 
     void Voxels::render(const float **view_mat, const float **projection_mat) {
-        float _mvp[4][4];
-        multiply_4x4(view_mat, projection_mat, _mvp);
-
         // reverse row-major to column-major order
         float mvp[16], proj[16];
         for (int i = 0; i < 4; i++) {
@@ -187,7 +171,6 @@ void main() {
                 proj[k] = projection_mat[j][i];
             }
         }
-
         renderFlatten(mvp, proj);
     }
 
