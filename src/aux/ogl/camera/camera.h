@@ -40,7 +40,11 @@ namespace eox::ogl {
 
         Camera &translate_free(float x, float y, float z);
 
+        Camera &translate_free_relative(float r, float u, float f);
+
         Camera &translate_lock(float x, float y, float z);
+
+        Camera &translate_lock_relative(float r, float u, float f);
 
         Camera &pitch(float rad);
 
@@ -59,6 +63,8 @@ namespace eox::ogl {
         Camera &orthographic(float width, float height, float z_near, float z_far);
 
         [[nodiscard]] const glm::mat3 &get_basis() const;
+
+        [[nodiscard]] const glm::mat3 &get_orbit_basis() const;
 
         [[nodiscard]] const glm::vec3 &get_position() const;
 

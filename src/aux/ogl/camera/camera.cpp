@@ -13,10 +13,6 @@ namespace eox::ogl {
 #define BASIS_U basis[1]
 #define BASIS_F basis[2]
 
-#define BASIS_O_R orbit_basis[0]
-#define BASIS_O_U orbit_basis[1]
-#define BASIS_O_F orbit_basis[2]
-
     Camera::Camera() {
         look_at(0, 0, 1);
     }
@@ -128,6 +124,20 @@ namespace eox::ogl {
         return move_lock(pos.x, pos.y, pos.z);
     }
 
+    Camera &Camera::translate_free_relative(float r, float u, float f) {
+        const auto o_pos = glm::inverse(basis) * position;
+        const auto n_pos = o_pos + glm::vec3(r, u, f);
+        const auto pos = basis * n_pos;
+        return move_free(pos.x, pos.y, pos.z);
+    }
+
+    Camera &Camera::translate_lock_relative(float r, float u, float f) {
+        const auto o_pos = glm::inverse(basis) * position;
+        const auto n_pos = o_pos + glm::vec3(r, u, f);
+        const auto pos = basis * n_pos;
+        return move_lock(pos.x, pos.y, pos.z);
+    }
+
     Camera &Camera::look_at(float x, float y, float z) {
         target = glm::vec3(x, y, z);
         view_matrix = glm::lookAt(position, target, BASIS_U);
@@ -152,7 +162,7 @@ namespace eox::ogl {
         const auto elevation = glm::clamp(
                 elevation_rad,
                 -glm::half_pi<float>(),
-                glm::half_pi<float>()
+                glm::half_pi<float>() * 0.9f
         );
 
         const auto target_orbit = orbit_basis * target;
@@ -165,7 +175,7 @@ namespace eox::ogl {
 
         position = glm::inverse(orbit_basis) * position_orbit;
 
-        view_matrix = glm::lookAt(position, target, BASIS_U);
+        view_matrix = glm::lookAt(position, target, orbit_basis[1]);
         refresh_basis();
         return *this;
     }
@@ -208,6 +218,10 @@ namespace eox::ogl {
         return proj_matrix;
     }
 
+    const glm::mat3 &Camera::get_orbit_basis() const {
+        return orbit_basis;
+    }
+
     float Camera::get_lock_distance() const {
         return glm::distance(position, target);
     }
@@ -220,7 +234,6 @@ namespace eox::ogl {
     }
 
     float Camera::get_lock_azimuth() const {
-        // TODO FIXME ERROR
 
         // this gives us coordinates of camera and target in orbit coordinate system
         const auto p = orbit_basis * position;

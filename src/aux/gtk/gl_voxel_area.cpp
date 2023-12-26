@@ -90,7 +90,7 @@ namespace eox::xgtk {
             if (mouse_l_r[0]) {
                 camera.orbit(glm::radians(0.5f * dx), glm::radians(0.5f * dy), 0.f);
             } else if (mouse_l_r[1]) {
-                camera.translate_free(-0.5 * dx, -0.5 * dy, 0);
+                camera.translate_free_relative(-0.5 * dx, 0.5 * dy, 0);
             }
 
             mouse_pos[0] = (float) e->x;
