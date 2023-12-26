@@ -36,6 +36,8 @@ namespace eox::xgtk {
 
         gl_area.set_size_request(v_w, v_h);
         gl_area.set_auto_render(true);
+        gl_area.set_has_depth_buffer(true);
+        gl_area.set_required_version(4, 5);
 
         auto event_box = Gtk::make_managed<Gtk::EventBox>();
         event_box->add(gl_area);

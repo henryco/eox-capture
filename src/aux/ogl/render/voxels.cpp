@@ -95,6 +95,7 @@ void main() {
 
         glEnable(GL_PROGRAM_POINT_SIZE);
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
 
         glGenBuffers(2, vbo);
         glGenVertexArrays(1, &vao);

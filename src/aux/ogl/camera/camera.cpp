@@ -162,7 +162,7 @@ namespace eox::ogl {
         const auto elevation = glm::clamp(
                 elevation_rad,
                 -glm::half_pi<float>(),
-                glm::half_pi<float>() * 0.9f
+                glm::half_pi<float>() * 0.95f
         );
 
         const auto target_orbit = orbit_basis * target;
