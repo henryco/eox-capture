@@ -20,8 +20,7 @@ namespace eox::xgtk {
         v_w = _width;
         v_h = _height;
 
-
-        camera.perspective((float) width / (float) height, glm::radians(60.f), 0.1, 1000);
+        camera.perspective((float) width / (float) height, glm::radians((float) fov), 0.1, 1000);
 
         camera.roll(glm::radians(180.f));
         camera.set_position(0, 0, -10);
@@ -111,6 +110,11 @@ namespace eox::xgtk {
         set_valign(Gtk::ALIGN_CENTER);
     }
 
+    void GLVoxelArea::setPerspectiveFov(float _fov) {
+        fov = _fov;
+        camera.perspective((float) width / (float) height, glm::radians((float) fov), 0.1, 1000);
+    }
+
     void GLVoxelArea::init_fn(bool bgr) {
         gl_area.make_current();
         gl_area.throw_if_error();
@@ -146,8 +150,9 @@ namespace eox::xgtk {
         mat = true;
     }
 
-    void GLVoxelArea::setPointSize(float size) {
-        voxels.setPointSize(size);
+    void GLVoxelArea::setPointSize(int size) {
+        p_size = size;
+        voxels.setPointSize(p_size);
     }
 
     void GLVoxelArea::scale(float _scale) {
@@ -183,6 +188,14 @@ namespace eox::xgtk {
 
     int GLVoxelArea::getViewHeight() const {
         return v_h;
+    }
+
+    int GLVoxelArea::getPerspectiveFov() const {
+        return fov;
+    }
+
+    int GLVoxelArea::getPointSize() const {
+        return p_size;
     }
 
 } // eox

@@ -32,6 +32,8 @@ namespace eox::xgtk {
         int height = 0;
         int v_w = 0;
         int v_h = 0;
+        int fov = 60;
+        int p_size = 200;
 
         long total;
 
@@ -48,7 +50,9 @@ namespace eox::xgtk {
 
         void setPoints(cv::Mat pos, cv::Mat color);
 
-        void setPointSize(float size);
+        void setPointSize(int size);
+
+        void setPerspectiveFov(float fov);
 
         void init(long total, bool bgr = false, int width = 0, int height = 0);
 
@@ -61,6 +65,10 @@ namespace eox::xgtk {
         int getViewWidth() const;
 
         int getViewHeight() const;
+
+        int getPerspectiveFov() const;
+
+        int getPointSize() const;
     };
 
 } // eox
