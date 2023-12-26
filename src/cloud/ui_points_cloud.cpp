@@ -226,6 +226,10 @@ namespace eox {
 
                 auto button_box = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
                 v_box->pack_start(*button_box, Gtk::PACK_SHRINK);
+                v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
+
+                scroll_pane->add(*v_box);
+                config_stack->add(*scroll_pane, std::to_string(group_id));
 
                 {
                     auto reset = std::make_unique<Gtk::Button>();
@@ -760,9 +764,6 @@ namespace eox {
                     }
                 }
 
-                v_box->pack_start(*c_box, Gtk::PACK_SHRINK);
-                scroll_pane->add(*v_box);
-                config_stack->add(*scroll_pane, std::to_string(group_id));
                 keep(std::move(scroll_pane));
                 keep(std::move(button_box));
                 keep(std::move(v_box));
