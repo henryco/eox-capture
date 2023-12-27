@@ -58,11 +58,6 @@ namespace eox::xgtk {
                 return true;
             }
 
-            log->info("D: {}, A: {}, E: {}",
-                      camera.get_lock_distance(),
-                      glm::degrees(camera.get_lock_azimuth()),
-                      glm::degrees(camera.get_lock_elevation()));
-
             camera.orbit(0.f, 0.f, 1.f * step * direction);
             return true;
         });
