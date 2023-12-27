@@ -20,7 +20,7 @@
 #### Real-time 3D visualization (video)
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/YNmbTUxgt3U/0.jpg)](https://www.youtube.com/watch?v=YNmbTUxgt3U "Real-time 3D visualization")
 
-#### Point cloud reconstruction
+#### Point cloud reconstruction, export to PLY (meshlab)
 ![1](https://raw.githubusercontent.com/henryco/eox-capture/master/media/1.png)
 ![2](https://raw.githubusercontent.com/henryco/eox-capture/master/media/2.png)
 ![3](https://raw.githubusercontent.com/henryco/eox-capture/master/media/3.png)
