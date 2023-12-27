@@ -1,15 +1,20 @@
 # Complex Real-time 3D Motion Capture tool (WIP)
 ### Dependencies
-- OpenGL (Should be installed)
+- OpenGL (Should be present by default)
+- OpenCL (Should be present by default)
 - [OpenCV](https://opencv.org/get-started) (tl;dr: `libopencv-dev`)
 - [GTKMM 4.0](https://gtkmm.org/en/download.html) (tl;dr: `libgtkmm-4.0-dev`)
 - [spdlog](https://github.com/gabime/spdlog) (tl;dr: `libspdlog-dev`)
 - [v4l2](https://trac.gateworks.com/wiki/linux/v4l2) (tl;dr: `libv4l-dev`) (linux)
 - [argparse](https://github.com/p-ranav/argparse#positional-arguments) (includes)
+- [glm] (includes)
 
 ## Cooking in progress
 
-#### Point cloud reconstruction (real-time)
+#### Real-time 3D visualization
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/YNmbTUxgt3U/0.jpg)](https://www.youtube.com/watch?v=YNmbTUxgt3U "Real-time 3D visualization")
+
+#### Point cloud reconstruction
 ![1](https://raw.githubusercontent.com/henryco/eox-capture/master/media/1.png)
 ![2](https://raw.githubusercontent.com/henryco/eox-capture/master/media/2.png)
 ![3](https://raw.githubusercontent.com/henryco/eox-capture/master/media/3.png)
