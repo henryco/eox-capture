@@ -11,7 +11,7 @@
 
 ## Cooking in progress
 
-#### Real-time 3D visualization
+#### Real-time 3D visualization (video)
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/YNmbTUxgt3U/0.jpg)](https://www.youtube.com/watch?v=YNmbTUxgt3U "Real-time 3D visualization")
 
 #### Point cloud reconstruction
