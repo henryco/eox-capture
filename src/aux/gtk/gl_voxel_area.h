@@ -33,7 +33,7 @@ namespace eox::xgtk {
         int v_w = 0;
         int v_h = 0;
         int fov = 60;
-        int p_size = 200;
+        int p_size = 50;
 
         long total;
 

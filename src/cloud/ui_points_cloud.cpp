@@ -85,10 +85,48 @@ namespace eox {
 
         {
             const long total = (long) props[0].width * props[0].height * 1 ;//* deviceGroupMap.size();
+            voxelArea.setPointSize(50);
             voxelArea.init(total,true, props[0].width * 2, props[0].height * 2);
             voxelArea.scale(config.scale);
-            voxelArea.setPointSize(50);
-            render_stack->add(voxelArea, "3D");
+
+            auto voxel_box_v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+            auto voxel_box_h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+            voxel_box_v->pack_start(*voxel_box_h, Gtk::PACK_SHRINK);
+            voxel_box_v->pack_start(voxelArea);
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        [this](double value) {
+                            voxelArea.setPointSize((int) value);
+                            return value;
+                        },
+                        "PointSize",
+                        voxelArea.getPointSize(),
+                        1,
+                        voxelArea.getPointSize(),
+                        1,
+                        200
+                );
+                voxel_box_h->pack_start(*control);
+            }
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        [this](double value) {
+                            voxelArea.setPerspectiveFov((int) value);
+                            return value;
+                        },
+                        "FOV",
+                        voxelArea.getPerspectiveFov(),
+                        1,
+                        voxelArea.getPerspectiveFov(),
+                        5,
+                        180
+                );
+                voxel_box_h->pack_start(*control);
+            }
+
+            render_stack->add(*voxel_box_v, "3D");
         }
 
         {
