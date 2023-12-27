@@ -7,7 +7,13 @@
 - [spdlog](https://github.com/gabime/spdlog) (tl;dr: `libspdlog-dev`)
 - [v4l2](https://trac.gateworks.com/wiki/linux/v4l2) (tl;dr: `libv4l-dev`) (linux)
 - [argparse](https://github.com/p-ranav/argparse#positional-arguments) (includes)
-- [glm] (includes)
+- [glm](https://github.com/g-truc/glm) (includes)
+
+## TODO:
+- Multi-camera setup (full 3D)
+- Tensorflow blazepose model (body + face + hands landmarks)
+- Region segmentation (humans only)
+- API: Ableton/Max/PureData/Unity/UE
 
 ## Cooking in progress
 
