@@ -17,4 +17,11 @@ with tf.compat.v1.Session(graph=graph) as sess:
     # Print the input nodes
     for op in graph.get_operations():
         if op.type == 'Placeholder':
-            print("--> " + op.name, op.outputs[0].shape, op.outputs[0].dtype)
+            print("--> Itg: " + op.name, op.outputs[0].shape, op.outputs[0].dtype)
+
+
+    # Print the output nodes
+    ops = graph.get_operations()
+    output_ops = [op for op in ops if op.outputs]
+    for op in output_ops:
+        print("--> O: " + op.name, op.outputs[0].shape, op.outputs[0].dtype)
