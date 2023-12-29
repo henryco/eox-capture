@@ -88,7 +88,9 @@ add_executable(${PROJECT_NAME}
         src/aux/ogl/camera/camera.cpp
         src/aux/ogl/camera/camera.h
         src/aux/gtk/gl_voxel_area.cpp
-        src/aux/gtk/gl_voxel_area.h)
+        src/aux/gtk/gl_voxel_area.h
+        src/aux/dnn/dnn_runner.cpp
+        src/aux/dnn/dnn_runner.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
