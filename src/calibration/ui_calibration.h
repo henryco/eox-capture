@@ -16,48 +16,51 @@
 #include "../aux/utils/timer/timer.h"
 #include "../aux/ocv/cv_utils.h"
 
-class UiCalibration final : public eox::xgtk::GtkEoxWindow {
+namespace eox {
 
-    static inline const auto log =
-            spdlog::stdout_color_mt("ui_calibration");
+    class UiCalibration final : public eox::xgtk::GtkEoxWindow {
 
-private:
-    std::shared_ptr<eox::util::ThreadPool> executor;
-    eox::data::basic_config config;
-    eox::xocv::StereoCamera camera;
-    eox::util::DeltaLoop deltaLoop;
-    eox::xgtk::GLImage glImage;
-    eox::utils::Timer timer;
+        static inline const auto log =
+                spdlog::stdout_color_mt("ui_calibration");
 
-    double progress = 0;
-    bool active = false;
-    float FPS = 0;
+    private:
+        std::shared_ptr<eox::util::ThreadPool> executor;
+        eox::data::basic_config config;
+        eox::xocv::StereoCamera camera;
+        eox::util::DeltaLoop deltaLoop;
+        eox::xgtk::GLImage glImage;
+        eox::utils::Timer timer;
 
-    Gtk::ProgressBar progressBar;
-    Gtk::Button start;
-    Gtk::Button save;
+        double progress = 0;
+        bool active = false;
+        float FPS = 0;
 
-    eox::ocv::StereoPackage stereoPackage;
-    std::map<uint, eox::ocv::CalibrationSolo> preCalibrated;
-    std::map<uint, std::vector<std::vector<cv::Point2f>>> image_points;
-    int cap = 0;
+        Gtk::ProgressBar progressBar;
+        Gtk::Button start;
+        Gtk::Button save;
 
-public:
-    UiCalibration() = default;
-    ~UiCalibration() override;
+        eox::ocv::StereoPackage stereoPackage;
+        std::map<uint, eox::ocv::CalibrationSolo> preCalibrated;
+        std::map<uint, std::vector<std::vector<cv::Point2f>>> image_points;
+        int cap = 0;
 
-    void init(eox::data::basic_config configuration) override;
+    public:
+        UiCalibration() = default;
+        ~UiCalibration() override;
 
-protected:
-    void onRefresh() override;
+        void init(eox::data::basic_config configuration) override;
 
-    void update(float delta, float late, float fps);
+    protected:
+        void onRefresh() override;
 
-    std::function<int(uint, int)> updateCamera(std::vector<uint> devices);
+        void update(float delta, float late, float fps);
 
-    std::function<void()> saveCamera(std::vector<uint> devices);
+        std::function<int(uint, int)> updateCamera(std::vector<uint> devices);
 
-    std::function<void()> resetCamera(std::vector<uint> devices);
+        std::function<void()> saveCamera(std::vector<uint> devices);
 
-    void update_ui(int remains, std::vector<cv::Mat>& _frames);
-};
+        std::function<void()> resetCamera(std::vector<uint> devices);
+
+        void update_ui(int remains, std::vector<cv::Mat>& _frames);
+    };
+}

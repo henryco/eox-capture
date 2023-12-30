@@ -90,7 +90,9 @@ add_executable(${PROJECT_NAME}
         src/aux/gtk/gl_voxel_area.cpp
         src/aux/gtk/gl_voxel_area.h
         src/aux/dnn/blaze_pose.cpp
-        src/aux/dnn/blaze_pose.h)
+        src/aux/dnn/blaze_pose.h
+        src/pose/ui_pose.cpp
+        src/pose/ui_pose.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}

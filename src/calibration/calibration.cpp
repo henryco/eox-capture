@@ -8,7 +8,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
 
-void UiCalibration::update(float delta, float latency, float _fps) {
+void eox::UiCalibration::update(float delta, float latency, float _fps) {
     this->FPS = _fps;
 
     auto captured = camera.capture();
