@@ -10,6 +10,7 @@
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <filesystem>
 
 namespace eox::dnn {
 
@@ -18,43 +19,15 @@ namespace eox::dnn {
                 spdlog::stdout_color_mt("blaze_pose");
 
     private:
-        static inline const std::string file = "../../../models/blazepose_model_float32.pb";
-        static inline const std::vector<std::string> layer_names = {
-                "Identity",
-                "Identity_1",
-                "Identity_4",
-        };
+        static const std::vector<std::string> layer_names;
+        static const std::string file;
 
         cv::dnn::Net net;
 
     public:
-        BlazePose() {
-            net = cv::dnn::readNetFromTensorflow(file);
-            net.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);
-            net.setPreferableTarget(cv::dnn::DNN_TARGET_OPENCL);
-        }
+        BlazePose();
 
-        void forward(const cv::UMat &frame) {
-            cv::UMat blob;
-
-            cv::dnn::blobFromImage(
-                    frame,
-                    blob,
-                    1.0,
-                    cv::Size(256, 256),
-                    cv::Scalar(),
-                    true,
-                    false,
-                    CV_32F
-            );
-
-            net.setInput(blob);
-
-            std::vector<cv::UMat> outputs;
-            net.forward(outputs, layer_names);
-
-            log->info("size: {}", outputs.size());
-        }
+        void forward(const cv::UMat &frame);
     };
 
 } // eox

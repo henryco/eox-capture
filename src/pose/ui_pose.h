@@ -11,6 +11,7 @@
 #include "../aux/gtk/gtk_eox_window.h"
 #include "../aux/dnn/blaze_pose.h"
 #include "../aux/gtk/gl_image.h"
+#include "../aux/utils/loop/delta_loop.h"
 
 namespace eox {
 
@@ -20,12 +21,17 @@ namespace eox {
                 spdlog::stdout_color_mt("ui_pose");
 
     private:
+        eox::util::DeltaLoop deltaLoop;
         eox::xgtk::GLImage glImage;
         eox::dnn::BlazePose pose;
+
+        cv::UMat frame;
 
         float FPS = 0;
 
     public:
+        ~UiPose() override;
+
         void init(eox::data::basic_config configuration) override;
 
         void update(float delta, float late, float fps);
