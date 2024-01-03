@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.26)
 project(stereox VERSION 0.1 LANGUAGES CXX)
 
+# TensorFlow Lite GPU support
+set(TFLITE_ENABLE_GPU ON CACHE BOOL "Enable TFLite GPU support")
+
+add_subdirectory(external/tensorflow/tensorflow/lite)
 add_subdirectory(external/argparse)
 add_subdirectory(external/glm)
 
@@ -107,6 +111,7 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE OpenGL::GL
         PRIVATE spdlog::spdlog
         PRIVATE ${V4L2_LIBRARIES}
+        PRIVATE tensorflow-lite
         PRIVATE argparse
         PRIVATE glm)
 

@@ -1,13 +1,21 @@
 # Complex Real-time 3D Motion Capture tool (WIP)
+### How to clone properly
+```shell
+git clone \
+    --recursive-submodules \
+    git@github.com:henryco/eox-capture.git
+  ```
+
 ### Dependencies
 - OpenGL (Should be present by default)
 - OpenCL (Should be present by default)
 - [OpenCV](https://opencv.org/get-started) (tl;dr: `libopencv-dev`)
 - [GTKMM 4.0](https://gtkmm.org/en/download.html) (tl;dr: `libgtkmm-4.0-dev`)
-- [spdlog](https://github.com/gabime/spdlog) (tl;dr: `libspdlog-dev`)
-- [v4l2](https://trac.gateworks.com/wiki/linux/v4l2) (tl;dr: `libv4l-dev`) (linux)
-- [argparse](https://github.com/p-ranav/argparse#positional-arguments) (includes)
-- [glm](https://github.com/g-truc/glm) (includes)
+- [Spdlog](https://github.com/gabime/spdlog) (tl;dr: `libspdlog-dev`)
+- [V4l2](https://trac.gateworks.com/wiki/linux/v4l2) (tl;dr: `libv4l-dev`) (linux)
+- [TensorFlow](https://github.com/tensorflow/tensorflow) (external/tensorflow)
+- [Argparse](https://github.com/p-ranav/argparse#positional-arguments) (external/argparse)
+- [Glm](https://github.com/g-truc/glm) (external/glm)
 
 ## TODO:
 - Multi-camera setup (full 3D)

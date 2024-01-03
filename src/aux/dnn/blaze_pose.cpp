@@ -6,11 +6,17 @@
 
 namespace eox::dnn {
 
-    const std::string BlazePose::file = "./../models/blazepose_model_float32.pb";
+    double sigmoid(double x) {
+        return 1.0 / (1.0 + exp(-x));
+    }
+
+    const std::string BlazePose::file = "./../models/blazepose_model_float32.tflite";
     const std::vector<std::string> BlazePose::layer_names = {
-            "Identity",
-            "Identity_4",
-            "Identity_1",
+            "Identity:0",   // [1, 195]           landmarks 3d
+            "Identity_1:0", // [1, 1]             pose flag (score)
+            "Identity_2:0", // [1, 128, 128, 1]   segmentation
+            "Identity_3:0", // [1, 64, 64, 39]    heatmap
+            "Identity_4:0", // [1, 117]           world 3d
     };
 
     BlazePose::BlazePose() {
@@ -18,12 +24,13 @@ namespace eox::dnn {
             log->error("File: " + file + " does not exists!");
             throw std::runtime_error("File: " + file + " does not exists!");
         }
-        net = cv::dnn::readNetFromTensorflow(file);
+        net = cv::dnn::readNetFromTFLite(file);
     }
 
     void BlazePose::forward(const cv::UMat &frame) {
         cv::UMat blob;
 
+        // [1, 3, 256, 256]
         cv::dnn::blobFromImage(
                 frame,
                 blob,
@@ -46,7 +53,10 @@ namespace eox::dnn {
             log->info("dim: {}x{}", o.cols, o.rows);
         }
 
-        log->info("o[2]: {}", outputs[2].getMat(cv::ACCESS_READ).at<float>(0));
+        log->info("o[2]: {} | {}",
+                  outputs[1].getMat(cv::ACCESS_READ).at<float>(0),
+                  sigmoid(outputs[1].getMat(cv::ACCESS_READ).at<float>(0))
+        );
 
     }
 } // eox

@@ -10,7 +10,8 @@ namespace eox {
 
     void UiPose::init(eox::data::basic_config configuration) {
 
-        const auto image = cv::imread("./../media/pose.png", cv::IMREAD_COLOR);
+//        const auto image = cv::imread("./../media/pose.png", cv::IMREAD_COLOR);
+        const auto image = cv::imread("/home/henryco/Pictures/nino.png", cv::IMREAD_COLOR);
         image.copyTo(frame);
 
         {
@@ -29,7 +30,7 @@ namespace eox {
         {
             // Stable FPS worker loop
             deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
-            deltaLoop.setFps(30);
+            deltaLoop.setFps(60);
             deltaLoop.start();
         }
     }
