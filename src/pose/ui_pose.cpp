@@ -13,11 +13,11 @@ namespace eox {
         const auto image = cv::imread("./../media/pose.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/nino.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/rosemi.png", cv::IMREAD_COLOR);
-        image.copyTo(frame);
+        cv::resize(image, frame, cv::Size(640, 480));
 
         {
             glImage.init(1, 1, 1, 640, 480, {"DEMO"}, GL_BGR);
-            glImage.setFrame(image);
+            glImage.setFrame(frame);
         }
 
         {
@@ -40,7 +40,24 @@ namespace eox {
         this->FPS = _fps;
         // TODO
         auto result = pose.inference(frame);
-        
+
+        if (result.presence > 0.7) {
+            cv::Mat segmentation(128, 128, CV_32F, result.segmentation.data());
+
+            cv::Mat segmentation_mask;
+            cv::threshold(segmentation, segmentation_mask, 0.5, 1., cv::THRESH_BINARY);
+            cv::resize(segmentation_mask, segmentation_mask, cv::Size(640, 480));
+            segmentation_mask.convertTo(segmentation_mask, CV_32FC1, 255.);
+            segmentation_mask.convertTo(segmentation_mask, CV_8UC1);
+
+            cv::Mat output;
+            cv::bitwise_and(frame, frame, output, segmentation_mask);
+
+            glImage.setFrame(output);
+        } else {
+            glImage.setFrame(frame);
+        }
+
         refresh();
     }
 

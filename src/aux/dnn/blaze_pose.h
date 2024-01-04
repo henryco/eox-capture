@@ -22,14 +22,19 @@ namespace eox::dnn {
     using PoseOutput = struct {
 
         /**
-         * 39x5 normalized landmarks
+         * 39x5 normalized [0,1] landmarks
          */
         std::vector<eox::dnn::Landmark> landmarks_norm;
 
         /**
-         * 1D 128x128 array
+         * 1D 128x128 float32 array
          */
         std::vector<float> segmentation;
+
+        /**
+         * Probability [0,1]
+         */
+        float presence;
     };
 
     class BlazePose {

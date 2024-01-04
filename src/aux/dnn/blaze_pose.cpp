@@ -128,7 +128,6 @@ namespace eox::dnn {
 
     PoseOutput BlazePose::process() {
         const auto presence = *pose_flag_1x1(*interpreter);
-        log->info("POSE: {}", presence);
 
         const float *land_marks_3d = lm_3d_1x195(*interpreter);
 
@@ -158,7 +157,8 @@ namespace eox::dnn {
 
         return {
             .landmarks_norm = lm_3d,
-            .segmentation = segmentation
+            .segmentation = segmentation,
+            .presence = presence
         };
     }
 
