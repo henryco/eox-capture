@@ -9,7 +9,7 @@
 namespace eox::dnn {
 
     double sigmoid(double x) {
-        return 1.0 / (1.0 + exp(-x));
+        return 1.0 / (1.0 + std::exp(-x));
     }
 
     const float *lm_3d_1x195(const tflite::Interpreter &interpreter) {
@@ -98,7 +98,7 @@ namespace eox::dnn {
         initialized = true;
     }
 
-    void BlazePose::forward(cv::InputArray &frame) {
+    PoseOutput BlazePose::inference(cv::InputArray &frame) {
         cv::Mat blob;
 
         {
@@ -108,10 +108,10 @@ namespace eox::dnn {
         }
 
         // [1, 3, 256, 256]
-        inference(blob.ptr<float>(0));
+        return inference(blob.ptr<float>(0));
     }
 
-    void BlazePose::inference(const float *frame) {
+    PoseOutput BlazePose::inference(const float *frame) {
         init();
 
         auto input = interpreter->input_tensor(0)->data.f;
@@ -122,8 +122,44 @@ namespace eox::dnn {
             throw std::runtime_error("Failed to invoke interpreter");
         }
 
+        return process();
+    }
+
+
+    PoseOutput BlazePose::process() {
         const auto presence = *pose_flag_1x1(*interpreter);
-        log->info("POSE: {}", presence);
+
+        const float *land_marks_3d = lm_3d_1x195(*interpreter);
+
+        // normalized landmarks_3d
+        std::vector<eox::dnn::Landmark> lm_3d;
+        lm_3d.reserve(39);
+        for (int i = 0; i < 39; i++) {
+            const int k = i * 5;
+            lm_3d.push_back({
+                .x = land_marks_3d[k + 0] / 255.f,
+                .y = land_marks_3d[k + 1] / 255.f,
+                .z = land_marks_3d[k + 2] / 255.f,
+                .v = land_marks_3d[k + 3],
+                .p = land_marks_3d[k + 4],
+            });
+        }
+
+        const float *s = segmentation_1x128x128x1(*interpreter);
+        std::vector<float> segmentation;
+        segmentation.reserve(16384); //128x128
+        for (int y = 0; y < 128; y++) {
+            for (int x = 0; x < 128; x++) {
+                // 1D row-column order for further oCV processing
+                segmentation.push_back(sigmoid(s[y * 128 + x]));
+            }
+        }
+
+        return {
+            .landmarks_norm = lm_3d,
+            .segmentation = segmentation,
+            .presence = presence
+        };
     }
 
 } // eox

@@ -25,7 +25,7 @@ namespace eox {
         eox::xgtk::GLImage glImage;
         eox::dnn::BlazePose pose;
 
-        cv::UMat frame;
+        cv::Mat frame;
 
         float FPS = 0;
 
