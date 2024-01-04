@@ -39,7 +39,7 @@ namespace eox::dnn {
 
         ~BlazePose();
 
-        void forward(cv::InputArray &frame);
+        void inference(cv::InputArray &frame);
 
         void inference(const float *frame);
     };

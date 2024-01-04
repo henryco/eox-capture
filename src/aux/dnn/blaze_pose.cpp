@@ -98,7 +98,7 @@ namespace eox::dnn {
         initialized = true;
     }
 
-    void BlazePose::forward(cv::InputArray &frame) {
+    void BlazePose::inference(cv::InputArray &frame) {
         cv::Mat blob;
 
         {
