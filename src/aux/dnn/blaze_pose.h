@@ -12,6 +12,9 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <filesystem>
 
+#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/kernels/register.h"
+
 namespace eox::dnn {
 
     class BlazePose {
@@ -19,15 +22,26 @@ namespace eox::dnn {
                 spdlog::stdout_color_mt("blaze_pose");
 
     private:
-        static const std::vector<std::string> layer_names;
+        static const std::vector<std::string> outputs;
         static const std::string file;
 
-        cv::dnn::Net net;
+        std::unique_ptr<tflite::FlatBufferModel> model;
+        std::unique_ptr<tflite::Interpreter> interpreter;
+        TfLiteDelegate* gpu_delegate = nullptr;
+
+        bool initialized = false;
+
+    protected:
+        void init();
 
     public:
         BlazePose();
 
-        void forward(const cv::UMat &frame);
+        ~BlazePose();
+
+        void forward(cv::InputArray &frame);
+
+        void inference(const float *frame);
     };
 
 } // eox

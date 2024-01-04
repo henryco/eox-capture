@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.26)
 project(stereox VERSION 0.1 LANGUAGES CXX)
 
-# TensorFlow Lite GPU support
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(TFLITE_ENABLE_GPU ON CACHE BOOL "Enable TFLite GPU support")
+set(ABSL_PROPAGATE_CXX_STD ON)
 
 add_subdirectory(external/tensorflow/tensorflow/lite)
 add_subdirectory(external/argparse)
 add_subdirectory(external/glm)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_C_COMPILER "clang-16")
 set(CMAKE_CXX_COMPILER "clang++-16")
 
