@@ -39,7 +39,8 @@ namespace eox {
     void UiPose::update(float _delta, float _late, float _fps) {
         this->FPS = _fps;
         // TODO
-        pose.forward(frame);
+        auto result = pose.inference(frame);
+        
         refresh();
     }
 

@@ -12,10 +12,25 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <filesystem>
 
-#include "tensorflow/lite/interpreter.h"
-#include "tensorflow/lite/kernels/register.h"
+#include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
+
+#include "dnn_common.h"
 
 namespace eox::dnn {
+
+    using PoseOutput = struct {
+
+        /**
+         * 39x5 normalized landmarks
+         */
+        std::vector<eox::dnn::Landmark> landmarks_norm;
+
+        /**
+         * 1D 128x128 array
+         */
+        std::vector<float> segmentation;
+    };
 
     class BlazePose {
         static inline const auto log =
@@ -32,16 +47,18 @@ namespace eox::dnn {
         bool initialized = false;
 
     protected:
-        void init();
+        PoseOutput process();
 
     public:
         BlazePose();
 
         ~BlazePose();
 
-        void inference(cv::InputArray &frame);
+        void init();
 
-        void inference(const float *frame);
+        PoseOutput inference(cv::InputArray &frame);
+
+        PoseOutput inference(const float *frame);
     };
 
 } // eox
