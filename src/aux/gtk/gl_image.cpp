@@ -59,6 +59,11 @@ namespace eox::xgtk {
         }
     }
 
+    void GLImage::setFrame(const cv::Mat &_frame) {
+        frames.clear();
+        frames.push_back(cv::Mat(_frame));
+    }
+
     void GLImage::setFrames(const std::vector<cv::Mat>& _frames) {
         frames.clear();
         for (auto item: _frames) {

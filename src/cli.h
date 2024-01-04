@@ -205,6 +205,16 @@ namespace eox::cli {
         program.add_subparser(stereo);
 
 
+        // Pose estimation config
+        argparse::ArgumentParser pose("pose");
+        pose.add_description(R"desc(
+                3D pose estimation module.
+                Use pose -h for help.
+        )desc");
+        // TODO
+        program.add_subparser(pose);
+
+
         try {
             program.parse_args(argc, argv);
         } catch (const std::runtime_error &err) {
@@ -322,6 +332,14 @@ namespace eox::cli {
                                          : eox::data::Algorithm::BM,
                             .confidence = instance.get<bool>("--confidence")
                     }
+            };
+        }
+
+        if (program.is_subcommand_used("pose")) {
+            const auto &instance = program.at<argparse::ArgumentParser>("pose");
+            // TODO
+            return {
+                .module = "pose"
             };
         }
 

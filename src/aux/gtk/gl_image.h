@@ -53,6 +53,7 @@ public:
     void init(size_t rows, size_t cols, size_t number, int width, int height, std::vector<std::string> ids, GLenum format = GL_RGB);
     void init(size_t rows, size_t cols, size_t number, int width, int height, GLenum format = GL_RGB);
 
+    void setFrame(const cv::Mat &_frame);
     void setFrames(const std::vector<cv::Mat>& _frames);
     void update(const std::vector<cv::Mat>& _frames);
     void update();

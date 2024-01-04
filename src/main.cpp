@@ -5,6 +5,7 @@
 #include "aux/utils/errors/error_reporter.h"
 #include "cli.h"
 #include "cloud/ui_points_cloud.h"
+#include "pose/ui_pose.h"
 
 int main(int argc, char **argv) {
 
@@ -31,12 +32,13 @@ int main(int argc, char **argv) {
         std::unique_ptr<eox::xgtk::GtkEoxWindow> window;
 
         if (configuration.module == "calibration")
-            window = std::make_unique<UiCalibration>();
+            window = std::make_unique<eox::UiCalibration>();
 
         else if (configuration.module == "stereo")
             window = std::make_unique<eox::UiPointsCloud>();
 
-
+        else if (configuration.module == "pose")
+            window = std::make_unique<eox::UiPose>();
 
         else return 1;
 

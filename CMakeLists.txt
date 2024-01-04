@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 3.26)
 project(stereox VERSION 0.1 LANGUAGES CXX)
 
-add_subdirectory(external/argparse)
-add_subdirectory(external/glm)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(TFLITE_ENABLE_GPU ON CACHE BOOL "Enable TFLite GPU support")
+set(ABSL_PROPAGATE_CXX_STD ON)
+
+add_subdirectory(external/tensorflow/tensorflow/lite)
+add_subdirectory(external/argparse)
+add_subdirectory(external/glm)
+
 set(CMAKE_C_COMPILER "clang-16")
 set(CMAKE_CXX_COMPILER "clang++-16")
 
@@ -88,7 +94,11 @@ add_executable(${PROJECT_NAME}
         src/aux/ogl/camera/camera.cpp
         src/aux/ogl/camera/camera.h
         src/aux/gtk/gl_voxel_area.cpp
-        src/aux/gtk/gl_voxel_area.h)
+        src/aux/gtk/gl_voxel_area.h
+        src/aux/dnn/blaze_pose.cpp
+        src/aux/dnn/blaze_pose.h
+        src/pose/ui_pose.cpp
+        src/pose/ui_pose.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
@@ -103,6 +113,7 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE OpenGL::GL
         PRIVATE spdlog::spdlog
         PRIVATE ${V4L2_LIBRARIES}
+        PRIVATE tensorflow-lite
         PRIVATE argparse
         PRIVATE glm)
 
