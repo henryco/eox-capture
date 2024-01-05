@@ -99,7 +99,8 @@ add_executable(${PROJECT_NAME}
         src/aux/dnn/blaze_pose.h
         src/pose/ui_pose.cpp
         src/pose/ui_pose.h
-        src/aux/dnn/dnn_common.h)
+        src/aux/dnn/dnn_common.h
+        src/aux/dnn/dnn_common.cpp)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}

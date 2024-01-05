@@ -33,6 +33,10 @@ namespace eox::dnn {
          */
         float p;
     };
+
+    extern const int body_joints[31][2];
+
+    double sigmoid(double x);
 }
 
 #endif //STEREOX_DNN_COMMON_H

@@ -8,10 +8,6 @@
 
 namespace eox::dnn {
 
-    double sigmoid(double x) {
-        return 1.0 / (1.0 + std::exp(-x));
-    }
-
     const float *lm_3d_1x195(const tflite::Interpreter &interpreter) {
         return interpreter.output_tensor(0)->data.f;
     }
@@ -151,7 +147,7 @@ namespace eox::dnn {
         for (int y = 0; y < 128; y++) {
             for (int x = 0; x < 128; x++) {
                 // 1D row-column order for further oCV processing
-                segmentation.push_back(sigmoid(s[y * 128 + x]));
+                segmentation.push_back(eox::dnn::sigmoid(s[y * 128 + x]));
             }
         }
 
