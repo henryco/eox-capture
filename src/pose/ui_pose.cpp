@@ -18,6 +18,7 @@ namespace eox {
         {
             glImage.init(1, 1, 1, 640, 480, {"DEMO"}, GL_BGR);
             glImage.setFrame(frame);
+            glImage.scale(2);
         }
 
         {
@@ -69,12 +70,22 @@ namespace eox {
                 }
             }
 
+            int i = 0;
             for (const auto &point: result.landmarks_norm) {
                 if (eox::dnn::sigmoid(point.v) > threshold) {
                     cv::Point circle(point.x * output.cols, point.y * output.rows);
                     cv::Scalar color(0, 255, 230);
 
                     cv::circle(output, circle, 2, color, 1);
+
+                    if (i > 32) {
+                        cv::putText(output, std::to_string(i), cv::Point(circle.x - 10, circle.y - 10),
+                                    cv::FONT_HERSHEY_PLAIN, 1,
+                                    cv::Scalar(255, 0, 0)
+                        );
+                    }
+
+                    i++;
                 }
             }
 

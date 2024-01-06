@@ -100,7 +100,11 @@ add_executable(${PROJECT_NAME}
         src/pose/ui_pose.cpp
         src/pose/ui_pose.h
         src/aux/dnn/dnn_common.h
-        src/aux/dnn/dnn_common.cpp)
+        src/aux/dnn/dnn_common.cpp
+        src/aux/sig/low_pass_filter.cpp
+        src/aux/sig/low_pass_filter.h
+        src/aux/sig/velocity_filter.cpp
+        src/aux/sig/velocity_filter.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
