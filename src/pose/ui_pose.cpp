@@ -32,7 +32,7 @@ namespace eox {
         {
             // Stable FPS worker loop
             deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
-            deltaLoop.setFps(144);
+            deltaLoop.setFps(30);
             deltaLoop.start();
         }
     }

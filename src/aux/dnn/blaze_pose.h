@@ -35,6 +35,16 @@ namespace eox::dnn {
          * Probability [0,1]
          */
         float presence;
+
+        /**
+         * original width
+         */
+        int o_width;
+
+        /**
+         * original height
+         */
+        int o_height;
     };
 
     class BlazePose {
@@ -61,8 +71,14 @@ namespace eox::dnn {
 
         void init();
 
+        /**
+         * @param frame BGR image (ie. cv::Mat of CV_8UC3)
+         */
         PoseOutput inference(cv::InputArray &frame);
 
+        /**
+         * @param frame pointer to 256x256 row-oriented 1D array representation of 256x256x3 RGB image
+         */
         PoseOutput inference(const float *frame);
     };
 

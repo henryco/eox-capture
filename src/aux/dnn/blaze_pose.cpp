@@ -96,15 +96,22 @@ namespace eox::dnn {
 
     PoseOutput BlazePose::inference(cv::InputArray &frame) {
         cv::Mat blob;
-
+        cv::Mat ref = frame.getMat();
         {
-            cv::resize(frame.getMat(), blob, cv::Size(256, 256));
+            if (ref.cols != 256 || ref.rows != 256) {
+                cv::resize(ref, blob, cv::Size(256, 256));
+            } else {
+                ref.copyTo(blob);
+            }
             cv::cvtColor(blob, blob, cv::COLOR_BGR2RGB);
             blob.convertTo(blob, CV_32FC3, 1.0 / 255.);
         }
 
         // [1, 3, 256, 256]
-        return inference(blob.ptr<float>(0));
+        auto r = inference(blob.ptr<float>(0));
+        r.o_width = ref.cols;
+        r.o_height = ref.rows;
+        return r;
     }
 
     PoseOutput BlazePose::inference(const float *frame) {
@@ -154,7 +161,9 @@ namespace eox::dnn {
         return {
             .landmarks_norm = lm_3d,
             .segmentation = segmentation,
-            .presence = presence
+            .presence = presence,
+            .o_width = 256,
+            .o_height = 256
         };
     }
 
