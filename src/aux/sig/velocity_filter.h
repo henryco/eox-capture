@@ -10,6 +10,9 @@
 #include <chrono>
 #include <deque>
 
+#include <spdlog/logger.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 namespace eox::sig {
 
     namespace velocity_filter {
@@ -20,6 +23,9 @@ namespace eox::sig {
     }
 
     class VelocityFilter {
+
+        static inline const auto log =
+                spdlog::stdout_color_mt("velocity_filter");
 
     private:
         std::deque<velocity_filter::Element> window;

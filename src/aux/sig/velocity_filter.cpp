@@ -9,16 +9,17 @@
 namespace eox::sig {
 
     VelocityFilter::VelocityFilter(int w_size, float v_scale, int fps)
-            : max_valid_total_duration(1000000000 / fps), velocity_scale(v_scale), window_size(w_size) {
+            : max_valid_total_duration(std::max(1, 1000000000 / fps)),
+              velocity_scale(v_scale),
+              window_size(std::max(1, w_size)) {
     }
 
     float VelocityFilter::filter(std::chrono::nanoseconds timestamp, float value, float scale) {
-
         float alpha = NAN;
 
         if (window.empty()) {
+            window.push_front({0.0f, 0});
             alpha = 1.0;
-
         } else {
             const auto &last = window.back();
 
@@ -36,11 +37,12 @@ namespace eox::sig {
                 total_duration += element.duration;
             }
 
-            const float velocity = total_distance / (total_duration * 1e-9);
-            alpha = 1.0f - 1.0f / (1.0f + velocity_scale * std::abs(velocity));
-
             window.push_front({distance, duration});
-            if (window.size() > window_size) {
+
+            const float velocity = total_distance / (total_duration * 1e-9);
+            alpha = 1.0f - (1.0f / (1.0f + (velocity_scale * std::abs(velocity))));
+
+            while (window.size() > window_size) {
                 window.pop_back();
             }
         }
@@ -53,12 +55,12 @@ namespace eox::sig {
     }
 
     void VelocityFilter::setTargetFps(int fps) {
-        max_valid_total_duration = 1000000000 / fps;
+        max_valid_total_duration = std::max(1, 1000000000 / fps);
         reset();
     }
 
     void VelocityFilter::setWindowSize(int size) {
-        window_size = size;
+        window_size = std::max(1, size);
         reset();
     }
 

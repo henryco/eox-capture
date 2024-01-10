@@ -92,7 +92,7 @@ namespace eox {
                         pipeline.getFilterWindowSize(),
                         1,
                         30,
-                        0,
+                        1,
                         300
                 );
 
