@@ -13,21 +13,32 @@
 namespace eox::dnn {
 
     using PoseRoiInput = struct {
-        eox::dnn::PoseOutput pose;
-        eox::dnn::RoI origin_roi;
-        int origin_w;
-        int origin_h;
+        eox::dnn::Landmark landmarks[39];
     };
+
+    PoseRoiInput roiFromPoseLandmarks39(const Landmark landmarks[39]);
 
     class PoseRoi : eox::dnn::RoiPredictor {
 
         static inline const auto log =
                 spdlog::stdout_color_mt("pose_roi_predictor");
 
+    private:
+        int fix_y = 10;
+        int margin = 10;
+
     public:
         RoI forward(void *data) override;
 
         [[nodiscard]] RoI forward(const PoseRoiInput &data) const;
+
+        [[nodiscard]] int getMargin() const;
+
+        [[nodiscard]] int getFixY() const;
+
+        PoseRoi &setMargin(int margin);
+
+        PoseRoi &setFixY(int fixY);
     };
 
 } // eox

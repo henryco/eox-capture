@@ -15,6 +15,29 @@
 
 namespace eox {
 
+    using PosePipelineOutput = struct {
+
+        /**
+         * pose landmarks in frame's coordinate system
+         */
+        eox::dnn::Landmark landmarks[39];
+
+        /**
+         * segmentation array
+         */
+        float segmentation[128 * 128];
+
+        /**
+         * presence flag
+         */
+        bool present;
+
+        /**
+         * presence score
+         */
+        float score;
+    };
+
     class PosePipeline {
 
         static inline const auto log =
@@ -35,26 +58,28 @@ namespace eox {
     public:
         void init();
 
-        int pass(const cv::Mat &frame);
+        PosePipelineOutput pass(const cv::Mat &frame);
 
-        int pass(const cv::Mat &frame, cv::Mat &segmented);
+        PosePipelineOutput pass(const cv::Mat &frame, cv::Mat &segmented);
 
-        int pass(const cv::Mat &frame, cv::Mat &segmented, cv::Mat &aux);
+        PosePipelineOutput pass(const cv::Mat &frame, cv::Mat &segmented, cv::Mat &debug);
 
         [[nodiscard]] float getThreshold() const;
 
         void setThreshold(float threshold);
 
     protected:
-        int inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *aux);
+        [[nodiscard]] PosePipelineOutput inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *debug);
 
-        std::chrono::nanoseconds timestamp();
+        void performSegmentation(float segmentation_array[128 * 128], const cv::Mat &frame, cv::Mat &out) const;
 
         void drawJoints(const eox::dnn::Landmark landmarks[39], cv::Mat &output) const;
 
         void drawLandmarks(const eox::dnn::Landmark landmarks[39], cv::Mat &output) const;
 
         void drawRoi(cv::Mat &output) const;
+
+        [[nodiscard]] std::chrono::nanoseconds timestamp() const;
     };
 
 } // eox
