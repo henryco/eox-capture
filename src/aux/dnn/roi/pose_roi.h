@@ -27,7 +27,7 @@ namespace eox::dnn {
     public:
         RoI forward(void *data) override;
 
-        RoI forward(const PoseRoiInput &data) const;
+        [[nodiscard]] RoI forward(const PoseRoiInput &data) const;
     };
 
 } // eox

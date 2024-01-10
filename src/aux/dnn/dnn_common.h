@@ -11,17 +11,17 @@ namespace eox::dnn {
     using Landmark = struct {
 
         /**
-         * X normalized, [0,1]
+         * X
          */
         float x;
 
         /**
-         * Y normalized, [0,1]
+         * Y
          */
         float y;
 
         /**
-         * Z normalized, [0,1]
+         * Z
          */
         float z;
 
@@ -39,7 +39,7 @@ namespace eox::dnn {
     using PoseOutput = struct {
 
         /**
-         * 39x5 normalized [0,1] landmarks
+         * 39x5 normalized (0,1) landmarks
          */
         eox::dnn::Landmark landmarks_norm[39];
 

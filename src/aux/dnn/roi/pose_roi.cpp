@@ -20,14 +20,11 @@ namespace eox::dnn {
         const auto &center = data.pose.landmarks_norm[33];
         const auto &end = data.pose.landmarks_norm[34];
 
-        const auto roi_w = std::abs(data.origin_roi.w - data.origin_roi.x);
-        const auto roi_h = std::abs(data.origin_roi.h - data.origin_roi.y);
-
         // global coordinates
-        const int x1 = (center.x * roi_w) + data.origin_roi.x;
-        const int y1 = (center.y * roi_h) + data.origin_roi.y;
-        const int x2 = (end.x * roi_w) + data.origin_roi.x;
-        const int y2 = (end.y * roi_h) + data.origin_roi.y;
+        const int x1 = (center.x * data.origin_roi.w) + data.origin_roi.x;
+        const int y1 = (center.y * data.origin_roi.h) + data.origin_roi.y;
+        const int x2 = (end.x * data.origin_roi.w) + data.origin_roi.x;
+        const int y2 = (end.y * data.origin_roi.h) + data.origin_roi.y;
 
         const int radius = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2)) + MARGIN;
         const int x0 = x1 - radius;

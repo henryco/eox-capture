@@ -44,14 +44,14 @@ namespace eox {
         cv::Mat source;
         if (prediction) {
             // crop using roi
-            log->info("x: {}, y: {}, w: {}, h: {}, fw: {}, fh: {}", roi.x, roi.y, roi.w, roi.h, frame.cols, frame.rows);
-
-//            source = frame(cv::Rect(roi.x, roi.y, roi.w, roi.h));
-            roi = {.x = 0, .y = 0, .w = 640, .h = 480};
-            source = frame;
+            source = frame(cv::Rect(roi.x, roi.y, roi.w, roi.h));
+//            source = frame(cv::Rect(44, 74, 380, 380));
+//            roi = {.x = 44, .y = 74, .w = 380, .h = 380};
+//            roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.rows};
+//            source = frame;
         } else {
             // use detector model TODO
-            roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.cols};
+            roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.rows};
             source = frame;
         }
 
@@ -59,8 +59,9 @@ namespace eox {
         if (result.presence > threshold) {
             prediction = true;
 
-            // temporal filtering (low pass based on velocity)
             const auto now = timestamp();
+
+            // temporal filtering (low pass based on velocity)
             for (int i = 0; i < 39; i++) {
                 const auto idx = i * 3;
                 auto fx = filters.at(idx + 0).filter(now, result.landmarks_norm[i].x);
@@ -72,6 +73,7 @@ namespace eox {
                 result.landmarks_norm[i].z = fz;
             }
 
+            // TODO FIXME
             roi = roiPredictor.forward(
                     {
                             .pose = result,
