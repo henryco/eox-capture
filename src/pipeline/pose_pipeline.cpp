@@ -10,9 +10,8 @@ namespace eox {
         filters.clear();
         filters.reserve(117);
         for (int i = 0; i < 117; i++) {
-            filters.emplace_back(30, 0.5f, 30);
+            filters.emplace_back(f_win_size, f_v_scale, f_fps);
         }
-
         initialized = true;
     }
 
@@ -104,6 +103,8 @@ namespace eox {
 
         } else {
             prediction = false;
+            if (debug)
+                frame.copyTo(*debug);
         }
 
         return output;
@@ -174,6 +175,39 @@ namespace eox {
 
     void PosePipeline::setThreshold(float _threshold) {
         threshold = _threshold;
+    }
+
+    void PosePipeline::setFilterWindowSize(int size) {
+        f_win_size = size;
+        for (auto &filter: filters) {
+            filter.setWindowSize(size);
+        }
+    }
+
+    void PosePipeline::setFilterVelocityScale(float scale) {
+        f_v_scale = scale;
+        for (auto &filter: filters) {
+            filter.setVelocityScale(scale);
+        }
+    }
+
+    void PosePipeline::setFilterTargetFps(int fps) {
+        f_fps = fps;
+        for (auto &filter: filters) {
+            filter.setTargetFps(fps);
+        }
+    }
+
+    float PosePipeline::getFilterVelocityScale() const {
+        return f_v_scale;
+    }
+
+    int PosePipeline::getFilterTargetFps() const {
+        return f_fps;
+    }
+
+    int PosePipeline::getFilterWindowSize() const {
+        return f_win_size;
     }
 
 } // eox

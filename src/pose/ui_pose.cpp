@@ -3,8 +3,11 @@
 //
 
 #include "ui_pose.h"
+#include "../aux/gtk/gtk_control.h"
+#include "../aux/gtk/gtk_config_stack.h"
 
 #include <opencv2/imgcodecs.hpp>
+#include <gtkmm/scrolledwindow.h>
 
 namespace eox {
 
@@ -22,13 +25,108 @@ namespace eox {
         {
             glImage.init(1, 1, 1, 640, 480, {"DEMO"}, GL_BGR);
             glImage.setFrame(frame);
-            glImage.scale(2);
+            glImage.scale(configuration.scale);
         }
 
         {
+            auto config_stack = Gtk::make_managed<eox::xgtk::GtkConfigStack>();
+            auto scroll_pane = Gtk::make_managed<Gtk::ScrolledWindow>();
+            auto control_box_v = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+            auto control_box_h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
+
+            config_stack->set_size_request(420);
+
+            config_stack->add(*scroll_pane, "Pose");
+            scroll_pane->add(*control_box_h);
+            control_box_h->pack_start(*control_box_v, Gtk::PACK_SHRINK);
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        ([this](double value) {
+                            pipeline.setThreshold((float) value);
+                            return value;
+                        }),
+                        "Threshold",
+                        pipeline.getThreshold(),
+                        0.01,
+                        0.5,
+                        0.0,
+                        1.0
+                );
+                control->digits(2);
+
+                auto box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                box->set_size_request(400, 50);
+                box->pack_start(*control);
+                control_box_v->pack_start(*box, Gtk::PACK_SHRINK);
+            }
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        ([this](double value) {
+                            pipeline.setFilterVelocityScale((float) value);
+                            return value;
+                        }),
+                        "FilterVelocityScale",
+                        pipeline.getFilterVelocityScale(),
+                        0.01,
+                        0.5,
+                        0,
+                        10
+                );
+                control->digits(2);
+
+                auto box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                box->set_size_request(400, 50);
+                box->pack_start(*control);
+                control_box_v->pack_start(*box, Gtk::PACK_SHRINK);
+            }
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        ([this](double value) {
+                            pipeline.setFilterWindowSize((int) value);
+                            return value;
+                        }),
+                        "FilterWindowSize",
+                        pipeline.getFilterWindowSize(),
+                        1,
+                        30,
+                        0,
+                        300
+                );
+
+                auto box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                box->set_size_request(400, 50);
+                box->pack_start(*control);
+                control_box_v->pack_start(*box, Gtk::PACK_SHRINK);
+            }
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        ([this](double value) {
+                            pipeline.setFilterTargetFps((int) value);
+                            return value;
+                        }),
+                        "FilterTargetFPS",
+                        pipeline.getFilterTargetFps(),
+                        1,
+                        30,
+                        1,
+                        300
+                );
+
+                auto box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                box->set_size_request(400, 50);
+                box->pack_start(*control);
+                control_box_v->pack_start(*box, Gtk::PACK_SHRINK);
+            }
+
             // Init Window
             auto layout_h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
             layout_h->pack_start(glImage, Gtk::PACK_EXPAND_WIDGET);
+            layout_h->pack_start(*config_stack, Gtk::PACK_SHRINK);
+
             add(*layout_h);
             show_all_children();
         }
@@ -43,7 +141,6 @@ namespace eox {
 
     void UiPose::update(float _delta, float _late, float _fps) {
         this->FPS = _fps;
-        // TODO
 
         cv::Mat output, segmentation;
         pipeline.pass(frame, segmentation, output);

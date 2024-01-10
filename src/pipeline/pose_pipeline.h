@@ -54,6 +54,9 @@ namespace eox {
         bool initialized = false;
         float threshold = 0.5;
 
+        float f_v_scale = 0.5;
+        int f_win_size = 30;
+        int f_fps = 30;
 
     public:
         void init();
@@ -64,9 +67,21 @@ namespace eox {
 
         PosePipelineOutput pass(const cv::Mat &frame, cv::Mat &segmented, cv::Mat &debug);
 
-        [[nodiscard]] float getThreshold() const;
-
         void setThreshold(float threshold);
+
+        void setFilterWindowSize(int size);
+
+        void setFilterVelocityScale(float scale);
+
+        void setFilterTargetFps(int fps);
+
+        [[nodiscard]] float getFilterVelocityScale() const;
+
+        [[nodiscard]] int getFilterWindowSize() const;
+
+        [[nodiscard]] int getFilterTargetFps() const;
+
+        [[nodiscard]] float getThreshold() const;
 
     protected:
         [[nodiscard]] PosePipelineOutput inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *debug);

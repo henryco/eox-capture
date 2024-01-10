@@ -339,7 +339,10 @@ namespace eox::cli {
             const auto &instance = program.at<argparse::ArgumentParser>("pose");
             // TODO
             return {
-                .module = "pose"
+                    .scale = scale,
+                    .work_dir = work_dir,
+                    .configs = new_configs,
+                    .module = "pose",
             };
         }
 
