@@ -41,15 +41,21 @@ namespace eox {
             init();
         }
 
+        cv::Mat source;
         if (prediction) {
             // crop using roi
+            log->info("x: {}, y: {}, w: {}, h: {}, fw: {}, fh: {}", roi.x, roi.y, roi.w, roi.h, frame.cols, frame.rows);
 
+//            source = frame(cv::Rect(roi.x, roi.y, roi.w, roi.h));
+            roi = {.x = 0, .y = 0, .w = 640, .h = 480};
+            source = frame;
         } else {
-            // use detector model
-
+            // use detector model TODO
+            roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.cols};
+            source = frame;
         }
 
-        auto result = pose.inference(frame);
+        auto result = pose.inference(source);
         if (result.presence > threshold) {
             prediction = true;
 
@@ -69,7 +75,7 @@ namespace eox {
             roi = roiPredictor.forward(
                     {
                             .pose = result,
-                            .origin_roi = {.x = 0, .y = 0, .w = 640, .h = 480},
+                            .origin_roi = roi,
                             .origin_w = frame.cols,
                             .origin_h = frame.rows
                     });
@@ -121,7 +127,7 @@ namespace eox {
                 cv::Scalar color(0, 255, 230);
                 cv::circle(output, circle, 2, color, 1);
                 if (i > 32)
-                    cv::putText(output, std::to_string(i - 1), cv::Point(circle.x - 10, circle.y - 10),
+                    cv::putText(output, std::to_string(i), cv::Point(circle.x - 10, circle.y - 10),
                                 cv::FONT_HERSHEY_PLAIN, 1,
                                 cv::Scalar(255, 0, 0));
             }
