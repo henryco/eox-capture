@@ -19,34 +19,6 @@
 
 namespace eox::dnn {
 
-    using PoseOutput = struct {
-
-        /**
-         * 39x5 normalized [0,1] landmarks
-         */
-        std::vector<eox::dnn::Landmark> landmarks_norm;
-
-        /**
-         * 1D 128x128 float32 array
-         */
-        std::vector<float> segmentation;
-
-        /**
-         * Probability [0,1]
-         */
-        float presence;
-
-        /**
-         * original width
-         */
-        int o_width;
-
-        /**
-         * original height
-         */
-        int o_height;
-    };
-
     class BlazePose {
         static inline const auto log =
                 spdlog::stdout_color_mt("blaze_pose");

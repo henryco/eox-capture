@@ -108,10 +108,7 @@ namespace eox::dnn {
         }
 
         // [1, 3, 256, 256]
-        auto r = inference(blob.ptr<float>(0));
-        r.o_width = ref.cols;
-        r.o_height = ref.rows;
-        return r;
+        return inference(blob.ptr<float>(0));
     }
 
     PoseOutput BlazePose::inference(const float *frame) {
@@ -130,41 +127,29 @@ namespace eox::dnn {
 
 
     PoseOutput BlazePose::process() {
+        PoseOutput output;
+
         const auto presence = *pose_flag_1x1(*interpreter);
+        output.presence = presence;
 
         const float *land_marks_3d = lm_3d_1x195(*interpreter);
-
-        // normalized landmarks_3d
-        std::vector<eox::dnn::Landmark> lm_3d;
-        lm_3d.reserve(39);
         for (int i = 0; i < 39; i++) {
             const int k = i * 5;
-            lm_3d.push_back({
-                .x = land_marks_3d[k + 0] / 255.f,
-                .y = land_marks_3d[k + 1] / 255.f,
-                .z = land_marks_3d[k + 2] / 255.f,
-                .v = land_marks_3d[k + 3],
-                .p = land_marks_3d[k + 4],
-            });
+            // normalized landmarks_3d
+            output.landmarks_norm[i] = {
+                    .x = land_marks_3d[k + 0] / 255.f,
+                    .y = land_marks_3d[k + 1] / 255.f,
+                    .z = land_marks_3d[k + 2] / 255.f,
+                    .v = land_marks_3d[k + 3],
+                    .p = land_marks_3d[k + 4],
+            };
         }
 
         const float *s = segmentation_1x128x128x1(*interpreter);
-        std::vector<float> segmentation;
-        segmentation.reserve(16384); //128x128
-        for (int y = 0; y < 128; y++) {
-            for (int x = 0; x < 128; x++) {
-                // 1D row-column order for further oCV processing
-                segmentation.push_back(eox::dnn::sigmoid(s[y * 128 + x]));
-            }
+        for (int i = 0; i < 128 * 128; i++) {
+            output.segmentation[i] = eox::dnn::sigmoid(s[i]);
         }
-
-        return {
-            .landmarks_norm = lm_3d,
-            .segmentation = segmentation,
-            .presence = presence,
-            .o_width = 256,
-            .o_height = 256
-        };
+        return output;
     }
 
 } // eox

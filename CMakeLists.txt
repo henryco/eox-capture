@@ -104,7 +104,12 @@ add_executable(${PROJECT_NAME}
         src/aux/sig/low_pass_filter.cpp
         src/aux/sig/low_pass_filter.h
         src/aux/sig/velocity_filter.cpp
-        src/aux/sig/velocity_filter.h)
+        src/aux/sig/velocity_filter.h
+        src/aux/dnn/roi/pose_roi.cpp
+        src/aux/dnn/roi/pose_roi.h
+        src/aux/dnn/roi/RoiPredictor.h
+        src/pipeline/pose_pipeline.cpp
+        src/pipeline/pose_pipeline.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
