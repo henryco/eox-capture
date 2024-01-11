@@ -8,7 +8,7 @@ namespace eox {
 
     void PosePipeline::init() {
         filters.clear();
-        filters.reserve(117);
+        filters.reserve(117); // 39 * (x,y,z) == 39 * 3 == 117
         for (int i = 0; i < 117; i++) {
             filters.emplace_back(f_win_size, f_v_scale, f_fps);
         }
@@ -102,7 +102,14 @@ namespace eox {
             }
 
         } else {
-            prediction = false;
+
+            // retry but without prediction
+            if (prediction) {
+                prediction = false;
+                return inference(frame, segmented, debug);
+            }
+
+            // still nothing
             if (debug)
                 frame.copyTo(*debug);
         }
