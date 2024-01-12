@@ -4,6 +4,8 @@
 
 #include "blaze_pose.h"
 
+#include <filesystem>
+
 #include "tensorflow/lite/delegates/gpu/delegate.h"
 
 namespace eox::dnn {
@@ -28,7 +30,6 @@ namespace eox::dnn {
         return interpreter.output_tensor(4)->data.f;
     }
 
-    const std::string BlazePose::file = "./../models/blazepose_heavy_float32.tflite";
     const std::vector<std::string> BlazePose::outputs = {
             "Identity:0",   // 598 | 0: [1, 195]           landmarks 3d
             "Identity_4:0", // 600 | 1: [1, 117]           world 3d

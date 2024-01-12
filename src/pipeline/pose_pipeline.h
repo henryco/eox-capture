@@ -12,6 +12,7 @@
 #include "../aux/sig/velocity_filter.h"
 #include "../aux/dnn/blaze_pose.h"
 #include "../aux/dnn/roi/pose_roi.h"
+#include "../aux/dnn/pose_detector.h"
 
 namespace eox {
 
@@ -46,6 +47,7 @@ namespace eox {
     private:
         std::vector<eox::sig::VelocityFilter> filters;
         eox::dnn::PoseRoi roiPredictor;
+        eox::dnn::PoseDetector detector;
         eox::dnn::BlazePose pose;
 
         bool prediction = false;

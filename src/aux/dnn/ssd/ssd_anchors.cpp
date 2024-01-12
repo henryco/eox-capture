@@ -3,7 +3,6 @@
 //
 
 #include "ssd_anchors.h"
-#include "../dnn_common.h"
 
 #include <cmath>
 
@@ -92,12 +91,9 @@ namespace eox::dnn::ssd {
         return anchors;
     }
 
-    std::vector<eox::dnn::DetectedRegion> decode_bboxes(float score_thresh,
-                                                        const std::vector<float> &scores,
-                                                        const std::vector<std::vector<float>> &bboxes,
-                                                        const std::vector<std::vector<float>> &anchors,
-                                                        const float scale = 224.f,
-                                                        bool best_only = false) {
+    std::vector<eox::dnn::DetectedRegion>
+    decode_bboxes(float score_thresh, const std::vector<float> &scores, const std::vector<std::vector<float>> &bboxes,
+                  const std::vector<std::vector<float>> &anchors, const float scale, bool best_only) {
         std::vector<eox::dnn::DetectedRegion> regions;
 
         // Sigmoid and thresholding
@@ -150,7 +146,7 @@ namespace eox::dnn::ssd {
                             det_bbox[1],
                             det_bbox[2],
                             det_bbox[3]
-                            ),
+                    ),
                     key_points,
                     sigmoid_scores[idx]);
         }

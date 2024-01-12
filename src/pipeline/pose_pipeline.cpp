@@ -40,8 +40,11 @@ namespace eox {
             // crop using roi
             source = frame(cv::Rect(roi.x, roi.y, roi.w, roi.h));
         } else {
-            // use detector model TODO
-            log->debug("using pose detector");
+            // using pose detector
+            const auto detections = detector.inference(frame);
+            const auto &detected = detections[0];
+            // TODO
+
             roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.rows};
             source = frame;
         }

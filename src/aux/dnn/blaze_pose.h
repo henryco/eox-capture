@@ -10,7 +10,6 @@
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <filesystem>
 
 #include <tensorflow/lite/interpreter.h>
 #include <tensorflow/lite/kernels/register.h>
@@ -24,10 +23,10 @@ namespace eox::dnn {
                 spdlog::stdout_color_mt("blaze_pose");
 
     private:
-        static const size_t in_resolution = 256;
+        static inline const std::string file = "./../models/blazepose_heavy_float32.tflite";
+        static inline const size_t in_resolution = 256;
 
         static const std::vector<std::string> outputs;
-        static const std::string file;
 
         std::unique_ptr<tflite::FlatBufferModel> model;
         std::unique_ptr<tflite::Interpreter> interpreter;

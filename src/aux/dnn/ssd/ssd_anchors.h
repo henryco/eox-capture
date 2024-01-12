@@ -7,10 +7,9 @@
 
 #include <vector>
 #include <array>
+#include "../dnn_common.h"
 
 namespace eox::dnn::ssd {
-
-//    extern const
 
     struct SSDAnchorOptions {
         int num_layers;
@@ -31,6 +30,12 @@ namespace eox::dnn::ssd {
 
     std::vector<std::array<float, 4>> generate_anchors(const SSDAnchorOptions& options);
 
+    std::vector<eox::dnn::DetectedRegion> decode_bboxes(float score_thresh,
+                                                        const std::vector<float> &scores,
+                                                        const std::vector<std::vector<float>> &bboxes,
+                                                        const std::vector<std::vector<float>> &anchors,
+                                                        const float scale = 224.f,
+                                                        bool best_only = false);
 }
 
 #endif //STEREOX_SSD_ANCHORS_H

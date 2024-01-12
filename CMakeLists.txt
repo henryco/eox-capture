@@ -111,7 +111,9 @@ add_executable(${PROJECT_NAME}
         src/pipeline/pose_pipeline.cpp
         src/pipeline/pose_pipeline.h
         src/aux/dnn/ssd/ssd_anchors.h
-        src/aux/dnn/ssd/ssd_anchors.cpp)
+        src/aux/dnn/ssd/ssd_anchors.cpp
+        src/aux/dnn/pose_detector.cpp
+        src/aux/dnn/pose_detector.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}
