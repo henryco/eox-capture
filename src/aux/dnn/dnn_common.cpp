@@ -9,6 +9,9 @@
 
 namespace eox::dnn {
 
+    /**
+     * see media/pose_landmark_topology.svg
+     */
     const int body_joints[31][2] = {
             {0,  2},
             {0,  5},
@@ -60,7 +63,7 @@ namespace eox::dnn {
         if (in.cols != size || in.rows != size) {
 
             if (keep_aspect_ratio) {
-                // letterbox
+                // letterbox, preserving aspect ratio
                 const float r = (float) in.cols / (float) in.rows;
                 const int n_w = size * std::min(1.f, r);
                 const int n_h = n_w / std::max(1.f, r);
@@ -72,6 +75,7 @@ namespace eox::dnn {
                 cv::resize(in, roi, cv::Size(n_w, n_h),
                            0, 0, cv::INTER_CUBIC);
             } else {
+                // resize without preserving aspect ratio
                 cv::resize(in, blob, cv::Size(size, size),
                            0, 0, cv::INTER_CUBIC);
             }
@@ -79,6 +83,7 @@ namespace eox::dnn {
         } else {
             in.copyTo(blob);
         }
+
         cv::cvtColor(blob, blob, cv::COLOR_BGR2RGB);
         blob.convertTo(blob, CV_32FC3, 1.0 / 255.);
 

@@ -23,20 +23,20 @@ namespace eox::dnn {
         const auto &center = data.landmarks[33];
         const auto &end = data.landmarks[34];
 
-        const int x1 = center.x;
-        const int y1 = center.y;
-        const int x2 = end.x;
-        const int y2 = end.y;
+        const float x1 = center.x;
+        const float y1 = center.y;
+        const float x2 = end.x;
+        const float y2 = end.y;
 
-        const int radius = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2)) + margin;
-        const int x0 = x1 - radius;
-        const int y0 = y1 - radius;
+        const float radius = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2)) + margin;
+        const float x0 = x1 - radius;
+        const float y0 = y1 - radius;
 
         return {
-                .x = std::max(0, x0),
-                .y = std::max(0, y0 + fix_y),
-                .w = std::max(0, (radius * 2)),
-                .h = std::max(0, (radius * 2)),
+                .x = std::max(0.f, x0),
+                .y = std::max(0.f, y0 + fix_y),
+                .w = std::max(0.f, (radius * 2.f)),
+                .h = std::max(0.f, (radius * 2.f)),
         };
     }
 

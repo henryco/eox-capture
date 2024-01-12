@@ -143,7 +143,7 @@ namespace eox::dnn {
                 bboxes_vec,
                 anchors_vec,
                 in_resolution,
-                false);
+                true);
 
         // TODO fix letterboxes?
 

@@ -42,13 +42,21 @@ namespace eox {
         } else {
             // using pose detector
             const auto detections = detector.inference(frame);
-            const auto &detected = detections[0];
-            const auto &box = detected.roi;
 
-            log->info("score: {} | x: {}, y: {}, w: {}, h: {}", detected.score, box.x, box.y, box.w, box.h);
+            for (const auto &detected: detections) {
+                const auto &box = detected.roi;
+                log->info("score: {} | x: {}, y: {}, w: {}, h: {}", detected.score, box.x, box.y, box.w, box.h);
+                for (const auto &point: detected.key_points) {
+                    log->info("p: {}, {}", point.x, point.y);
+                }
+            }
+
             // TODO
 
-            roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.rows};
+            roi = {.x = 0, .y = 0, .w = (float) frame.cols, .h = (float) frame.rows};
+            for (auto &filter: filters) {
+                filter.reset();
+            }
             source = frame;
         }
 

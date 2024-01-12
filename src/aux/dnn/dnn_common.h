@@ -15,7 +15,7 @@ namespace eox::dnn {
     };
 
     using RoI = struct {
-        int x, y, w, h;
+        float x, y, w, h;
     };
 
     using Landmark = struct {
