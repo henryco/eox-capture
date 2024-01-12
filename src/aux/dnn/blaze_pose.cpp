@@ -4,13 +4,11 @@
 
 #include "blaze_pose.h"
 
+#include <filesystem>
+
 #include "tensorflow/lite/delegates/gpu/delegate.h"
 
 namespace eox::dnn {
-
-    double sigmoid(double x) {
-        return 1.0 / (1.0 + std::exp(-x));
-    }
 
     const float *lm_3d_1x195(const tflite::Interpreter &interpreter) {
         return interpreter.output_tensor(0)->data.f;
@@ -32,7 +30,6 @@ namespace eox::dnn {
         return interpreter.output_tensor(4)->data.f;
     }
 
-    const std::string BlazePose::file = "./../models/blazepose_heavy_float32.tflite";
     const std::vector<std::string> BlazePose::outputs = {
             "Identity:0",   // 598 | 0: [1, 195]           landmarks 3d
             "Identity_4:0", // 600 | 1: [1, 117]           world 3d
@@ -100,9 +97,13 @@ namespace eox::dnn {
 
     PoseOutput BlazePose::inference(cv::InputArray &frame) {
         cv::Mat blob;
-
+        cv::Mat ref = frame.getMat();
         {
-            cv::resize(frame.getMat(), blob, cv::Size(256, 256));
+            if (ref.cols != in_resolution || ref.rows != in_resolution) {
+                cv::resize(ref, blob, cv::Size(in_resolution, in_resolution));
+            } else {
+                ref.copyTo(blob);
+            }
             cv::cvtColor(blob, blob, cv::COLOR_BGR2RGB);
             blob.convertTo(blob, CV_32FC3, 1.0 / 255.);
         }
@@ -115,7 +116,7 @@ namespace eox::dnn {
         init();
 
         auto input = interpreter->input_tensor(0)->data.f;
-        std::memcpy(input, frame, 786432); // 256*256*3*4 = 786432
+        std::memcpy(input, frame, in_resolution * in_resolution * 3 * 4); // 256*256*3*4 = 786432
 
         if (interpreter->Invoke() != kTfLiteOk) {
             log->error("Failed to invoke interpreter");
@@ -127,39 +128,29 @@ namespace eox::dnn {
 
 
     PoseOutput BlazePose::process() {
+        PoseOutput output;
+
         const auto presence = *pose_flag_1x1(*interpreter);
+        output.score = presence;
 
         const float *land_marks_3d = lm_3d_1x195(*interpreter);
-
-        // normalized landmarks_3d
-        std::vector<eox::dnn::Landmark> lm_3d;
-        lm_3d.reserve(39);
         for (int i = 0; i < 39; i++) {
             const int k = i * 5;
-            lm_3d.push_back({
-                .x = land_marks_3d[k + 0] / 255.f,
-                .y = land_marks_3d[k + 1] / 255.f,
-                .z = land_marks_3d[k + 2] / 255.f,
-                .v = land_marks_3d[k + 3],
-                .p = land_marks_3d[k + 4],
-            });
+            // normalized landmarks_3d
+            output.landmarks_norm[i] = {
+                    .x = land_marks_3d[k + 0] / (float) in_resolution,
+                    .y = land_marks_3d[k + 1] / (float) in_resolution,
+                    .z = land_marks_3d[k + 2] / (float) in_resolution,
+                    .v = land_marks_3d[k + 3],
+                    .p = land_marks_3d[k + 4],
+            };
         }
 
         const float *s = segmentation_1x128x128x1(*interpreter);
-        std::vector<float> segmentation;
-        segmentation.reserve(16384); //128x128
-        for (int y = 0; y < 128; y++) {
-            for (int x = 0; x < 128; x++) {
-                // 1D row-column order for further oCV processing
-                segmentation.push_back(sigmoid(s[y * 128 + x]));
-            }
+        for (int i = 0; i < 128 * 128; i++) {
+            output.segmentation[i] = eox::dnn::sigmoid(s[i]);
         }
-
-        return {
-            .landmarks_norm = lm_3d,
-            .segmentation = segmentation,
-            .presence = presence
-        };
+        return output;
     }
 
 } // eox

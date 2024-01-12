@@ -10,7 +10,6 @@
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <filesystem>
 
 #include <tensorflow/lite/interpreter.h>
 #include <tensorflow/lite/kernels/register.h>
@@ -19,31 +18,15 @@
 
 namespace eox::dnn {
 
-    using PoseOutput = struct {
-
-        /**
-         * 39x5 normalized [0,1] landmarks
-         */
-        std::vector<eox::dnn::Landmark> landmarks_norm;
-
-        /**
-         * 1D 128x128 float32 array
-         */
-        std::vector<float> segmentation;
-
-        /**
-         * Probability [0,1]
-         */
-        float presence;
-    };
-
     class BlazePose {
         static inline const auto log =
                 spdlog::stdout_color_mt("blaze_pose");
 
     private:
+        static inline const std::string file = "./../models/blazepose_heavy_float32.tflite";
+        static inline const size_t in_resolution = 256;
+
         static const std::vector<std::string> outputs;
-        static const std::string file;
 
         std::unique_ptr<tflite::FlatBufferModel> model;
         std::unique_ptr<tflite::Interpreter> interpreter;
@@ -61,8 +44,14 @@ namespace eox::dnn {
 
         void init();
 
+        /**
+         * @param frame BGR image (ie. cv::Mat of CV_8UC3)
+         */
         PoseOutput inference(cv::InputArray &frame);
 
+        /**
+         * @param frame pointer to 256x256 row-oriented 1D array representation of 256x256x3 RGB image
+         */
         PoseOutput inference(const float *frame);
     };
 

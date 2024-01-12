@@ -9,9 +9,9 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "../aux/gtk/gtk_eox_window.h"
-#include "../aux/dnn/blaze_pose.h"
 #include "../aux/gtk/gl_image.h"
 #include "../aux/utils/loop/delta_loop.h"
+#include "../pipeline/pose_pipeline.h"
 
 namespace eox {
 
@@ -23,7 +23,7 @@ namespace eox {
     private:
         eox::util::DeltaLoop deltaLoop;
         eox::xgtk::GLImage glImage;
-        eox::dnn::BlazePose pose;
+        eox::PosePipeline pipeline;
 
         cv::Mat frame;
 
