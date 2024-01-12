@@ -96,18 +96,7 @@ namespace eox::dnn {
     }
 
     PoseOutput BlazePose::inference(cv::InputArray &frame) {
-        cv::Mat blob;
-        cv::Mat ref = frame.getMat();
-        {
-            if (ref.cols != in_resolution || ref.rows != in_resolution) {
-                cv::resize(ref, blob, cv::Size(in_resolution, in_resolution),
-                           0, 0, cv::INTER_CUBIC);
-            } else {
-                ref.copyTo(blob);
-            }
-            cv::cvtColor(blob, blob, cv::COLOR_BGR2RGB);
-            blob.convertTo(blob, CV_32FC3, 1.0 / 255.);
-        }
+        cv::Mat blob = eox::dnn::convert_to_squared_blob(frame.getMat(), in_resolution);
 
         // [1, 3, 256, 256]
         return inference(blob.ptr<float>(0));

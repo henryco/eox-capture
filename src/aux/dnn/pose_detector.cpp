@@ -112,27 +112,7 @@ namespace eox::dnn {
     }
 
     std::vector<eox::dnn::DetectedRegion> PoseDetector::inference(cv::InputArray &frame) {
-        cv::Mat blob;
-        cv::Mat ref = frame.getMat();
-        {
-            if (ref.cols != in_resolution || ref.rows != in_resolution) {
-                const float r = (float) ref.cols / (float) ref.rows;
-                const int n_w = in_resolution * std::min(1.f, r);
-                const int n_h = n_w / std::max(1.f, r);
-                const int s_x = (in_resolution - n_w) / 2;
-                const int s_y = (in_resolution - n_h) / 2;
-
-                blob = cv::Mat::zeros(cv::Size(in_resolution, in_resolution), CV_8UC3);
-                cv::Mat roi = blob(cv::Rect(s_x, s_y, n_w, n_h));
-                cv::resize(ref, roi, cv::Size(n_w, n_h),
-                           0, 0, cv::INTER_CUBIC);
-            } else {
-                ref.copyTo(blob);
-            }
-            cv::cvtColor(blob, blob, cv::COLOR_BGR2RGB);
-            blob.convertTo(blob, CV_32FC3, 1.0 / 255.);
-        }
-
+        cv::Mat blob = eox::dnn::convert_to_squared_blob(frame.getMat(), in_resolution, true);
         return inference(blob.ptr<float>(0));
     }
 

@@ -6,6 +6,7 @@
 #define STEREOX_DNN_COMMON_H
 
 #include <vector>
+#include <opencv2/core/mat.hpp>
 
 namespace eox::dnn {
 
@@ -79,6 +80,8 @@ namespace eox::dnn {
     extern const int body_joints[31][2];
 
     double sigmoid(double x);
+
+    cv::Mat convert_to_squared_blob(const cv::Mat &in, int size, bool keep_aspect_ratio = false);
 }
 
 #endif //STEREOX_DNN_COMMON_H
