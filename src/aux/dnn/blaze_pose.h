@@ -24,6 +24,8 @@ namespace eox::dnn {
                 spdlog::stdout_color_mt("blaze_pose");
 
     private:
+        static const size_t in_resolution = 256;
+
         static const std::vector<std::string> outputs;
         static const std::string file;
 

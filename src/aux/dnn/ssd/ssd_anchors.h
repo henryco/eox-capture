@@ -10,6 +10,8 @@
 
 namespace eox::dnn::ssd {
 
+//    extern const
+
     struct SSDAnchorOptions {
         int num_layers;
         float min_scale;

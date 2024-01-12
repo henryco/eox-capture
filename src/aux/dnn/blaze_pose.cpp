@@ -98,8 +98,8 @@ namespace eox::dnn {
         cv::Mat blob;
         cv::Mat ref = frame.getMat();
         {
-            if (ref.cols != 256 || ref.rows != 256) {
-                cv::resize(ref, blob, cv::Size(256, 256));
+            if (ref.cols != in_resolution || ref.rows != in_resolution) {
+                cv::resize(ref, blob, cv::Size(in_resolution, in_resolution));
             } else {
                 ref.copyTo(blob);
             }
@@ -115,7 +115,7 @@ namespace eox::dnn {
         init();
 
         auto input = interpreter->input_tensor(0)->data.f;
-        std::memcpy(input, frame, 786432); // 256*256*3*4 = 786432
+        std::memcpy(input, frame, in_resolution * in_resolution * 3 * 4); // 256*256*3*4 = 786432
 
         if (interpreter->Invoke() != kTfLiteOk) {
             log->error("Failed to invoke interpreter");
@@ -137,9 +137,9 @@ namespace eox::dnn {
             const int k = i * 5;
             // normalized landmarks_3d
             output.landmarks_norm[i] = {
-                    .x = land_marks_3d[k + 0] / 255.f,
-                    .y = land_marks_3d[k + 1] / 255.f,
-                    .z = land_marks_3d[k + 2] / 255.f,
+                    .x = land_marks_3d[k + 0] / (float) in_resolution,
+                    .y = land_marks_3d[k + 1] / (float) in_resolution,
+                    .z = land_marks_3d[k + 2] / (float) in_resolution,
                     .v = land_marks_3d[k + 3],
                     .p = land_marks_3d[k + 4],
             };

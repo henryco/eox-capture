@@ -92,10 +92,11 @@ namespace eox::dnn::ssd {
         return anchors;
     }
 
-
-    std::vector<eox::dnn::DetectedRegion> decode_bboxes(float score_thresh, const std::vector<float> &scores,
+    std::vector<eox::dnn::DetectedRegion> decode_bboxes(float score_thresh,
+                                                        const std::vector<float> &scores,
                                                         const std::vector<std::vector<float>> &bboxes,
                                                         const std::vector<std::vector<float>> &anchors,
+                                                        const float scale = 224.f,
                                                         bool best_only = false) {
         std::vector<eox::dnn::DetectedRegion> regions;
 
@@ -118,8 +119,6 @@ namespace eox::dnn::ssd {
             }
             if (valid_indices.empty()) return regions;
         }
-
-        const float scale = 224.0f;
 
         for (auto idx: valid_indices) {
             std::vector<float> det_bbox = bboxes[idx];
