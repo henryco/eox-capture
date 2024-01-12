@@ -10,6 +10,16 @@
 
 namespace eox::dnn {
 
+    namespace dtc {
+        const float *detector_bboxes_1x2254x12(const tflite::Interpreter &interpreter) {
+            return interpreter.output_tensor(0)->data.f;
+        }
+
+        const float *detector_scores_1x2254x1(const tflite::Interpreter &interpreter) {
+            return interpreter.output_tensor(1)->data.f;
+        }
+    }
+
     const std::vector<std::string> PoseDetector::outputs = {
             "Identity",   // 441  | 0: [1, 2254, 12]           un-decoded face bboxes location and key-points
             "Identity_1", // 1429 | 4: [1, 2254, 1]            scores of the detected bboxes
@@ -33,6 +43,21 @@ namespace eox::dnn {
             return;
 
         log->info("INIT");
+
+        anchors_vec = eox::dnn::ssd::generate_anchors(eox::dnn::ssd::SSDAnchorOptions(
+                5,
+                0.15,
+                0.75,
+                in_resolution,
+                in_resolution,
+                0.5,
+                0.5,
+                {8, 16, 32, 32, 32},
+                {1.0},
+                false,
+                1.0,
+                true
+                ));
 
         model = std::move(tflite::FlatBufferModel::BuildFromFile(file.c_str()));
         if (!model) {
@@ -65,7 +90,7 @@ namespace eox::dnn {
             log->info("T_O: {}, {}, {}", item, i, interpreter->GetOutputName(i));
 
             auto tensor = interpreter->output_tensor(i);
-            log->info("type: {}", tensor->bytes);
+            log->info("size: {}", tensor->bytes);
             i++;
         }
 
@@ -90,9 +115,17 @@ namespace eox::dnn {
         cv::Mat blob;
         cv::Mat ref = frame.getMat();
         {
-            // TODO FIXME: add letterboxes
             if (ref.cols != in_resolution || ref.rows != in_resolution) {
-                cv::resize(ref, blob, cv::Size(in_resolution, in_resolution));
+                const float r = (float) ref.cols / (float) ref.rows;
+                const int n_w = in_resolution * std::min(1.f, r);
+                const int n_h = n_w / std::max(1.f, r);
+                const int s_x = (in_resolution - n_w) / 2;
+                const int s_y = (in_resolution - n_h) / 2;
+
+                blob = cv::Mat::zeros(cv::Size(in_resolution, in_resolution), CV_8UC3);
+                cv::Mat roi = blob(cv::Rect(s_x, s_y, n_w, n_h));
+                cv::resize(ref, roi, cv::Size(n_w, n_h),
+                           0, 0, cv::INTER_CUBIC);
             } else {
                 ref.copyTo(blob);
             }
@@ -104,8 +137,45 @@ namespace eox::dnn {
     }
 
     std::vector<eox::dnn::DetectedRegion> PoseDetector::process() {
-        // TODO
-        return {};
+
+        const auto bboxes = dtc::detector_bboxes_1x2254x12(*interpreter);
+        const auto scores = dtc::detector_scores_1x2254x1(*interpreter);
+
+        std::vector<float> scores_vec;
+        std::vector<std::array<float, 12>> bboxes_vec;
+
+        scores_vec.reserve(2254);
+        bboxes_vec.reserve(2254);
+
+        for (int i = 0; i < 2254; i++) {
+            scores_vec.push_back(scores[i]);
+
+            std::array<float, 12> det_bbox{};
+            for (int k = 0; k < 12; k++) {
+                det_bbox[k] = bboxes[i * 12 + k];
+            }
+            bboxes_vec.push_back(det_bbox);
+        }
+
+        auto boxes = eox::dnn::ssd::decode_bboxes(
+                threshold,
+                scores_vec,
+                bboxes_vec,
+                anchors_vec,
+                in_resolution,
+                false);
+
+        // TODO fix letterboxes?
+
+        return boxes;
+    }
+
+    float PoseDetector::getThreshold() const {
+        return threshold;
+    }
+
+    void PoseDetector::setThreshold(float _threshold) {
+        threshold = _threshold;
     }
 
 } // eox

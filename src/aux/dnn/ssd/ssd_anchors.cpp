@@ -91,9 +91,13 @@ namespace eox::dnn::ssd {
         return anchors;
     }
 
-    std::vector<eox::dnn::DetectedRegion>
-    decode_bboxes(float score_thresh, const std::vector<float> &scores, const std::vector<std::vector<float>> &bboxes,
-                  const std::vector<std::vector<float>> &anchors, const float scale, bool best_only) {
+    std::vector<eox::dnn::DetectedRegion> decode_bboxes(float score_thresh,
+                                                        const std::vector<float> &scores,
+                                                        const std::vector<std::array<float, 12>> &bboxes,
+                                                        const std::vector<std::array<float, 4>> &anchors,
+                                                        const float scale,
+                                                        bool best_only) {
+        // output vector
         std::vector<eox::dnn::DetectedRegion> regions;
 
         // Sigmoid and thresholding
@@ -117,8 +121,8 @@ namespace eox::dnn::ssd {
         }
 
         for (auto idx: valid_indices) {
-            std::vector<float> det_bbox = bboxes[idx];
-            std::vector<float> anchor = anchors[idx];
+            std::array<float, 12> det_bbox = bboxes[idx];
+            std::array<float, 4> anchor = anchors[idx];
 
             // Apply scale and anchor adjustments
             for (size_t i = 0; i < det_bbox.size(); i += 2) {

@@ -88,7 +88,7 @@ namespace eox::dnn {
             log->info("T_O: {}, {}, {}", item, i, interpreter->GetOutputName(i));
 
             auto tensor = interpreter->output_tensor(i);
-            log->info("type: {}", tensor->bytes);
+            log->info("size: {}", tensor->bytes);
             i++;
         }
 
@@ -100,7 +100,8 @@ namespace eox::dnn {
         cv::Mat ref = frame.getMat();
         {
             if (ref.cols != in_resolution || ref.rows != in_resolution) {
-                cv::resize(ref, blob, cv::Size(in_resolution, in_resolution));
+                cv::resize(ref, blob, cv::Size(in_resolution, in_resolution),
+                           0, 0, cv::INTER_CUBIC);
             } else {
                 ref.copyTo(blob);
             }

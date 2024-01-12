@@ -43,6 +43,9 @@ namespace eox {
             // using pose detector
             const auto detections = detector.inference(frame);
             const auto &detected = detections[0];
+            const auto &box = detected.roi;
+
+            log->info("score: {} | x: {}, y: {}, w: {}, h: {}", detected.score, box.x, box.y, box.w, box.h);
             // TODO
 
             roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.rows};
