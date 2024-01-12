@@ -8,6 +8,15 @@
 #include <vector>
 
 namespace eox::dnn {
+
+    using Point = struct {
+        float x, y;
+    };
+
+    using RoI = struct {
+        int x, y, w, h;
+    };
+
     using Landmark = struct {
 
         /**
@@ -51,12 +60,21 @@ namespace eox::dnn {
         /**
          * Probability [0,1]
          */
-        float presence;
+        float score;
     };
 
-    using RoI = struct {
-        int x, y, w, h;
+    using DetectedRegion = struct {
+
+        RoI roi;
+
+        std::vector<Point> key_points;
+
+        /**
+         * Probability [0,1]
+         */
+        float score;
     };
+
 
     extern const int body_joints[31][2];
 

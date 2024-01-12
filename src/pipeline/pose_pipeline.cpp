@@ -49,7 +49,7 @@ namespace eox {
         auto result = pose.inference(source);
         const auto now = timestamp();
 
-        if (result.presence > threshold) {
+        if (result.score > threshold) {
             eox::dnn::Landmark landmarks[39];
             for (int i = 0; i < 39; i++) {
                 landmarks[i] = {
@@ -97,7 +97,7 @@ namespace eox {
                 for (int i = 0; i < 128 * 128; i++)
                     output.segmentation[i] = result.segmentation[i];
 
-                output.score = result.presence;
+                output.score = result.score;
                 output.present = true;
             }
 

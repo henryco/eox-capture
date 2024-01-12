@@ -109,7 +109,9 @@ add_executable(${PROJECT_NAME}
         src/aux/dnn/roi/pose_roi.h
         src/aux/dnn/roi/RoiPredictor.h
         src/pipeline/pose_pipeline.cpp
-        src/pipeline/pose_pipeline.h)
+        src/pipeline/pose_pipeline.h
+        src/aux/dnn/ssd/ssd_anchors.h
+        src/aux/dnn/ssd/ssd_anchors.cpp)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}

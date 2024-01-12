@@ -130,7 +130,7 @@ namespace eox::dnn {
         PoseOutput output;
 
         const auto presence = *pose_flag_1x1(*interpreter);
-        output.presence = presence;
+        output.score = presence;
 
         const float *land_marks_3d = lm_3d_1x195(*interpreter);
         for (int i = 0; i < 39; i++) {
