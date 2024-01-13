@@ -18,6 +18,37 @@ namespace eox::dnn {
         const float *detector_scores_1x2254x1(const tflite::Interpreter &interpreter) {
             return interpreter.output_tensor(1)->data.f;
         }
+
+        double normalize_radians(double angle) {
+            return angle - 2 * M_PI * floor((angle + M_PI) / (2 * M_PI));
+        }
+
+        // TODO FIXME REPLACE WITH ROI PREDICTOR
+        void detections_to_rect(std::vector<eox::dnn::DetectedRegion> &regions) {
+            const double target_angle = M_PI * 0.5; // 90 degrees in radians
+            for (auto &region: regions) {
+                // mid-hip center
+                const auto &x_center = region.key_points[0].x;
+                const auto &y_center = region.key_points[0].y;
+
+                // point that encodes size & rotation (for full body)
+                const auto &x_scale = region.key_points[1].x;
+                const auto &y_scale = region.key_points[1].y;
+
+                // 2xRadius, where the radius is just a Euclidean distance between two points
+                const auto radius = sqrt(
+                        std::pow((x_scale - x_center), 2)
+                        + std::pow((y_scale - y_center), 2));
+
+                region.width = radius * 2 * 1.25;
+                region.height = radius * 2 * 1.25;
+                region.center_x = x_center;
+                region.center_y = y_center;
+
+                const float rotation = target_angle - atan2(-(y_scale - y_center), x_scale - x_center);
+                region.rotation = normalize_radians(rotation);
+            }
+        }
     }
 
     const std::vector<std::string> PoseDetector::outputs = {
@@ -57,7 +88,7 @@ namespace eox::dnn {
                 false,
                 1.0,
                 true
-                ));
+        ));
 
         model = std::move(tflite::FlatBufferModel::BuildFromFile(file.c_str()));
         if (!model) {
@@ -150,19 +181,27 @@ namespace eox::dnn {
                 true);
 
         // correcting letterbox paddings
-        const auto p = eox::dnn::get_letterbox_paddings(view_w, view_h, 224);
+        const auto p = eox::dnn::get_letterbox_paddings(view_w, view_h, in_resolution);
         const auto n_w = in_resolution - (p.left + p.right);
         const auto n_h = in_resolution - (p.top + p.bottom);
 
+        eox::dnn::dtc::detections_to_rect(boxes);
+
         for (auto &box: boxes) {
-            box.roi.x = ((box.roi.x * (float) in_resolution) - p.left) / n_w;
-            box.roi.w = ((box.roi.w * (float) in_resolution)) / n_w;
-            box.roi.y = ((box.roi.y * (float) in_resolution) - p.top) / n_h;
-            box.roi.h = ((box.roi.h * (float) in_resolution)) / n_h;
+            box.box.x = ((box.box.x * (float) in_resolution) - p.left) / n_w;
+            box.box.w = ((box.box.w * (float) in_resolution)) / n_w;
+            box.box.y = ((box.box.y * (float) in_resolution) - p.top) / n_h;
+            box.box.h = ((box.box.h * (float) in_resolution)) / n_h;
+
+            box.center_x = ((box.center_x * (float) in_resolution) - p.left) / n_w;
+            box.center_y = ((box.center_y * (float) in_resolution) - p.top) / n_h;
+            box.width =  ((box.width * (float) in_resolution)) / n_w;
+            box.height =  ((box.height * (float) in_resolution)) / n_h;
 
             for (auto &point: box.key_points) {
                 point.x = ((point.x * (float) in_resolution) - p.left) / n_w;
-                point.y = ((point.y * (float) in_resolution) - p.top) / n_w;
+                // problem was here, n_w instead of n_h
+                point.y = ((point.y * (float) in_resolution) - p.top) / n_h;
             }
         }
 

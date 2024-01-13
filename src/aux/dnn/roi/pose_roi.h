@@ -18,6 +18,8 @@ namespace eox::dnn {
 
     PoseRoiInput roiFromPoseLandmarks39(const Landmark landmarks[39]);
 
+    PoseRoiInput roiFromPoints(const float mid[2], const float end[2]);
+
     class PoseRoi : eox::dnn::RoiPredictor {
 
         static inline const auto log =

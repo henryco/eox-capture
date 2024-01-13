@@ -12,6 +12,8 @@
 namespace eox {
 
     void UiPose::init(eox::data::basic_config configuration) {
+//        const auto image = cv::imread("./../media/pose4.png", cv::IMREAD_COLOR);
+//        const auto image = cv::imread("./../media/pose3.png", cv::IMREAD_COLOR);
         const auto image = cv::imread("./../media/pose2.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/nino.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/rosemi.png", cv::IMREAD_COLOR);
@@ -72,7 +74,7 @@ namespace eox {
                         0.01,
                         0.5,
                         0,
-                        10
+                        100
                 );
                 control->digits(2);
 

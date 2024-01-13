@@ -35,8 +35,8 @@ namespace eox::dnn {
         std::vector<std::array<float, 4>> anchors_vec;
         float threshold = 0.5;
 
-        int view_w;
-        int view_h;
+        int view_w = 0;
+        int view_h = 0;
 
     protected:
         std::vector<eox::dnn::DetectedRegion> process();

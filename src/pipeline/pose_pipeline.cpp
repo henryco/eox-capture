@@ -37,27 +37,91 @@ namespace eox {
         cv::Mat source;
 
         if (prediction) {
+
             // crop using roi
+            const int end_x = roi.x + roi.w;
+            const int end_y = roi.y + roi.h;
+
+            if (end_x > frame.cols) {
+                roi.x -= (end_x - frame.cols);
+            }
+            if (end_y > frame.rows) {
+                roi.y -= (end_y - frame.rows);
+            }
+
+            roi.x = (int) std::max(0.f, roi.x);
+            roi.y = (int) std::max(0.f, roi.y);
+            roi.w = (int) std::min(frame.cols - roi.x, roi.w);
+            roi.h = (int) std::min(frame.rows - roi.y, roi.h);
+
             source = frame(cv::Rect(roi.x, roi.y, roi.w, roi.h));
         } else {
             // using pose detector
             const auto detections = detector.inference(frame);
 
-            for (const auto &detected: detections) {
-                const auto &box = detected.roi;
-                log->info("score: {} | x: {}, y: {}, w: {}, h: {}", detected.score, box.x, box.y, box.w, box.h);
-                for (const auto &point: detected.key_points) {
-                    log->info("p: {}, {}", point.x, point.y);
-                }
+            if (detections.empty()) {
+                output.present = false;
+                output.score = 0;
+                return output;
             }
 
             // TODO
+
+//            log->info("x: {}, y: {}, w: {}, h: {}", box.x, box.y, box.w, box.h);
 
             roi = {.x = 0, .y = 0, .w = (float) frame.cols, .h = (float) frame.rows};
             for (auto &filter: filters) {
                 filter.reset();
             }
             source = frame;
+
+            if (debug) {
+                source.copyTo(*debug);
+
+
+                for (auto &detected: detections) {
+
+                    log->info("dx: {}, dy: {}, dw: {}, dh: {}", detected.center_x, detected.center_y, detected.width,
+                              detected.height);
+                    log->info("rotation: {}", detected.rotation);
+                    auto box = detected.box;
+                    box.x *= frame.cols;
+                    box.y *= frame.rows;
+                    box.w *= frame.cols;
+                    box.h *= frame.rows;
+
+                    auto p1 = cv::Point(
+                            (detected.center_x - (detected.width / 2)) * frame.cols,
+                            (detected.center_y - (detected.height / 2)) * frame.rows);
+                    auto p2 = cv::Point(
+                            p1.x + (detected.width * frame.cols),
+                            p1.y + (detected.height * frame.rows));
+
+
+                    cv::Scalar color(0, 255, 0);
+                    cv::line(*debug, p1, cv::Point(p2.x, p1.y), color, 2);
+                    cv::line(*debug, p1, cv::Point(p1.x, p2.y), color, 2);
+                    cv::line(*debug, p2, cv::Point(p1.x, p2.y), color, 2);
+                    cv::line(*debug, p2, cv::Point(p2.x, p1.y), color, 2);
+
+                    log->info("");
+                    int i = 0;
+                    for (auto &point: detected.key_points) {
+
+                        cv::Point circle(point.x * frame.cols, point.y * frame.rows);
+                        cv::circle(*debug, circle, 2, cv::Scalar(0, 255, 230), 2);
+
+                        cv::putText(*debug, std::to_string(i), cv::Point(circle.x - 10, circle.y - 10),
+                                    cv::FONT_HERSHEY_PLAIN, 1,
+                                    cv::Scalar(255, 0, 255));
+                        i++;
+                    }
+                }
+
+
+
+            }
+
         }
 
         auto result = pose.inference(source);
@@ -124,8 +188,8 @@ namespace eox {
             }
 
             // still nothing
-            if (debug)
-                frame.copyTo(*debug);
+//            if (debug)
+//                frame.copyTo(*debug);
         }
 
         return output;

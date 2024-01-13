@@ -73,14 +73,33 @@ namespace eox::dnn {
 
     using DetectedRegion = struct {
 
-        RoI roi;
+        /**
+         * Detected SSD box
+         */
+        RoI box;
 
+        /**
+         * Key point 0 - mid hip center
+         * Key point 1 - point that encodes size & rotation (for full body)
+         * Key point 2 - mid shoulder center
+         * Key point 3 - point that encodes size & rotation (for upper body)
+         */
         std::vector<Point> key_points;
 
         /**
          * Probability [0,1]
          */
         float score;
+
+        /**
+         * from -Pi to Pi radians
+         */
+        float rotation;
+
+        float width;
+        float height;
+        float center_x;
+        float center_y;
     };
 
 
