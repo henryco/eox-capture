@@ -104,5 +104,26 @@ namespace eox::dnn {
         };
     }
 
+    RoI clamp_roi(const RoI &in, int width, int height) {
+        auto roi = RoI(in.x, in.y, in.w, in.h);
+
+        const int end_x = roi.x + roi.w;
+        const int end_y = roi.y + roi.h;
+
+        if (end_x > width) {
+            roi.x -= (end_x - width);
+        }
+        if (end_y > height) {
+            roi.y -= (end_y - height);
+        }
+
+        roi.x = (int) std::max(0.f, roi.x);
+        roi.y = (int) std::max(0.f, roi.y);
+        roi.w = (int) std::min(width - roi.x, roi.w);
+        roi.h = (int) std::min(height - roi.y, roi.h);
+
+        return roi;
+    }
+
 
 }

@@ -26,8 +26,11 @@ namespace eox::dnn {
                 spdlog::stdout_color_mt("pose_roi_predictor");
 
     private:
-        int fix_y = 10;
-        int margin = 10;
+        float scale_x = 1;
+        float scale_y = 1;
+        float fix_x = 0;
+        float fix_y = 0;
+        float margin = 0;
 
     public:
         RoI forward(void *data) override;
@@ -36,11 +39,25 @@ namespace eox::dnn {
 
         [[nodiscard]] int getMargin() const;
 
+        [[nodiscard]] int getFixX() const;
+
         [[nodiscard]] int getFixY() const;
 
-        PoseRoi &setMargin(int margin);
+        [[nodiscard]] int getScaleX() const;
 
-        PoseRoi &setFixY(int fixY);
+        [[nodiscard]] int getScaleY() const;
+
+        PoseRoi &setMargin(float margin);
+
+        PoseRoi &setFixX(float fixX);
+
+        PoseRoi &setFixY(float fixY);
+
+        PoseRoi &setScaleX(float x);
+
+        PoseRoi &setScaleY(float y);
+
+        PoseRoi &setScale(float s);
     };
 
 } // eox

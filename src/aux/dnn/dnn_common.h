@@ -96,10 +96,6 @@ namespace eox::dnn {
          */
         float rotation;
 
-        float width;
-        float height;
-        float center_x;
-        float center_y;
     };
 
 
@@ -111,6 +107,7 @@ namespace eox::dnn {
 
     cv::Mat convert_to_squared_blob(const cv::Mat &in, int size, bool keep_aspect_ratio = false);
 
+    RoI clamp_roi(const eox::dnn::RoI &roi, int width, int height);
 }
 
 #endif //STEREOX_DNN_COMMON_H

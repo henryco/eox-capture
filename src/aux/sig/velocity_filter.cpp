@@ -14,6 +14,7 @@ namespace eox::sig {
               window_size(std::max(1, w_size)) {
     }
 
+    // TODO FIXME
     float VelocityFilter::filter(std::chrono::nanoseconds timestamp, float value, float scale) {
         float alpha = NAN;
 
