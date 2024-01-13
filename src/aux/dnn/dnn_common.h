@@ -6,15 +6,23 @@
 #define STEREOX_DNN_COMMON_H
 
 #include <vector>
+#include <opencv2/core/mat.hpp>
 
 namespace eox::dnn {
+
+    using Paddings = struct {
+        float left;
+        float right;
+        float top;
+        float bottom;
+    };
 
     using Point = struct {
         float x, y;
     };
 
     using RoI = struct {
-        int x, y, w, h;
+        float x, y, w, h;
     };
 
     using Landmark = struct {
@@ -65,20 +73,41 @@ namespace eox::dnn {
 
     using DetectedRegion = struct {
 
-        RoI roi;
+        /**
+         * Detected SSD box
+         */
+        RoI box;
 
+        /**
+         * Key point 0 - mid hip center
+         * Key point 1 - point that encodes size & rotation (for full body)
+         * Key point 2 - mid shoulder center
+         * Key point 3 - point that encodes size & rotation (for upper body)
+         */
         std::vector<Point> key_points;
 
         /**
          * Probability [0,1]
          */
         float score;
+
+        /**
+         * from -Pi to Pi radians
+         */
+        float rotation;
+
     };
 
 
     extern const int body_joints[31][2];
 
     double sigmoid(double x);
+
+    Paddings get_letterbox_paddings(int width, int height, int size);
+
+    cv::Mat convert_to_squared_blob(const cv::Mat &in, int size, bool keep_aspect_ratio = false);
+
+    RoI clamp_roi(const eox::dnn::RoI &roi, int width, int height);
 }
 
 #endif //STEREOX_DNN_COMMON_H

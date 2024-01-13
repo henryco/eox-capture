@@ -12,13 +12,16 @@
 namespace eox {
 
     void UiPose::init(eox::data::basic_config configuration) {
-        const auto image = cv::imread("./../media/pose2.png", cv::IMREAD_COLOR);
+//        const auto image = cv::imread("./../media/pose4.png", cv::IMREAD_COLOR);
+        const auto image = cv::imread("./../media/pose3.png", cv::IMREAD_COLOR);
+//        const auto image = cv::imread("./../media/pose2.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/nino.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/rosemi.png", cv::IMREAD_COLOR);
         cv::resize(image, frame, cv::Size(640, 480));
 
         {
-            pipeline.setThreshold(0.5f);
+            pipeline.setDetectorThreshold(0.5f);
+            pipeline.setPoseThreshold(0.5f);
             pipeline.init();
         }
 
@@ -43,11 +46,32 @@ namespace eox {
             {
                 auto control = Gtk::make_managed<eox::gtk::GtkControl>(
                         ([this](double value) {
-                            pipeline.setThreshold((float) value);
+                            pipeline.setPoseThreshold((float) value);
                             return value;
                         }),
-                        "Threshold",
-                        pipeline.getThreshold(),
+                        "PoseThreshold",
+                        pipeline.getPoseThreshold(),
+                        0.01,
+                        0.5,
+                        0.0,
+                        1.0
+                );
+                control->digits(2);
+
+                auto box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                box->set_size_request(400, 50);
+                box->pack_start(*control);
+                control_box_v->pack_start(*box, Gtk::PACK_SHRINK);
+            }
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        ([this](double value) {
+                            pipeline.setDetectorThreshold((float) value);
+                            return value;
+                        }),
+                        "DetectorThreshold",
+                        pipeline.getDetectorThreshold(),
                         0.01,
                         0.5,
                         0.0,
@@ -72,7 +96,7 @@ namespace eox {
                         0.01,
                         0.5,
                         0,
-                        10
+                        100
                 );
                 control->digits(2);
 

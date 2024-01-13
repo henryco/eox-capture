@@ -29,6 +29,10 @@ namespace eox {
     }
 
     PosePipelineOutput PosePipeline::inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *debug) {
+        constexpr float MARGIN = 10;
+        constexpr float FIX_X = 0;
+        constexpr float FIX_Y = 10;
+
         if (!initialized) {
             init();
         }
@@ -38,21 +42,55 @@ namespace eox {
 
         if (prediction) {
             // crop using roi
+            roi = eox::dnn::clamp_roi(roi, frame.cols, frame.rows);
             source = frame(cv::Rect(roi.x, roi.y, roi.w, roi.h));
-        } else {
-            // using pose detector
-            const auto detections = detector.inference(frame);
-            const auto &detected = detections[0];
-            // TODO
+        }
 
-            roi = {.x = 0, .y = 0, .w = frame.cols, .h = frame.rows};
-            source = frame;
+        if (!prediction) {
+            // using pose detector
+            auto detections = detector.inference(frame);
+
+            if (detections.empty() || detections[0].score < threshold_detector) {
+                output.present = false;
+                output.score = 0;
+
+                if (debug)
+                    frame.copyTo(*debug);
+
+                return output;
+            }
+
+            auto &detected = detections[0];
+
+            auto &body = detected.body;
+            body.x *= frame.cols;
+            body.y *= frame.rows;
+            body.w *= frame.cols;
+            body.h *= frame.rows;
+
+            body.x += FIX_X - (MARGIN / 2.f);
+            body.y += FIX_Y - (MARGIN / 2.f);
+            body.w += (MARGIN / 2.f);
+            body.h += (MARGIN / 2.f);
+
+            auto &face = detected.face;
+            face.x *= frame.cols;
+            face.y *= frame.rows;
+            face.w *= frame.cols;
+            face.h *= frame.rows;
+
+            roi = eox::dnn::clamp_roi(body, frame.cols, frame.rows);
+            source = frame(cv::Rect(roi.x, roi.y, roi.w, roi.h));
+
+            for (auto &filter: filters) {
+                filter.reset();
+            }
         }
 
         auto result = pose.inference(source);
         const auto now = timestamp();
 
-        if (result.score > threshold) {
+        if (result.score > threshold_pose) {
             eox::dnn::Landmark landmarks[39];
             for (int i = 0; i < 39; i++) {
                 landmarks[i] = {
@@ -90,7 +128,11 @@ namespace eox {
             }
 
             // predict new roi
-            roi = roiPredictor.forward(eox::dnn::roiFromPoseLandmarks39(landmarks));
+            roi = roiPredictor
+                    .setMargin(MARGIN)
+                    .setFixX(FIX_X)
+                    .setFixY(FIX_Y)
+                    .forward(eox::dnn::roiFromPoseLandmarks39(landmarks));
             prediction = true;
 
             // output
@@ -113,8 +155,10 @@ namespace eox {
             }
 
             // still nothing
-            if (debug)
+            if (debug) {
                 frame.copyTo(*debug);
+                drawRoi(*debug);
+            }
         }
 
         return output;
@@ -140,7 +184,7 @@ namespace eox {
         for (auto bone: eox::dnn::body_joints) {
             const auto &start = landmarks[bone[0]];
             const auto &end = landmarks[bone[1]];
-            if (eox::dnn::sigmoid(start.p) > threshold && eox::dnn::sigmoid(end.p) > threshold) {
+            if (eox::dnn::sigmoid(start.p) > threshold_pose && eox::dnn::sigmoid(end.p) > threshold_pose) {
                 cv::Point sp(start.x, start.y);
                 cv::Point ep(end.x, end.y);
                 cv::Scalar color(230, 0, 230);
@@ -152,7 +196,7 @@ namespace eox {
     void PosePipeline::drawLandmarks(const eox::dnn::Landmark landmarks[39], cv::Mat &output) const {
         for (int i = 0; i < 39; i++) {
             const auto point = landmarks[i];
-            if (eox::dnn::sigmoid(point.v) > threshold || i > 32) {
+            if (eox::dnn::sigmoid(point.v) > threshold_pose || i > 32) {
                 cv::Point circle(point.x, point.y);
                 cv::Scalar color(0, 255, 230);
                 cv::circle(output, circle, 2, color, 1);
@@ -179,12 +223,20 @@ namespace eox {
                 std::chrono::high_resolution_clock::now().time_since_epoch());
     }
 
-    float PosePipeline::getThreshold() const {
-        return threshold;
+    float PosePipeline::getPoseThreshold() const {
+        return threshold_pose;
     }
 
-    void PosePipeline::setThreshold(float _threshold) {
-        threshold = _threshold;
+    void PosePipeline::setPoseThreshold(float threshold) {
+        threshold_pose = threshold;
+    }
+
+    void PosePipeline::setDetectorThreshold(float threshold) {
+        threshold_detector = threshold;
+    }
+
+    float PosePipeline::getDetectorThreshold() const {
+        return threshold_detector;
     }
 
     void PosePipeline::setFilterWindowSize(int size) {

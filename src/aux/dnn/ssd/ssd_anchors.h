@@ -26,14 +26,12 @@ namespace eox::dnn::ssd {
         bool fixed_anchor_size;
     };
 
-    float calculate_scale(float min_scale, float max_scale, int stride_index, int num_strides);
-
     std::vector<std::array<float, 4>> generate_anchors(const SSDAnchorOptions& options);
 
     std::vector<eox::dnn::DetectedRegion> decode_bboxes(float score_thresh,
                                                         const std::vector<float> &scores,
-                                                        const std::vector<std::vector<float>> &bboxes,
-                                                        const std::vector<std::vector<float>> &anchors,
+                                                        const std::vector<std::array<float, 12>> &bboxes,
+                                                        const std::vector<std::array<float, 4>> &anchors,
                                                         const float scale = 224.f,
                                                         bool best_only = false);
 }

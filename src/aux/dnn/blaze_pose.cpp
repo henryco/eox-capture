@@ -88,7 +88,7 @@ namespace eox::dnn {
             log->info("T_O: {}, {}, {}", item, i, interpreter->GetOutputName(i));
 
             auto tensor = interpreter->output_tensor(i);
-            log->info("type: {}", tensor->bytes);
+            log->info("size: {}", tensor->bytes);
             i++;
         }
 
@@ -96,17 +96,7 @@ namespace eox::dnn {
     }
 
     PoseOutput BlazePose::inference(cv::InputArray &frame) {
-        cv::Mat blob;
-        cv::Mat ref = frame.getMat();
-        {
-            if (ref.cols != in_resolution || ref.rows != in_resolution) {
-                cv::resize(ref, blob, cv::Size(in_resolution, in_resolution));
-            } else {
-                ref.copyTo(blob);
-            }
-            cv::cvtColor(blob, blob, cv::COLOR_BGR2RGB);
-            blob.convertTo(blob, CV_32FC3, 1.0 / 255.);
-        }
+        cv::Mat blob = eox::dnn::convert_to_squared_blob(frame.getMat(), in_resolution);
 
         // [1, 3, 256, 256]
         return inference(blob.ptr<float>(0));

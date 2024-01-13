@@ -5,14 +5,18 @@
 #import "dnn_common.h"
 
 #import <cmath>
+#include <opencv2/imgproc.hpp>
 
 namespace eox::dnn {
 
+    /**
+     * see media/pose_landmark_topology.svg
+     */
     const int body_joints[31][2] = {
-            {0, 2},
-            {0, 5},
-            {2, 7},
-            {5, 8},
+            {0,  2},
+            {0,  5},
+            {2,  7},
+            {5,  8},
 
             {10, 9},
 
@@ -52,5 +56,74 @@ namespace eox::dnn {
     double sigmoid(double x) {
         return 1.0 / (1.0 + std::exp(-x));
     }
+
+    cv::Mat convert_to_squared_blob(const cv::Mat &in, int size, bool keep_aspect_ratio) {
+        cv::Mat blob;
+
+        if (in.cols != size || in.rows != size) {
+
+            if (keep_aspect_ratio) {
+                // letterbox, preserving aspect ratio
+                const float r = (float) in.cols / (float) in.rows;
+                const int n_w = size * std::min(1.f, r);
+                const int n_h = n_w / std::max(1.f, r);
+                const int s_x = (size - n_w) / 2;
+                const int s_y = (size - n_h) / 2;
+
+                blob = cv::Mat::zeros(cv::Size(size, size), CV_8UC3);
+                cv::Mat roi = blob(cv::Rect(s_x, s_y, n_w, n_h));
+                cv::resize(in, roi, cv::Size(n_w, n_h),
+                           0, 0, cv::INTER_CUBIC);
+            } else {
+                // resize without preserving aspect ratio
+                cv::resize(in, blob, cv::Size(size, size),
+                           0, 0, cv::INTER_CUBIC);
+            }
+
+        } else {
+            in.copyTo(blob);
+        }
+
+        cv::cvtColor(blob, blob, cv::COLOR_BGR2RGB);
+        blob.convertTo(blob, CV_32FC3, 1.0 / 255.);
+
+        return blob;
+    }
+
+    Paddings get_letterbox_paddings(int width, int height, int size) {
+        const float r = (float) width / (float) height;
+        const int n_w = size * std::min(1.f, r);
+        const int n_h = n_w / std::max(1.f, r);
+        const int s_x = (size - n_w) / 2.f;
+        const int s_y = (size - n_h) / 2.f;
+        return {
+            .left = (float) s_x,
+            .right = (float) s_x,
+            .top = (float) s_y,
+            .bottom = (float) s_y,
+        };
+    }
+
+    RoI clamp_roi(const RoI &in, int width, int height) {
+        auto roi = RoI(in.x, in.y, in.w, in.h);
+
+        const int end_x = roi.x + roi.w;
+        const int end_y = roi.y + roi.h;
+
+        if (end_x > width) {
+            roi.x -= (end_x - width);
+        }
+        if (end_y > height) {
+            roi.y -= (end_y - height);
+        }
+
+        roi.x = (int) std::max(0.f, roi.x);
+        roi.y = (int) std::max(0.f, roi.y);
+        roi.w = (int) std::min(width - roi.x, roi.w);
+        roi.h = (int) std::min(height - roi.y, roi.h);
+
+        return roi;
+    }
+
 
 }

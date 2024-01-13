@@ -54,7 +54,9 @@ namespace eox {
         eox::dnn::RoI roi;
 
         bool initialized = false;
-        float threshold = 0.5;
+
+        float threshold_detector = 0.5;
+        float threshold_pose = 0.5;
 
         float f_v_scale = 0.5;
         int f_win_size = 30;
@@ -69,7 +71,9 @@ namespace eox {
 
         PosePipelineOutput pass(const cv::Mat &frame, cv::Mat &segmented, cv::Mat &debug);
 
-        void setThreshold(float threshold);
+        void setPoseThreshold(float threshold);
+
+        void setDetectorThreshold(float threshold);
 
         void setFilterWindowSize(int size);
 
@@ -83,7 +87,9 @@ namespace eox {
 
         [[nodiscard]] int getFilterTargetFps() const;
 
-        [[nodiscard]] float getThreshold() const;
+        [[nodiscard]] float getPoseThreshold() const;
+
+        [[nodiscard]] float getDetectorThreshold() const;
 
     protected:
         [[nodiscard]] PosePipelineOutput inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *debug);
