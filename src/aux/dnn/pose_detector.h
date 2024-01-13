@@ -35,6 +35,9 @@ namespace eox::dnn {
         std::vector<std::array<float, 4>> anchors_vec;
         float threshold = 0.5;
 
+        int view_w;
+        int view_h;
+
     protected:
         std::vector<eox::dnn::DetectedRegion> process();
 
@@ -47,7 +50,7 @@ namespace eox::dnn {
 
         std::vector<eox::dnn::DetectedRegion> inference(cv::InputArray &frame);
 
-        std::vector<eox::dnn::DetectedRegion> inference(const float *frame);
+        std::vector<eox::dnn::DetectedRegion> inference(const float *frame, int w, int h);
 
         void setThreshold(float threshold);
 

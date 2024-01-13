@@ -10,6 +10,13 @@
 
 namespace eox::dnn {
 
+    using Paddings = struct {
+        float left;
+        float right;
+        float top;
+        float bottom;
+    };
+
     using Point = struct {
         float x, y;
     };
@@ -81,7 +88,10 @@ namespace eox::dnn {
 
     double sigmoid(double x);
 
+    Paddings get_letterbox_paddings(int width, int height, int size);
+
     cv::Mat convert_to_squared_blob(const cv::Mat &in, int size, bool keep_aspect_ratio = false);
+
 }
 
 #endif //STEREOX_DNN_COMMON_H

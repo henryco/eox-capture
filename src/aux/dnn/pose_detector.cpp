@@ -97,8 +97,11 @@ namespace eox::dnn {
         initialized = true;
     }
 
-    std::vector<eox::dnn::DetectedRegion> PoseDetector::inference(const float *frame) {
+    std::vector<eox::dnn::DetectedRegion> PoseDetector::inference(const float *frame, int w, int h) {
         init();
+
+        view_w = w;
+        view_h = h;
 
         auto input = interpreter->input_tensor(0)->data.f;
         std::memcpy(input, frame, in_resolution * in_resolution * 3 * 4); // 224*224*3*4 = 602112
@@ -112,8 +115,9 @@ namespace eox::dnn {
     }
 
     std::vector<eox::dnn::DetectedRegion> PoseDetector::inference(cv::InputArray &frame) {
-        cv::Mat blob = eox::dnn::convert_to_squared_blob(frame.getMat(), in_resolution, true);
-        return inference(blob.ptr<float>(0));
+        auto ref = frame.getMat();
+        cv::Mat blob = eox::dnn::convert_to_squared_blob(ref, in_resolution, true);
+        return inference(blob.ptr<float>(0), ref.cols, ref.rows);
     }
 
     std::vector<eox::dnn::DetectedRegion> PoseDetector::process() {
@@ -145,7 +149,22 @@ namespace eox::dnn {
                 in_resolution,
                 true);
 
-        // TODO fix letterboxes?
+        // correcting letterbox paddings
+        const auto p = eox::dnn::get_letterbox_paddings(view_w, view_h, 224);
+        const auto n_w = in_resolution - (p.left + p.right);
+        const auto n_h = in_resolution - (p.top + p.bottom);
+
+        for (auto &box: boxes) {
+            box.roi.x = ((box.roi.x * (float) in_resolution) - p.left) / n_w;
+            box.roi.w = ((box.roi.w * (float) in_resolution)) / n_w;
+            box.roi.y = ((box.roi.y * (float) in_resolution) - p.top) / n_h;
+            box.roi.h = ((box.roi.h * (float) in_resolution)) / n_h;
+
+            for (auto &point: box.key_points) {
+                point.x = ((point.x * (float) in_resolution) - p.left) / n_w;
+                point.y = ((point.y * (float) in_resolution) - p.top) / n_w;
+            }
+        }
 
         return boxes;
     }

@@ -90,5 +90,19 @@ namespace eox::dnn {
         return blob;
     }
 
+    Paddings get_letterbox_paddings(int width, int height, int size) {
+        const float r = (float) width / (float) height;
+        const int n_w = size * std::min(1.f, r);
+        const int n_h = n_w / std::max(1.f, r);
+        const int s_x = (size - n_w) / 2.f;
+        const int s_y = (size - n_h) / 2.f;
+        return {
+            .left = (float) s_x,
+            .right = (float) s_x,
+            .top = (float) s_y,
+            .bottom = (float) s_y,
+        };
+    }
+
 
 }
