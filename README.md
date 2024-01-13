@@ -25,6 +25,9 @@ git clone \
 
 ## Cooking in progress
 
+#### Body landmarks and pose detection (using blazepose tflite models)
+![5](https://raw.githubusercontent.com/henryco/eox-capture/master/media/5.png)
+
 #### Real-time 3D visualization (video)
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/YNmbTUxgt3U/0.jpg)](https://www.youtube.com/watch?v=YNmbTUxgt3U "Real-time 3D visualization")
 

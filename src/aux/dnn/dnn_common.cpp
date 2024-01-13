@@ -104,6 +104,7 @@ namespace eox::dnn {
         };
     }
 
+    // TODO: inspect, fix?
     RoI clamp_roi(const RoI &in, int width, int height) {
         auto roi = RoI(in.x, in.y, in.w, in.h);
 

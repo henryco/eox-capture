@@ -29,7 +29,7 @@ namespace eox {
     }
 
     PosePipelineOutput PosePipeline::inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *debug) {
-        constexpr float MARGIN = 10;
+        constexpr float MARGIN = 20;
         constexpr float FIX_X = 0;
         constexpr float FIX_Y = 10;
 

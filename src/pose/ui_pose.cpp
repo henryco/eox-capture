@@ -13,8 +13,8 @@ namespace eox {
 
     void UiPose::init(eox::data::basic_config configuration) {
 //        const auto image = cv::imread("./../media/pose4.png", cv::IMREAD_COLOR);
-        const auto image = cv::imread("./../media/pose3.png", cv::IMREAD_COLOR);
-//        const auto image = cv::imread("./../media/pose2.png", cv::IMREAD_COLOR);
+//        const auto image = cv::imread("./../media/pose3.png", cv::IMREAD_COLOR);
+        const auto image = cv::imread("./../media/pose2.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/nino.png", cv::IMREAD_COLOR);
 //        const auto image = cv::imread("/home/henryco/Pictures/rosemi.png", cv::IMREAD_COLOR);
         cv::resize(image, frame, cv::Size(640, 480));
