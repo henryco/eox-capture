@@ -12,23 +12,27 @@
 namespace eox {
 
     void UiPose::init(eox::data::basic_config configuration) {
-//        const auto image = cv::imread("./../media/pose4.png", cv::IMREAD_COLOR);
-//        const auto image = cv::imread("./../media/pose3.png", cv::IMREAD_COLOR);
-        const auto image = cv::imread("./../media/pose2.png", cv::IMREAD_COLOR);
-//        const auto image = cv::imread("/home/henryco/Pictures/nino.png", cv::IMREAD_COLOR);
-//        const auto image = cv::imread("/home/henryco/Pictures/rosemi.png", cv::IMREAD_COLOR);
-        cv::resize(image, frame, cv::Size(640, 480));
+        const auto &props = configuration.camera;
 
         {
             pipeline.setDetectorThreshold(0.5f);
             pipeline.setPoseThreshold(0.5f);
+            pipeline.setFilterTargetFps(props[0].fps);
             pipeline.init();
         }
 
         {
-            glImage.init(1, 1, 1, 640, 480, {"DEMO"}, GL_BGR);
-            glImage.setFrame(frame);
+            glImage.init((int) props.size(), props[0].output_width, props[0].output_height, {"DEMO"}, GL_BGR);
             glImage.scale(configuration.scale);
+            glImage.setFrame(frame);
+        }
+
+        {
+            camera.setProperties(props);
+            camera.setHomogeneous(props[0].homogeneous);
+            camera.setFast(props[0].fast);
+            camera.setApi(props[0].api);
+            camera.open();
         }
 
         {
@@ -38,7 +42,6 @@ namespace eox {
             auto control_box_h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
 
             config_stack->set_size_request(420);
-
             config_stack->add(*scroll_pane, "Pose");
             scroll_pane->add(*control_box_h);
             control_box_h->pack_start(*control_box_v, Gtk::PACK_SHRINK);
@@ -135,7 +138,7 @@ namespace eox {
                         "FilterTargetFPS",
                         pipeline.getFilterTargetFps(),
                         1,
-                        30,
+                        props[0].fps,
                         1,
                         300
                 );
@@ -165,6 +168,15 @@ namespace eox {
 
     void UiPose::update(float _delta, float _late, float _fps) {
         this->FPS = _fps;
+
+        auto captured = camera.capture();
+        if (captured.empty()) {
+            // nothing captured at all
+            log->debug("skip");
+            return;
+        }
+
+        frame = captured[0];
 
         cv::Mat output, segmentation;
         pipeline.pass(frame, segmentation, output);

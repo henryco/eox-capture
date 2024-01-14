@@ -12,6 +12,7 @@
 #include "../aux/gtk/gl_image.h"
 #include "../aux/utils/loop/delta_loop.h"
 #include "../pipeline/pose_pipeline.h"
+#include "../aux/ocv/stereo_camera.h"
 
 namespace eox {
 
@@ -21,6 +22,7 @@ namespace eox {
                 spdlog::stdout_color_mt("ui_pose");
 
     private:
+        eox::xocv::StereoCamera camera;
         eox::util::DeltaLoop deltaLoop;
         eox::xgtk::GLImage glImage;
         eox::PosePipeline pipeline;

@@ -339,9 +339,11 @@ namespace eox::cli {
             const auto &instance = program.at<argparse::ArgumentParser>("pose");
             // TODO
             return {
+                    .denoise = program.get<bool>("--denoise"),
                     .scale = scale,
                     .work_dir = work_dir,
                     .configs = new_configs,
+                    .camera = props,
                     .module = "pose",
             };
         }
