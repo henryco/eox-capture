@@ -23,6 +23,25 @@ namespace eox::dnn {
 
     using RoI = struct {
         float x, y, w, h;
+        Point c;
+        float r;
+    };
+
+    using Coord3d = struct {
+        /**
+         * X
+         */
+        float x;
+
+        /**
+         * Y
+         */
+        float y;
+
+        /**
+         * Z
+         */
+        float z;
     };
 
     using Landmark = struct {
@@ -59,6 +78,11 @@ namespace eox::dnn {
          * 39x5 normalized (0,1) landmarks
          */
         eox::dnn::Landmark landmarks_norm[39];
+
+        /*
+         * 39x3 world space landmarks
+         */
+        eox::dnn::Coord3d landmarks_3d[39];
 
         /**
          * 1D 128x128 float32 array

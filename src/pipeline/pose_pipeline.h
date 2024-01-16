@@ -24,6 +24,11 @@ namespace eox {
         eox::dnn::Landmark landmarks[39];
 
         /**
+         * pose landmarks in world space
+         */
+        eox::dnn::Coord3d ws_landmarks[39];
+
+        /**
          * segmentation array
          */
         float segmentation[128 * 128];
@@ -55,6 +60,7 @@ namespace eox {
 
         bool initialized = false;
 
+        float threshold_presence = 0.5;
         float threshold_detector = 0.5;
         float threshold_pose = 0.5;
 
@@ -70,6 +76,8 @@ namespace eox {
         PosePipelineOutput pass(const cv::Mat &frame, cv::Mat &segmented);
 
         PosePipelineOutput pass(const cv::Mat &frame, cv::Mat &segmented, cv::Mat &debug);
+
+        void setPresenceThreshold(float threshold);
 
         void setPoseThreshold(float threshold);
 
@@ -91,6 +99,8 @@ namespace eox {
 
         [[nodiscard]] float getDetectorThreshold() const;
 
+        [[nodiscard]] float getPresenceThreshold() const;
+
     protected:
         [[nodiscard]] PosePipelineOutput inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *debug);
 
@@ -98,7 +108,7 @@ namespace eox {
 
         void drawJoints(const eox::dnn::Landmark landmarks[39], cv::Mat &output) const;
 
-        void drawLandmarks(const eox::dnn::Landmark landmarks[39], cv::Mat &output) const;
+        void drawLandmarks(const eox::dnn::Landmark landmarks[39], const eox::dnn::Coord3d ws3d[39], cv::Mat &output) const;
 
         void drawRoi(cv::Mat &output) const;
 

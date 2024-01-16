@@ -14,10 +14,14 @@ namespace eox {
     void UiPose::init(eox::data::basic_config configuration) {
         const auto &props = configuration.camera;
 
+        if (props.empty()) {
+            log->error("No video source provided");
+            throw std::runtime_error("No video source provided");
+        }
+
         {
             pipeline.setDetectorThreshold(0.5f);
             pipeline.setPoseThreshold(0.5f);
-            pipeline.setFilterTargetFps(props[0].fps);
             pipeline.init();
         }
 
@@ -91,6 +95,27 @@ namespace eox {
             {
                 auto control = Gtk::make_managed<eox::gtk::GtkControl>(
                         ([this](double value) {
+                            pipeline.setPresenceThreshold((float) value);
+                            return value;
+                        }),
+                        "PresenceThreshold",
+                        pipeline.getPresenceThreshold(),
+                        0.01,
+                        0.5,
+                        0.0,
+                        1.0
+                );
+                control->digits(2);
+
+                auto box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
+                box->set_size_request(400, 50);
+                box->pack_start(*control);
+                control_box_v->pack_start(*box, Gtk::PACK_SHRINK);
+            }
+
+            {
+                auto control = Gtk::make_managed<eox::gtk::GtkControl>(
+                        ([this](double value) {
                             pipeline.setFilterVelocityScale((float) value);
                             return value;
                         }),
@@ -138,7 +163,7 @@ namespace eox {
                         "FilterTargetFPS",
                         pipeline.getFilterTargetFps(),
                         1,
-                        props[0].fps,
+                        30,
                         1,
                         300
                 );
@@ -161,7 +186,7 @@ namespace eox {
         {
             // Stable FPS worker loop
             deltaLoop.setFunc([this](float d, float l, float f) { update(d, l, f); });
-            deltaLoop.setFps(30);
+//            deltaLoop.setFps(30);
             deltaLoop.start();
         }
     }

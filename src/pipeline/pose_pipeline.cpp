@@ -29,7 +29,7 @@ namespace eox {
     }
 
     PosePipelineOutput PosePipeline::inference(const cv::Mat &frame, cv::Mat &segmented, cv::Mat *debug) {
-        constexpr float MARGIN = 20;
+        constexpr float MARGIN = 30;
         constexpr float FIX_X = 0;
         constexpr float FIX_Y = 10;
 
@@ -107,23 +107,23 @@ namespace eox {
             }
 
             // temporal filtering (low pass based on velocity)
-            for (int i = 0; i < 39; i++) {
-                const auto idx = i * 3;
-                auto fx = filters.at(idx + 0).filter(now, landmarks[i].x);
-                auto fy = filters.at(idx + 1).filter(now, landmarks[i].y);
-                auto fz = filters.at(idx + 2).filter(now, landmarks[i].z);
-
-                landmarks[i].x = fx;
-                landmarks[i].y = fy;
-                landmarks[i].z = fz;
-            }
+//            for (int i = 0; i < 39; i++) {
+//                const auto idx = i * 3;
+//                auto fx = filters.at(idx + 0).filter(now, landmarks[i].x);
+//                auto fy = filters.at(idx + 1).filter(now, landmarks[i].y);
+//                auto fz = filters.at(idx + 2).filter(now, landmarks[i].z);
+//
+//                landmarks[i].x = fx;
+//                landmarks[i].y = fy;
+//                landmarks[i].z = fz;
+//            }
 
             performSegmentation(result.segmentation, frame, segmented);
 
             if (debug) {
                 segmented.copyTo(*debug);
                 drawJoints(landmarks, *debug);
-                drawLandmarks(landmarks, *debug);
+                drawLandmarks(landmarks, result.landmarks_3d,*debug);
                 drawRoi(*debug);
             }
 
@@ -137,8 +137,11 @@ namespace eox {
 
             // output
             {
-                for (int i = 0; i < 39; i++)
+                for (int i = 0; i < 39; i++) {
+                    output.ws_landmarks[i] = result.landmarks_3d[i];
                     output.landmarks[i] = landmarks[i];
+                }
+
                 for (int i = 0; i < 128 * 128; i++)
                     output.segmentation[i] = result.segmentation[i];
 
@@ -184,7 +187,7 @@ namespace eox {
         for (auto bone: eox::dnn::body_joints) {
             const auto &start = landmarks[bone[0]];
             const auto &end = landmarks[bone[1]];
-            if (eox::dnn::sigmoid(start.p) > threshold_pose && eox::dnn::sigmoid(end.p) > threshold_pose) {
+            if (eox::dnn::sigmoid(start.p) > threshold_presence && eox::dnn::sigmoid(end.p) > threshold_presence) {
                 cv::Point sp(start.x, start.y);
                 cv::Point ep(end.x, end.y);
                 cv::Scalar color(230, 0, 230);
@@ -193,17 +196,44 @@ namespace eox {
         }
     }
 
-    void PosePipeline::drawLandmarks(const eox::dnn::Landmark landmarks[39], cv::Mat &output) const {
+    void PosePipeline::drawLandmarks(const eox::dnn::Landmark landmarks[39], const eox::dnn::Coord3d ws3d[39], cv::Mat &output) const {
         for (int i = 0; i < 39; i++) {
             const auto point = landmarks[i];
-            if (eox::dnn::sigmoid(point.v) > threshold_pose || i > 32) {
+            const auto visibility = eox::dnn::sigmoid(point.v);
+            const auto presence = eox::dnn::sigmoid(point.p);
+            if (presence > threshold_presence || i > 32) {
                 cv::Point circle(point.x, point.y);
-                cv::Scalar color(0, 255, 230);
-                cv::circle(output, circle, 2, color, 1);
-                if (i > 32)
-                    cv::putText(output, std::to_string(i), cv::Point(circle.x - 10, circle.y - 10),
-                                cv::FONT_HERSHEY_PLAIN, 1,
-                                cv::Scalar(255, 0, 0));
+                cv::Scalar color(255 * (1.f - visibility), 255 * visibility, 0);
+                cv::circle(output, circle, 2, color, 2);
+//                if (i > 32) {
+//                    cv::putText(output, std::to_string(i), cv::Point(circle.x - 10, circle.y - 10),
+//                                cv::FONT_HERSHEY_SIMPLEX, 1.25,
+//                                cv::Scalar(0, 0, 255), 2);
+//                }
+
+                if (i <= 32) {
+                    cv::putText(output, std::to_string(visibility), cv::Point(circle.x - 10, circle.y - 10),
+                                cv::FONT_HERSHEY_SIMPLEX, 0.7,
+                                cv::Scalar(0, 0, 255), 2);
+                }
+
+                if (i == 25) {
+                    cv::putText(output,
+                                std::to_string(point.x / output.cols) + ", " +
+                                std::to_string(point.y / output.rows) + ", " +
+                                std::to_string(point.z),
+                                cv::Point(40, 40),
+                                cv::FONT_HERSHEY_SIMPLEX, 0.7,
+                                cv::Scalar(0, 0, 255), 2);
+
+                    cv::putText(output,
+                                std::to_string(ws3d[i].x) + ", " +
+                                std::to_string(ws3d[i].y) + ", " +
+                                std::to_string(ws3d[i].z),
+                                cv::Point(40, 80),
+                                cv::FONT_HERSHEY_SIMPLEX, 0.7,
+                                cv::Scalar(0, 0, 255), 2);
+                }
             }
         }
     }
@@ -270,6 +300,14 @@ namespace eox {
 
     int PosePipeline::getFilterWindowSize() const {
         return f_win_size;
+    }
+
+    void PosePipeline::setPresenceThreshold(float threshold) {
+        threshold_presence = threshold;
+    }
+
+    float PosePipeline::getPresenceThreshold() const {
+        return threshold_presence;
     }
 
 } // eox

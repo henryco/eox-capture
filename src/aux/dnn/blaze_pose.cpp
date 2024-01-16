@@ -124,7 +124,10 @@ namespace eox::dnn {
         output.score = presence;
 
         const float *land_marks_3d = lm_3d_1x195(*interpreter);
+        const float *land_marks_wd = lm_world_1x117(*interpreter);
+
         for (int i = 0; i < 39; i++) {
+            const int j = i * 3;
             const int k = i * 5;
             // normalized landmarks_3d
             output.landmarks_norm[i] = {
@@ -133,6 +136,13 @@ namespace eox::dnn {
                     .z = land_marks_3d[k + 2] / (float) in_resolution,
                     .v = land_marks_3d[k + 3],
                     .p = land_marks_3d[k + 4],
+            };
+
+            // world-space landmarks
+            output.landmarks_3d[i] = {
+                    .x = land_marks_wd[j + 0],
+                    .y = land_marks_wd[j + 1],
+                    .z = land_marks_wd[j + 2],
             };
         }
 
