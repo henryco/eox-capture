@@ -62,10 +62,10 @@ namespace eox {
 
         float threshold_presence = 0.5;
         float threshold_detector = 0.5;
-        float threshold_pose = 0.99;
+        float threshold_pose = 0.5;
 
-        float f_v_scale = 0.01;
-        int f_win_size = 10;
+        float f_v_scale = 0.5;
+        int f_win_size = 30;
         int f_fps = 30;
 
     public:

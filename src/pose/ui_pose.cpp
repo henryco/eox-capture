@@ -20,8 +20,9 @@ namespace eox {
         }
 
         {
-            pipeline.setDetectorThreshold(0.5f);
-            pipeline.setPoseThreshold(0.5f);
+            pipeline.setFilterVelocityScale(0.01f);
+            pipeline.setPoseThreshold(0.98f);
+            pipeline.setFilterWindowSize(10);
             pipeline.init();
         }
 
