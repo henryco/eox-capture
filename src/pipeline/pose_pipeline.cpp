@@ -107,16 +107,17 @@ namespace eox {
             }
 
             // temporal filtering (low pass based on velocity)
-//            for (int i = 0; i < 39; i++) {
-//                const auto idx = i * 3;
-//                auto fx = filters.at(idx + 0).filter(now, landmarks[i].x);
-//                auto fy = filters.at(idx + 1).filter(now, landmarks[i].y);
-//                auto fz = filters.at(idx + 2).filter(now, landmarks[i].z);
-//
-//                landmarks[i].x = fx;
-//                landmarks[i].y = fy;
-//                landmarks[i].z = fz;
-//            }
+            for (int i = 0; i < 39; i++) {
+                const auto idx = i * 3;
+
+                auto fx = filters.at(idx + 0).filter(now, landmarks[i].x);
+                auto fy = filters.at(idx + 1).filter(now, landmarks[i].y);
+                auto fz = filters.at(idx + 2).filter(now, landmarks[i].z);
+
+                landmarks[i].x = fx;
+                landmarks[i].y = fy;
+                landmarks[i].z = fz;
+            }
 
             performSegmentation(result.segmentation, frame, segmented);
 

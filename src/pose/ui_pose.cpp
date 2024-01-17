@@ -59,7 +59,7 @@ namespace eox {
                         "PoseThreshold",
                         pipeline.getPoseThreshold(),
                         0.01,
-                        0.5,
+                        0.99,
                         0.0,
                         1.0
                 );
@@ -122,9 +122,9 @@ namespace eox {
                         "FilterVelocityScale",
                         pipeline.getFilterVelocityScale(),
                         0.01,
-                        0.5,
+                        0.01,
                         0,
-                        100
+                        10000
                 );
                 control->digits(2);
 
@@ -143,7 +143,7 @@ namespace eox {
                         "FilterWindowSize",
                         pipeline.getFilterWindowSize(),
                         1,
-                        30,
+                        10,
                         1,
                         300
                 );
