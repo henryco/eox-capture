@@ -34,6 +34,9 @@ namespace eox::sig {
         float velocity_scale;
         int window_size;
 
+        float last_value = 0;
+        long last_time = 0;
+
     public:
         VelocityFilter(int window_size, float velocity_scale, int target_fps = 30);
 

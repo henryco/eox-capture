@@ -22,6 +22,11 @@ namespace eox {
         auto config_stack = std::make_unique<eox::xgtk::GtkConfigStack>();
         auto render_stack = std::make_unique<eox::xgtk::GtkConfigStack>();
 
+        if (props.empty()) {
+            log->error("No video source provided");
+            throw std::runtime_error("No video source provided");
+        }
+
         render_stack->onChange([this](auto name) {
             aux = (name == "AUX");
         });

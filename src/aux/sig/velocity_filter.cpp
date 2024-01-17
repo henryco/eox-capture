@@ -14,18 +14,16 @@ namespace eox::sig {
               window_size(std::max(1, w_size)) {
     }
 
-    // TODO FIXME
     float VelocityFilter::filter(std::chrono::nanoseconds timestamp, float value, float scale) {
         float alpha = NAN;
-
         if (window.empty()) {
             window.push_front({0.0f, 0});
+            last_value = 0;
+            last_time = 0;
             alpha = 1.0;
         } else {
-            const auto &last = window.back();
-
-            const auto distance = scale * (value - last.distance);
-            const auto duration = timestamp.count() - last.duration;
+            const auto distance = scale * (value - last_value);
+            const auto duration = timestamp.count() - last_time;
 
             int64_t total_duration = duration;
             float total_distance = distance;
@@ -48,6 +46,8 @@ namespace eox::sig {
             }
         }
 
+        last_value = value;
+        last_time = timestamp.count();
         return low_pass.filter(value, alpha);
     }
 

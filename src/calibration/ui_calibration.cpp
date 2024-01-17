@@ -22,6 +22,11 @@ namespace eox {
         auto layout_h = std::make_unique<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
         auto config_stack = std::make_unique<eox::xgtk::GtkConfigStack>();
 
+        if (props.empty()) {
+            log->error("No video source provided");
+            throw std::runtime_error("No video source provided");
+        }
+
         {
             std::vector<std::string> c_ids;
             c_ids.reserve(config.camera.size());

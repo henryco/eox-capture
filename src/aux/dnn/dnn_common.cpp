@@ -104,9 +104,44 @@ namespace eox::dnn {
         };
     }
 
-    // TODO: inspect, fix?
     RoI clamp_roi(const RoI &in, int width, int height) {
-        auto roi = RoI(in.x, in.y, in.w, in.h);
+        auto roi = RoI(in.x, in.y, in.w, in.h, in.c, in.r);
+
+//        // clamping roi, not square
+//        const int s_x = std::max(0, (int) roi.x);
+//        const int s_y = std::max(0, (int) roi.y);
+//        const int e_x = std::min(width, (int) roi.w);
+//        const int e_y = std::min(height, (int) roi.h);
+//
+//        // sides of the roi
+//        const int a = e_x - s_x;
+//        const int b = e_y - s_y;
+//
+//        // halves of those sizes
+//        const int r_x = a / 2;
+//        const int r_y = b / 2;
+//
+//        // current clamped center
+//        const int c_x = s_x + r_x;
+//        const int c_y = s_y + r_y;
+//
+//        // size of new square size
+//        const int s = std::min(width, height);
+//        const int c = std::min(std::max(a, b), s);
+//
+//        // shift of current center from desired one
+//        const int k_x = r_x - (c / 2);
+//        const int k_y = r_y - (c / 2);
+//
+//        // center of new square roi
+//        const int nc_x = c_x + k_x;
+//        const int nc_y = c_y + k_y;
+//
+//        // new clamped and squared roi
+//        roi.x = (int) (nc_x - c / 2);
+//        roi.y = (int) (nc_y - c / 2);
+//        roi.w = (int) c;
+//        roi.h = (int) c;
 
         const int end_x = roi.x + roi.w;
         const int end_y = roi.y + roi.h;
@@ -123,6 +158,13 @@ namespace eox::dnn {
         roi.w = (int) std::min(width - roi.x, roi.w);
         roi.h = (int) std::min(height - roi.y, roi.h);
 
+        const auto c_x = roi.x + 0.5 * roi.w;
+        const auto c_y = roi.y + 0.5 * roi.h;
+        const auto c = std::min(roi.w, roi.h);
+        roi.x = c_x - 0.5 * c;
+        roi.y = c_y - 0.5 * c;
+        roi.w = c;
+        roi.h = c;
         return roi;
     }
 
