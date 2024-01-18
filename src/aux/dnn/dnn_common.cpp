@@ -58,25 +58,29 @@ namespace eox::dnn {
     }
 
     cv::Mat convert_to_squared_blob(const cv::Mat &in, int size, bool keep_aspect_ratio) {
+        return convert_to_squared_blob(in, size, size, keep_aspect_ratio);
+    }
+
+    cv::Mat convert_to_squared_blob(const cv::Mat &in, int width, int height, bool keep_aspect_ratio) {
         cv::Mat blob;
 
-        if (in.cols != size || in.rows != size) {
+        if (in.cols != width || in.rows != height) {
 
             if (keep_aspect_ratio) {
                 // letterbox, preserving aspect ratio
                 const float r = (float) in.cols / (float) in.rows;
-                const int n_w = size * std::min(1.f, r);
+                const int n_w = width * std::min(1.f, r);
                 const int n_h = n_w / std::max(1.f, r);
-                const int s_x = (size - n_w) / 2;
-                const int s_y = (size - n_h) / 2;
+                const int s_x = (width - n_w) / 2;
+                const int s_y = (height - n_h) / 2;
 
-                blob = cv::Mat::zeros(cv::Size(size, size), CV_8UC3);
+                blob = cv::Mat::zeros(cv::Size(width, height), CV_8UC3);
                 cv::Mat roi = blob(cv::Rect(s_x, s_y, n_w, n_h));
                 cv::resize(in, roi, cv::Size(n_w, n_h),
                            0, 0, cv::INTER_CUBIC);
             } else {
                 // resize without preserving aspect ratio
-                cv::resize(in, blob, cv::Size(size, size),
+                cv::resize(in, blob, cv::Size(width, height),
                            0, 0, cv::INTER_CUBIC);
             }
 

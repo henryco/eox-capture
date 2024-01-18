@@ -113,7 +113,10 @@ add_executable(${PROJECT_NAME}
         src/aux/dnn/ssd/ssd_anchors.h
         src/aux/dnn/ssd/ssd_anchors.cpp
         src/aux/dnn/pose_detector.cpp
-        src/aux/dnn/pose_detector.h)
+        src/aux/dnn/pose_detector.h
+        src/aux/dnn/hitnet_disparity.cpp
+        src/aux/dnn/hitnet_disparity.h
+        src/aux/dnn/dnn_runner.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}

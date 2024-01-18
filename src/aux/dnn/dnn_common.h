@@ -122,7 +122,6 @@ namespace eox::dnn {
 
     };
 
-
     extern const int body_joints[31][2];
 
     double sigmoid(double x);
@@ -130,6 +129,8 @@ namespace eox::dnn {
     Paddings get_letterbox_paddings(int width, int height, int size);
 
     cv::Mat convert_to_squared_blob(const cv::Mat &in, int size, bool keep_aspect_ratio = false);
+
+    cv::Mat convert_to_squared_blob(const cv::Mat &in, int width, int height, bool keep_aspect_ratio = false);
 
     RoI clamp_roi(const eox::dnn::RoI &roi, int width, int height);
 }

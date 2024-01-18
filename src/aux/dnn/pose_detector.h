@@ -53,7 +53,7 @@ namespace eox::dnn {
                 spdlog::stdout_color_mt("pose_detector");
 
     private:
-        static inline const std::string file = "./../models/blazepose_detection_float32.tflite";
+        static inline const std::string file = "./../models/blazepose/blazepose_detection_float32.tflite";
         static inline const size_t in_resolution = 224;
         static const std::vector<std::string> outputs;
         std::unique_ptr<tflite::FlatBufferModel> model;
