@@ -316,7 +316,13 @@ namespace eox::cli {
                     instance.get<std::vector<std::string>>("--group")
             );
 
-            const auto algo = instance.get<std::string>("--algorithm");
+            const auto algo = to_lower_case(instance.get<std::string>("--algorithm"));
+
+            eox::data::Algorithm alg = eox::data::Algorithm::BM;
+            if (algo == "hitnet")
+                alg = eox::data::Algorithm::HITNET;
+            else if (algo == "sgbm")
+                alg = eox::data::Algorithm::SGBM;
 
             return {
                     .denoise = program.get<bool>("--denoise"),
@@ -327,9 +333,7 @@ namespace eox::cli {
                     .groups = groups,
                     .module = "stereo",
                     .stereo = {
-                            .algorithm = to_lower_case(algo) == "sgbm"
-                                         ? eox::data::Algorithm::SGBM
-                                         : eox::data::Algorithm::BM,
+                            .algorithm = alg,
                             .confidence = instance.get<bool>("--confidence")
                     }
             };

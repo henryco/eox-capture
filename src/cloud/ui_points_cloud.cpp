@@ -10,6 +10,7 @@
 #include "../aux/gtk/gtk_cam_params.h"
 #include "../aux/utils/mappers/cam_gtk_mapper.h"
 #include "../aux/gtk/gtk_utils.h"
+#include "../aux/utils/adapters/hitnet_matcher.h"
 
 namespace eox {
 
@@ -637,6 +638,28 @@ namespace eox {
                         c_box->pack_start(*control);
                         controls.push_back(std::move(control));
                     }
+                } else if (config.stereo.algorithm == eox::data::Algorithm::HITNET) {
+
+                    log->debug("HitNetDisparity matcher");
+
+                    // todo fixme test more
+                    auto matcher = eox::adapt::HitNetMatcher::create(1280, 720);
+
+                    {
+                        log->debug("initializing matcher from work directory implicitly");
+                        const auto paths = eox::helpers::work_paths(config);
+                        eox::helpers::read_matcher_data(matcher, group_id, paths, log);
+                    }
+
+                    {
+                        log->debug("initializing matcher from configuration files explicitly");
+                        const auto paths = eox::helpers::config_paths(config);
+                        eox::helpers::read_matcher_data(matcher, group_id, paths, log);
+                    }
+
+                    std::pair<cv::Ptr<cv::StereoMatcher>, cv::Ptr<cv::StereoMatcher>> lr_matchers(matcher, matcher);
+                    matchers.emplace(group_id, std::move(lr_matchers));
+
                 } else {
                     log->error("Unknown block matcher algorithm");
                     throw std::runtime_error("Unknown block matcher algorithm");

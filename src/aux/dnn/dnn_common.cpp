@@ -95,17 +95,33 @@ namespace eox::dnn {
     }
 
     Paddings get_letterbox_paddings(int width, int height, int size) {
+        return get_letterbox_paddings(width, height, size, size);
+    }
+
+    Paddings get_letterbox_paddings(int width, int height, int box_w, int box_h) {
         const float r = (float) width / (float) height;
-        const int n_w = size * std::min(1.f, r);
+        const int n_w = box_w * std::min(1.f, r);
         const int n_h = n_w / std::max(1.f, r);
-        const int s_x = (size - n_w) / 2.f;
-        const int s_y = (size - n_h) / 2.f;
+        const int s_x = (box_w - n_w) / 2.f;
+        const int s_y = (box_h - n_h) / 2.f;
         return {
-            .left = (float) s_x,
-            .right = (float) s_x,
-            .top = (float) s_y,
-            .bottom = (float) s_y,
+                .left = (float) s_x,
+                .right = (float) s_x,
+                .top = (float) s_y,
+                .bottom = (float) s_y,
         };
+    }
+
+    cv::Mat remove_paddings(const cv::Mat &in, int width, int height) {
+        const auto paddings = get_letterbox_paddings(
+                width, height, in.cols, in.rows
+        );
+        return in(cv::Rect(
+                paddings.left,
+                paddings.top,
+                width - (paddings.left + paddings.right),
+                height - (paddings.top + paddings.bottom)
+        ));
     }
 
     RoI clamp_roi(const RoI &in, int width, int height) {
@@ -171,6 +187,5 @@ namespace eox::dnn {
         roi.h = c;
         return roi;
     }
-
 
 }

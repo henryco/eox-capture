@@ -116,7 +116,9 @@ add_executable(${PROJECT_NAME}
         src/aux/dnn/pose_detector.h
         src/aux/dnn/hitnet_disparity.cpp
         src/aux/dnn/hitnet_disparity.h
-        src/aux/dnn/dnn_runner.h)
+        src/aux/dnn/dnn_runner.h
+        src/aux/utils/adapters/hitnet_matcher.cpp
+        src/aux/utils/adapters/hitnet_matcher.h)
 
 # Include directories for the specific target
 target_include_directories(${PROJECT_NAME}

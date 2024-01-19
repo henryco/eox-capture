@@ -18,13 +18,12 @@ namespace eox::dnn {
         }
     }
 
-    std::string HitnetDisparity::get_model_file() {
-        return "./../models/hitnet/hitnet_" +
-               std::to_string(width) + "x" + std::to_string(height) +
-               "_float32.tflite";
+    std::string HitNetDisparity::get_model_file() {
+        return root_dir +
+               "/hitnet_" + std::to_string(width) + "x" + std::to_string(height) + "_float32.tflite";
     }
 
-    HitnetOutput HitnetDisparity::inference(const cv::_InputArray &left, const cv::_InputArray &right) {
+    HitNetOutput HitNetDisparity::inference(const cv::_InputArray &left, const cv::_InputArray &right) {
         cv::Mat blob_l = eox::dnn::convert_to_squared_blob(
                 left.getMat(),
                 getWidth(),
@@ -51,10 +50,13 @@ namespace eox::dnn {
         cv::Mat blob(blob_l.rows, blob_l.cols, CV_MAKETYPE(blob_l.depth(), 6));
         cv::mixChannels(in, 2, &blob, 1, from_to, 6);
 
-        return inference(blob.ptr<float>(0));
+        auto result = inference(blob.ptr<float>(0));
+        auto mat = eox::dnn::remove_paddings(result.disparity, left.cols(), left.rows());
+        result.disparity = mat;
+        return result;
     }
 
-    HitnetOutput HitnetDisparity::inference(const float *frame) {
+    HitNetOutput HitNetDisparity::inference(const float *frame) {
         init();
 
         input(0, frame, width * height * 4 * 6);
@@ -66,24 +68,35 @@ namespace eox::dnn {
         mat.convertTo(mat, CV_8UC1);
 
         return {
-            .disparity = mat
+                .disparity = mat
         };
     }
 
-    size_t HitnetDisparity::getWidth() const {
+    size_t HitNetDisparity::getWidth() const {
         return width;
     }
 
-    size_t HitnetDisparity::getHeight() const {
+    size_t HitNetDisparity::getHeight() const {
         return height;
     }
 
-    void HitnetDisparity::setWidth(size_t _width) {
-        width = _width;
+    const std::string &HitNetDisparity::getRootDir() const {
+        return root_dir;
     }
 
-    void HitnetDisparity::setHeight(size_t _height) {
+    void HitNetDisparity::setWidth(size_t _width) {
+        width = _width;
+        reset();
+    }
+
+    void HitNetDisparity::setHeight(size_t _height) {
         height = _height;
+        reset();
+    }
+
+    void HitNetDisparity::setRootDir(const std::string &rootDir) {
+        root_dir = rootDir;
+        reset();
     }
 
 } // eox

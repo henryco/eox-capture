@@ -11,14 +11,15 @@
 
 namespace eox::dnn {
 
-    using HitnetOutput = struct {
+    using HitNetOutput = struct {
         cv::Mat disparity;
     };
 
-    class HitnetDisparity : DnnRunner<HitnetOutput> {
+    class HitNetDisparity : DnnRunner<HitNetOutput> {
         static inline const auto log =
                 spdlog::stdout_color_mt("hitnet_disparity");
 
+        std::string root_dir = "./../models/hitnet";
         size_t width{};
         size_t height{};
 
@@ -26,17 +27,21 @@ namespace eox::dnn {
         std::string get_model_file() override;
 
     public:
-        HitnetOutput inference(const cv::_InputArray &left, const cv::_InputArray &right);
+        HitNetOutput inference(const cv::_InputArray &left, const cv::_InputArray &right);
 
-        HitnetOutput inference(const float *frame) override;
+        HitNetOutput inference(const float *frame) override;
 
         [[nodiscard]] size_t getWidth() const;
 
         [[nodiscard]] size_t getHeight() const;
 
+        [[nodiscard]] const std::string &getRootDir() const;
+
         void setWidth(size_t width);
 
         void setHeight(size_t height);
+
+        void setRootDir(const std::string &rootDir);
     };
 
 } // eox

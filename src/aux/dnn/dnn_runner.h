@@ -54,6 +54,13 @@ namespace eox::dnn {
             }
         }
 
+        void reset() {
+            if (gpu_delegate) {
+                TfLiteGpuDelegateV2Delete(gpu_delegate);
+            }
+            initialized = false;
+        }
+
         void init() {
             if (initialized)
                 return;

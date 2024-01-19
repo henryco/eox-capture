@@ -13,6 +13,7 @@ namespace eox::ts {
 namespace eox::data {
 
     typedef enum  {
+        HITNET,
         SGBM,
         BM
     } Algorithm;
