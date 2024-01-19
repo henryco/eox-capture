@@ -5,6 +5,7 @@ project(stereox VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#set(TFLITE_FLEX_SHARED ${CMAKE_SOURCE_DIR}/shared/libtensorflowlite_flex.so)
 set(TFLITE_ENABLE_GPU ON CACHE BOOL "Enable TFLite GPU support")
 set(ABSL_PROPAGATE_CXX_STD ON)
 
@@ -134,6 +135,7 @@ target_link_libraries(${PROJECT_NAME}
         PRIVATE spdlog::spdlog
         PRIVATE ${V4L2_LIBRARIES}
         PRIVATE tensorflow-lite
+#        PRIVATE ${TFLITE_FLEX_SHARED}
         PRIVATE argparse
         PRIVATE glm)
 
