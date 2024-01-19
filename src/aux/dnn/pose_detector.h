@@ -14,6 +14,7 @@
 #include "ssd/ssd_anchors.h"
 #include "roi/pose_roi.h"
 #include "dnn_common.h"
+#include "dnn_runner.h"
 
 namespace eox::dnn {
 
@@ -48,40 +49,28 @@ namespace eox::dnn {
         float rotation;
     };
 
-    class PoseDetector {
+    class PoseDetector : DnnRunner<std::vector<eox::dnn::DetectedPose>> {
         static inline const auto log =
                 spdlog::stdout_color_mt("pose_detector");
 
     private:
-        static inline const std::string file = "./../models/blazepose/blazepose_detection_float32.tflite";
         static inline const size_t in_resolution = 224;
-        static const std::vector<std::string> outputs;
-        std::unique_ptr<tflite::FlatBufferModel> model;
-        std::unique_ptr<tflite::Interpreter> interpreter;
-        TfLiteDelegate *gpu_delegate = nullptr;
-        bool initialized = false;
 
+        eox::dnn::PoseRoi roiPredictor;
         std::vector<std::array<float, 4>> anchors_vec;
         float threshold = 0.5;
-
         int view_w = 0;
         int view_h = 0;
 
-        eox::dnn::PoseRoi roiPredictor;
-
     protected:
-        std::vector<eox::dnn::DetectedPose> process();
+        void initialize() override;
 
     public:
-        PoseDetector();
+        std::string get_model_file() override;
 
-        ~PoseDetector();
+        std::vector<DetectedPose> inference(const float *frame) override;
 
-        void init();
-
-        std::vector<eox::dnn::DetectedPose> inference(cv::InputArray &frame);
-
-        std::vector<eox::dnn::DetectedPose> inference(const float *frame, int w, int h);
+        std::vector<DetectedPose> inference(cv::InputArray &frame);
 
         void setThreshold(float threshold);
 
