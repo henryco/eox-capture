@@ -11,6 +11,11 @@
 
 namespace eox::dnn {
 
+    typedef enum {
+        Float_16 = 16,
+        Float_32 = 32
+    } Precision;
+
     using HitNetOutput = struct {
         cv::Mat disparity;
     };
@@ -20,8 +25,9 @@ namespace eox::dnn {
                 spdlog::stdout_color_mt("hitnet_disparity");
 
         std::string root_dir = "./../models/hitnet";
-        size_t width{};
-        size_t height{};
+        Precision precision = Float_16;
+        size_t width = 640;
+        size_t height = 480;
 
     protected:
         std::string get_model_file() override;
@@ -37,11 +43,15 @@ namespace eox::dnn {
 
         [[nodiscard]] const std::string &getRootDir() const;
 
+        [[nodiscard]] Precision getPrecision() const;
+
         void setWidth(size_t width);
 
         void setHeight(size_t height);
 
         void setRootDir(const std::string &rootDir);
+
+        void setPrecision(Precision precision);
     };
 
 } // eox

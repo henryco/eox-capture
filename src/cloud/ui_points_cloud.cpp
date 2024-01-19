@@ -643,7 +643,7 @@ namespace eox {
                     log->debug("HitNetDisparity matcher");
 
                     // todo fixme test more
-                    auto matcher = eox::adapt::HitNetMatcher::create(1280, 720);
+                    auto matcher = eox::adapt::HitNetMatcher::create(640, 480);
 
                     {
                         log->debug("initializing matcher from work directory implicitly");

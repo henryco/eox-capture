@@ -200,7 +200,7 @@ namespace eox::cli {
                 .append();
         stereo.add_argument("-a", "--algorithm")
                 .help("pattern matching algorithm [bm, sgbm]")
-                .choices("bm", "sgbm")
+                .choices("bm", "sgbm", "hitnet")
                 .default_value("bm");
         program.add_subparser(stereo);
 

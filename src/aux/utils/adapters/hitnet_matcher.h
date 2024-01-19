@@ -16,6 +16,8 @@ namespace eox::adapt {
         eox::dnn::HitNetDisparity instance;
 
     public:
+        HitNetMatcher &setPrecision(eox::dnn::Precision precision);
+
         HitNetMatcher &setWidth(size_t width);
 
         HitNetMatcher &setHeight(size_t height);
@@ -23,6 +25,8 @@ namespace eox::adapt {
         [[nodiscard]] size_t getWidth() const;
 
         [[nodiscard]] size_t getHeight() const;
+
+        [[nodiscard]] eox::dnn::Precision getPrecision() const;
 
         static cv::Ptr<HitNetMatcher> create();
 

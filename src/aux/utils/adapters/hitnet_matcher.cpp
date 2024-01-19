@@ -16,12 +16,21 @@ namespace eox::adapt {
         return *this;
     }
 
+    HitNetMatcher &HitNetMatcher::setPrecision(eox::dnn::Precision precision) {
+        instance.setPrecision(precision);
+        return *this;
+    }
+
     size_t HitNetMatcher::getWidth() const {
         return instance.getWidth();
     }
 
     size_t HitNetMatcher::getHeight() const {
         return instance.getHeight();
+    }
+
+    eox::dnn::Precision HitNetMatcher::getPrecision() const {
+        return instance.getPrecision();
     }
 
     cv::Ptr<HitNetMatcher> HitNetMatcher::create() {
@@ -87,6 +96,5 @@ namespace eox::adapt {
     void HitNetMatcher::setDisp12MaxDiff(int disp12MaxDiff) {
         // mock
     }
-
 
 } // eox

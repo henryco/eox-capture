@@ -20,7 +20,8 @@ namespace eox::dnn {
 
     std::string HitNetDisparity::get_model_file() {
         return root_dir +
-               "/hitnet_" + std::to_string(width) + "x" + std::to_string(height) + "_float32.tflite";
+               "/hitnet_" + std::to_string(width) + "x" + std::to_string(height) +
+               "_float" + std::to_string(precision) + ".tflite";
     }
 
     HitNetOutput HitNetDisparity::inference(const cv::_InputArray &left, const cv::_InputArray &right) {
@@ -80,6 +81,10 @@ namespace eox::dnn {
         return height;
     }
 
+    Precision HitNetDisparity::getPrecision() const {
+        return precision;
+    }
+
     const std::string &HitNetDisparity::getRootDir() const {
         return root_dir;
     }
@@ -96,6 +101,11 @@ namespace eox::dnn {
 
     void HitNetDisparity::setRootDir(const std::string &rootDir) {
         root_dir = rootDir;
+        reset();
+    }
+
+    void HitNetDisparity::setPrecision(Precision _precision) {
+        precision = _precision;
         reset();
     }
 
