@@ -3,10 +3,7 @@
 //
 
 #include "blaze_pose.h"
-
 #include <filesystem>
-
-#include "tensorflow/lite/delegates/gpu/delegate.h"
 
 namespace eox::dnn {
 
@@ -30,94 +27,26 @@ namespace eox::dnn {
         return interpreter.output_tensor(4)->data.f;
     }
 
-    const std::vector<std::string> BlazePose::outputs = {
-            "Identity:0",   // 598 | 0: [1, 195]           landmarks 3d
-            "Identity_4:0", // 600 | 1: [1, 117]           world 3d
-            "Identity_3:0", // 481 | 2: [1, 64, 64, 39]    heatmap
-            "Identity_2:0", // 608 | 3: [1, 128, 128, 1]   segmentation
-            "Identity_1:0", // 603 | 4: [1, 1]             pose flag (score)
-    };
-
-    BlazePose::BlazePose() {
-        if (!std::filesystem::exists(file)) {
-            log->error("File: " + file + " does not exists!");
-            throw std::runtime_error("File: " + file + " does not exists!");
-        }
-    }
-
-    BlazePose::~BlazePose() {
-        if (gpu_delegate) {
-            TfLiteGpuDelegateV2Delete(gpu_delegate);
-        }
-    }
-
-    void BlazePose::init() {
-        if (initialized)
-            return;
-
-        log->info("INIT");
-
-        model = std::move(tflite::FlatBufferModel::BuildFromFile(file.c_str()));
-        if (!model) {
-            log->error("Failed to load tflite model");
-            throw std::runtime_error("Failed to load tflite model");
-        }
-
-        tflite::ops::builtin::BuiltinOpResolver resolver;
-        tflite::InterpreterBuilder(*model, resolver)(&interpreter);
-        if (!interpreter) {
-            log->error("Failed to create tflite interpreter");
-            throw std::runtime_error("Failed to create tflite interpreter");
-        }
-
-        TfLiteGpuDelegateOptionsV2 options = TfLiteGpuDelegateOptionsV2Default();
-        gpu_delegate = TfLiteGpuDelegateV2Create(&options);
-
-        if (interpreter->ModifyGraphWithDelegate(gpu_delegate) != kTfLiteOk) {
-            log->error("Failed to modify graph with GPU delegate");
-            throw std::runtime_error("Failed to modify graph with GPU delegate");
-        }
-
-        if (interpreter->AllocateTensors() != kTfLiteOk) {
-            log->error("Failed to allocate tensors for tflite interpreter");
-            throw std::runtime_error("Failed to allocate tensors for tflite interpreter");
-        }
-
-        int i = 0;
-        for (const auto &item: interpreter->outputs()) {
-            log->info("T_O: {}, {}, {}", item, i, interpreter->GetOutputName(i));
-
-            auto tensor = interpreter->output_tensor(i);
-            log->info("size: {}", tensor->bytes);
-            i++;
-        }
-
-        initialized = true;
-    }
+//    const std::vector<std::string> BlazePose::outputs = {
+//            "Identity:0",   // 598 | 0: [1, 195]           landmarks 3d
+//            "Identity_4:0", // 600 | 1: [1, 117]           world 3d
+//            "Identity_3:0", // 481 | 2: [1, 64, 64, 39]    heatmap
+//            "Identity_2:0", // 608 | 3: [1, 128, 128, 1]   segmentation
+//            "Identity_1:0", // 603 | 4: [1, 1]             pose flag (score)
+//    };
 
     PoseOutput BlazePose::inference(cv::InputArray &frame) {
-        cv::Mat blob = eox::dnn::convert_to_squared_blob(frame.getMat(), in_resolution);
-
         // [1, 3, 256, 256]
+        cv::Mat blob = eox::dnn::convert_to_squared_blob(frame.getMat(), in_resolution);
         return inference(blob.ptr<float>(0));
     }
 
     PoseOutput BlazePose::inference(const float *frame) {
         init();
 
-        auto input = interpreter->input_tensor(0)->data.f;
-        std::memcpy(input, frame, in_resolution * in_resolution * 3 * 4); // 256*256*3*4 = 786432
+        input(0, frame, in_resolution * in_resolution * 3 * 4);
+        invoke();
 
-        if (interpreter->Invoke() != kTfLiteOk) {
-            log->error("Failed to invoke interpreter");
-            throw std::runtime_error("Failed to invoke interpreter");
-        }
-
-        return process();
-    }
-
-
-    PoseOutput BlazePose::process() {
         PoseOutput output;
 
         const auto presence = *pose_flag_1x1(*interpreter);
@@ -151,6 +80,10 @@ namespace eox::dnn {
             output.segmentation[i] = eox::dnn::sigmoid(s[i]);
         }
         return output;
+    }
+
+    std::string BlazePose::get_model_file() {
+        return "./../models/blazepose/blazepose_heavy_float32.tflite";
     }
 
 } // eox

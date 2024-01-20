@@ -15,10 +15,11 @@
 #include <tensorflow/lite/kernels/register.h>
 
 #include "dnn_common.h"
+#include "dnn_runner.h"
 
 namespace eox::dnn {
 
-    class BlazePose {
+    class BlazePose : DnnRunner<PoseOutput> {
         static inline const auto log =
                 spdlog::stdout_color_mt("blaze_pose");
 
@@ -26,23 +27,10 @@ namespace eox::dnn {
         static inline const std::string file = "./../models/blazepose/blazepose_heavy_float32.tflite";
         static inline const size_t in_resolution = 256;
 
-        static const std::vector<std::string> outputs;
-
-        std::unique_ptr<tflite::FlatBufferModel> model;
-        std::unique_ptr<tflite::Interpreter> interpreter;
-        TfLiteDelegate* gpu_delegate = nullptr;
-
-        bool initialized = false;
-
     protected:
-        PoseOutput process();
+        std::string get_model_file() override;
 
     public:
-        BlazePose();
-
-        ~BlazePose();
-
-        void init();
 
         /**
          * @param frame BGR image (ie. cv::Mat of CV_8UC3)
@@ -52,7 +40,7 @@ namespace eox::dnn {
         /**
          * @param frame pointer to 256x256 row-oriented 1D array representation of 256x256x3 RGB image
          */
-        PoseOutput inference(const float *frame);
+        PoseOutput inference(const float *frame) override;
     };
 
 } // eox
