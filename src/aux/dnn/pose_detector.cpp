@@ -17,10 +17,6 @@ namespace eox::dnn {
         const float *detector_scores_1x2254x1(const tflite::Interpreter &interpreter) {
             return interpreter.output_tensor(1)->data.f;
         }
-
-        double normalize_radians(double angle) {
-            return angle - 2 * M_PI * floor((angle + M_PI) / (2 * M_PI));
-        }
     }
 
 //    const std::vector<std::string> PoseDetector::outputs = {
@@ -102,7 +98,11 @@ namespace eox::dnn {
                 box.box.y = ((box.box.y * (float) in_resolution) - p.top) / n_h;
                 box.box.w = ((box.box.w * (float) in_resolution)) / n_w;
                 box.box.h = ((box.box.h * (float) in_resolution)) / n_h;
-                pose.face = box.box;
+
+                pose.face.x = box.box.x;
+                pose.face.y = box.box.y;
+                pose.face.w = box.box.w;
+                pose.face.h = box.box.h;
             }
 
             {
@@ -121,7 +121,7 @@ namespace eox::dnn {
                 pose.body = body;
 
                 const float angle = M_PI * 0.5 - std::atan2(-(end[1] - mid[1]), end[0] - mid[0]);
-                pose.rotation = eox::dnn::dtc::normalize_radians(angle);
+                pose.rotation = eox::dnn::normalize_radians(angle);
             }
 
             for (int i = 0; i < 4; i++) {

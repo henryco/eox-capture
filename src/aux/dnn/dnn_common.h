@@ -21,10 +21,22 @@ namespace eox::dnn {
         float x, y;
     };
 
+    using Box = struct {
+        float x, y, w, h;
+    };
+
     using RoI = struct {
         float x, y, w, h;
+
+        /**
+         * center
+         */
         Point c;
-        float r;
+
+        /**
+         * end
+         */
+        Point e;
     };
 
     using Coord3d = struct {
@@ -100,7 +112,7 @@ namespace eox::dnn {
         /**
          * Detected SSD box
          */
-        RoI box;
+        Box box;
 
         /**
          * Key point 0 - mid hip center
@@ -137,6 +149,8 @@ namespace eox::dnn {
     cv::Mat remove_paddings(const cv::Mat &in, int width, int height);
 
     RoI clamp_roi(const eox::dnn::RoI &roi, int width, int height);
+
+    double normalize_radians(double angle);
 }
 
 #endif //STEREOX_DNN_COMMON_H

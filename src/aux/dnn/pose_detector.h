@@ -23,7 +23,7 @@ namespace eox::dnn {
         /**
          * RoI for face
          */
-        RoI face;
+        Box face;
 
         /**
          * RoI for body

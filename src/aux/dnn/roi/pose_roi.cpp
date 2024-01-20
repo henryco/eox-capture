@@ -35,7 +35,8 @@ namespace eox::dnn {
         const float x2 = end.x;
         const float y2 = end.y;
 
-        const float radius = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2)) + margin;
+        const float dist = std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
+        const float radius = dist + margin;
 
         const float w = radius * 2.f * scale_x;
         const float h = radius * 2.f * scale_y;
@@ -43,11 +44,16 @@ namespace eox::dnn {
         const float x0 = x1 - (w / 2.f);
         const float y0 = y1 - (h / 2.f);
 
+        const float ex = x1 + (((x2 - x1) / dist) * radius * scale_x);
+        const float ey = y1 + (((y2 - y1) / dist) * radius * scale_y);
+
         return {
                 .x = std::max(0.f, x0 + fix_x),
                 .y = std::max(0.f, y0 + fix_y),
                 .w = std::max(0.f, w),
                 .h = std::max(0.f, h),
+                .c = Point(x1, y1),
+                .e = Point(ex, ey)
         };
     }
 

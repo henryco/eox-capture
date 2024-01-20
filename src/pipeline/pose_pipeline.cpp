@@ -73,6 +73,16 @@ namespace eox {
             body.w += (MARGIN / 2.f);
             body.h += (MARGIN / 2.f);
 
+            body.c.x *= frame.cols;
+            body.c.y *= frame.rows;
+            body.e.x *= frame.cols;
+            body.e.y *= frame.rows;
+
+            body.c.x += FIX_X - (MARGIN / 2.f);
+            body.c.y += FIX_Y - (MARGIN / 2.f);
+            body.e.x += FIX_X - (MARGIN / 2.f);
+            body.e.y += FIX_Y - (MARGIN / 2.f);
+
             auto &face = detected.face;
             face.x *= frame.cols;
             face.y *= frame.rows;
@@ -205,12 +215,7 @@ namespace eox {
             if (presence > threshold_presence || i > 32) {
                 cv::Point circle(point.x, point.y);
                 cv::Scalar color(255 * (1.f - visibility), 255 * visibility, 0);
-                cv::circle(output, circle, 2, color, 2);
-//                if (i > 32) {
-//                    cv::putText(output, std::to_string(i), cv::Point(circle.x - 10, circle.y - 10),
-//                                cv::FONT_HERSHEY_SIMPLEX, 1.25,
-//                                cv::Scalar(0, 0, 255), 2);
-//                }
+                cv::circle(output, circle, 2, color, 3);
 
                 if (i <= 32) {
                     cv::putText(output, std::to_string(visibility), cv::Point(circle.x - 10, circle.y - 10),
@@ -247,6 +252,24 @@ namespace eox {
         cv::line(output, p1, cv::Point(roi.x, roi.y + roi.h), color, 2);
         cv::line(output, p2, cv::Point(roi.x, roi.y + roi.h), color, 2);
         cv::line(output, p2, cv::Point(roi.x + roi.w, roi.y), color, 2);
+
+        cv::Point mid(roi.c.x, roi.c.y);
+        cv::Point end(roi.e.x, roi.e.y);
+        cv::Scalar pc(0, 255, 255);
+        cv::circle(output, mid, 3, pc, 3);
+        cv::circle(output, end, 3, pc, 3);
+
+        cv::putText(output,
+                    std::to_string(mid.x) + ", " +std::to_string(mid.y),
+                    cv::Point(40, 120),
+                    cv::FONT_HERSHEY_SIMPLEX, 0.7,
+                    cv::Scalar(0, 0, 255), 2);
+
+        cv::putText(output,
+                    std::to_string(end.x) + ", " +std::to_string(end.y),
+                    cv::Point(40, 160),
+                    cv::FONT_HERSHEY_SIMPLEX, 0.7,
+                    cv::Scalar(0, 0, 255), 2);
     }
 
     std::chrono::nanoseconds PosePipeline::timestamp() const {

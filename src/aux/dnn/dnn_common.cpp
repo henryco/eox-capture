@@ -125,7 +125,7 @@ namespace eox::dnn {
     }
 
     RoI clamp_roi(const RoI &in, int width, int height) {
-        auto roi = RoI(in.x, in.y, in.w, in.h, in.c, in.r);
+        auto roi = RoI(in.x, in.y, in.w, in.h, in.c, in.e);
 
 //        // clamping roi, not square
 //        const int s_x = std::max(0, (int) roi.x);
@@ -186,6 +186,10 @@ namespace eox::dnn {
         roi.w = c;
         roi.h = c;
         return roi;
+    }
+
+    double normalize_radians(double angle) {
+        return angle - 2 * M_PI * floor((angle + M_PI) / (2 * M_PI));
     }
 
 }

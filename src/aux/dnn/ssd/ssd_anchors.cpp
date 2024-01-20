@@ -145,7 +145,7 @@ namespace eox::dnn::ssd {
 
             // Add region
             regions.emplace_back(
-                    eox::dnn::RoI(
+                    eox::dnn::Box(
                             det_bbox[0],
                             det_bbox[1],
                             det_bbox[2],
